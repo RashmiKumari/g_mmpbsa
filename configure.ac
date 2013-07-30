@@ -1,0 +1,323 @@
+AC_INIT(g_mmpbsa, version-1.0)
+AC_CONFIG_HEADER(config.h)
+AC_MSG_NOTICE([g_mmpbsa: A tool for MMPBSA with GROMACS])
+AM_INIT_AUTOMAKE([g_mmpbsa], [1.0])
+
+cclist="gcc"
+f77list="gfortran g95 g77"
+
+AC_PROG_CC(${cclist})
+AC_PROG_F77(${f77list})
+
+dnl # -------------------------------------------------------------------------
+dnl # Test to see if the compiler combination is valid for gcc/g77 or
+dnl # gcc/gfortran/g95. Since code compiled with gcc 4.0 is only link
+dnl # compatible with gfortran/g95. If they are using g77 then they need to
+dnl # use gcc < 4.0 - D. Gohara 8/30/2006
+dnl # -------------------------------------------------------------------------
+if test ["$CC" = "gcc"]; then
+	gcc_version=`gcc --version`
+	gcc_complete_version=`echo ${gcc_version} | awk '{printf("%s",$3)}'`
+	gcc_major_version=`echo ${gcc_complete_version} | awk '{printf("%i",$1)}'`
+
+	if test ["$F77" = "g77"]; then
+		if test ["${gcc_major_version}" -ge 4]; then
+			AC_MSG_ERROR([Error, your GCC version is: ${gcc_complete_version} which is not compatible])
+			AC_MSG_ERROR([with g77. You need to either use gcc < 4.0 as your C/CC/CXX compiler])
+			AC_MSG_ERROR([or gfortran/g95 as your Fortran compiler ... exiting.])
+		fi
+	fi
+fi
+
+dnl # To check Math Library
+if $CC -V 2>&1 | grep 'Intel Corporation' > /dev/null 2>&1; then
+  AC_MSG_NOTICE([Using built-in math library with intel compiler])
+else
+  AC_CHECK_LIB(m,sqrt,,AC_MSG_ERROR([No math library found]))
+fi
+
+
+dnl #----------------------------------------------
+dnl #To Check the Path of GROMACS Headers Directory
+dnl #----------------------------------------------
+AC_MSG_CHECKING([for --with-gmx-include option])
+AC_ARG_WITH(
+                [gmx-include],
+                AS_HELP_STRING([--with-gmx-include=PATH], [full path to the GROMACS Include Directory]),
+                [gmx_include_path=$withval]
+        )
+if test x"$gmx_include_path" != "xno" -a -n "$gmx_include_path"; then
+	AC_MSG_RESULT([${gmx_include_path}])
+else
+	AC_MSG_RESULT([no])
+	AC_MSG_NOTICE([WARNING: Path to GROMACS Inculde directory not provided])
+	AC_MSG_NOTICE([checking for GROMACS Inlcude Directory in standard location])
+	AC_CHECK_FILE(/usr/local/include/gromacs,[a="yes"],[a="no"])
+	if test x"$a" = "xyes"; then
+        	gmx_include_path="/usr/local/include"
+	fi
+
+	if test x"$a" = "xno" ; then
+        	AC_CHECK_FILE(${HOME}/include/gromacs,[b="yes"],[b="no"])
+	fi
+
+	if test x"$b" = "xyes"; then
+        	gmx_include_path="${HOME}/include"
+	fi
+
+	if test [ x"$a" = "xno" ] -a  [ x"$b" = "xno" ] ; then
+		AC_MSG_ERROR([Please Specify the path to GROMACS Inlcude Directory
+                e.g. --with-gmx-include=/path/to/include])
+        fi
+fi
+
+gmx_include_path=${gmx_include_path}/gromacs
+AC_CHECK_FILES([${gmx_include_path}/statutil.h 
+		${gmx_include_path}/typedefs.h
+		${gmx_include_path}/smalloc.h
+		${gmx_include_path}/copyrite.h
+		${gmx_include_path}/vec.h
+		${gmx_include_path}/tpxio.h
+		${gmx_include_path}/rmpbc.h
+		${gmx_include_path}/xvgr.h
+		${gmx_include_path}/readinp.h
+		${gmx_include_path}/warninp.h
+		${gmx_include_path}/string2.h ],[a="yes"],[a=""])
+
+if test -z "$a"; then
+	AC_MSG_ERROR([Could not find GROMACS Header files in ${gmx_include_path}])
+fi
+
+gmx_include="-I${gmx_include_path} -static"
+AC_SUBST(gmx_include)
+
+#------------------------------------
+# To check the Path of GROMACS Library
+#-----------------------------------
+AC_MSG_CHECKING([for --with-gmx-lib option])
+AC_ARG_WITH(
+                [gmx-lib],
+                AS_HELP_STRING([--with-gmx-lib=PATH], [full path to the GROMACS Library Directory]),
+                [gmx_lib_path=$withval]
+        )
+
+if test x"$gmx_lib_path" != "xno" -a -n "$gmx_lib_path"; then
+	AC_MSG_RESULT([${gmx_lib_path}])
+
+	#       libgmx.a
+	AC_CHECK_FILE(${gmx_lib_path}/libgmx.a,[a="yes"],[a=""])
+	if test -z "$a"; then
+        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmx.a library file])
+	fi
+
+	#       libgmxana.a
+	AC_CHECK_FILE(${gmx_lib_path}/libgmxana.a,[a="yes"],[a=""])
+	if test -z "$a"; then
+        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmxana.a library file])
+	fi
+	#       libmd.a
+	AC_CHECK_FILE(${gmx_lib_path}/libmd.a,[a="yes"],[a=""])
+	if test -z "$a"; then
+        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libmd.a library file])
+	fi
+else
+	AC_MSG_RESULT([no])
+	AC_MSG_NOTICE([WARNING: Path to GROMACS Libraries not provided])
+	AC_MSG_NOTICE([checking for GROMACS Libraries in standard location])
+	AC_CHECK_FILES([/usr/local/lib/libgmx.a
+			/usr/local/lib/libgmxana.a
+			/usr/local/lib/libmd.a ], [a="yes"],[a="no"])
+	if test x"$a" = "xyes"; then
+        	gmx_lib_path="/usr/local/lib"
+	fi
+
+	if test x"$a" = "xno" ; then
+        	AC_CHECK_FILES([${HOME}/lib/libgmx.a
+	                	${HOME}/lib/libgmxana.a
+        	        	${HOME}/lib/libmd.a ], [b="yes"],[b="no"])
+	fi
+
+	if test x"$b" = "xyes"; then
+        	gmx_lib_path="${HOME}/lib"
+	fi
+
+	if test [ x"$a" = "xno" ] -a  [ x"$b" = "xno" ] ; then
+		AC_MSG_ERROR([GROMACS Libraries not found at the standard location. 
+                Please provide the path e.g. --with-gmx-lib=/path/to/lib])
+	fi
+fi
+
+lib_path_list="-L${gmx_lib_path}"
+lib_list="-lgmx -lgmxana -lmd -ldl -pthread"
+#------------------------------------
+# To check the Path of APBS Library
+#-----------------------------------
+AC_MSG_CHECKING([for --with-apbs-lib option])
+AC_ARG_WITH(
+		[apbs-lib],
+		AS_HELP_STRING([--with-apbs-lib=PATH], [full path to the APBS Library Directory]),
+		[apbs_lib_path=$withval]
+	)
+if test x"$apbs_lib_path" != "xno" -a -n "$apbs_lib_path"; then
+	AC_MSG_RESULT([${apbs_lib_path}])
+	
+	#       libapbsmainroutines.a
+        AC_CHECK_FILE(${apbs_lib_path}/libapbsmainroutines.a,[a="yes"],[a=""])
+        if test -z "$a"; then
+                AC_MSG_ERROR([Could not find ${apbs_lib_path}/libapbsmainroutines.a library file])
+        fi
+
+        #       libapbs.a
+        AC_CHECK_FILE(${apbs_lib_path}/libapbs.a,[a="yes"],[a=""])
+        if test -z "$a"; then
+                AC_MSG_ERROR([Could not find ${apbs_lib_path}/libapbs.a library file])
+        fi
+else
+	AC_MSG_RESULT([no])
+	AC_MSG_NOTICE([WARNING: Path to APBS Libraries not provided])
+	AC_MSG_NOTICE([checking for APBS Libraries in standard location])
+	AC_CHECK_FILES([/usr/local/lib/libapbsmainroutines.a
+                	/usr/local/lib/libapbs.a ], [a="yes"],[a="no"])
+	if test x"$a" = "xyes"; then
+        	apbs_lib_path="/usr/local/lib"
+	fi
+
+	if test x"$a" = "xno" ; then
+        	AC_CHECK_FILES([${HOME}/lib/libapbsmainroutines.a
+                        	${HOME}/lib/libapbs.a ], [b="yes"],[b="no"])
+	fi
+
+	if test x"$b" = "xyes"; then
+        	apbs_lib_path="${HOME}/lib"
+	fi
+
+	if test [ x"$a" = "xno" ] -a [ x"$b" = "xno" ] ; then
+        	AC_MSG_ERROR([APBS Libraries not found in standard location
+		Please provide the path e.g. --with-apbs-lib=/path/to/lib
+		which should contains libapbsmainroutines.a and libapbs.a files])
+	fi
+fi
+
+lib_path_list="${lib_path_list} -L${apbs_lib_path}"
+lib_list="${lib_list} -lapbsmainroutines -lapbs"
+
+#-------------------------------------------------
+# To check the Path of APBS Source Code Directory
+#-------------------------------------------------
+AC_MSG_CHECKING([for --with-apbs option])
+AC_ARG_WITH(
+        [apbs],
+        AS_HELP_STRING([--with-apbs=PATH], [full path to the APBS Source Code Directory]),
+        [apbs_path=$withval]
+)
+if test x"$apbs_path" != "xno" -a -n "$apbs_path"; then
+        AC_MSG_RESULT([${apbs_path}])
+else
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([Please Specify the path to APBS Source Code Directory])
+fi
+
+#	libapbsblas.a
+AC_CHECK_FILE(${apbs_path}/contrib/lib/libapbsblas.a,[a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Could not find ${apbs_path}/contrib/lib/libapbsblas.a library file])
+fi
+
+#	libmaloc.a
+AC_CHECK_FILE(${apbs_path}/contrib/lib/libmaloc.a,[a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Could not find ${apbs_path}/contrib/lib/libmaloc.a library file])
+fi
+
+#	libapbsgen.a
+AC_CHECK_FILE(${apbs_path}/src/generic/.libs/libapbsgen.a,[a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Could not find ${apbs_path}/src/generic/.libs/libapbsgen.a library file])
+fi
+
+#	libz.a
+AC_CHECK_FILE(${apbs_path}/contrib/zlib/.libs/libz.a,[a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Could not find ${apbs_path}/contrib/zlib/.libs/libz.a library file])
+fi
+
+lib_path_list="${lib_path_list} -L${apbs_path}/contrib/lib -L${apbs_path}/src/generic/.libs -L${apbs_path}/contrib/zlib/.libs"
+lib_list="${lib_list} -lapbsblas -lmaloc -lapbsgen -lz -static-libgfortran"
+
+#-------------------------------------------------
+# To check the Path of APBS Source Code Directory
+#-------------------------------------------------
+
+AC_CHECK_FILES([${apbs_path}/src/aaa_inc/apbscfg.h
+	        ${apbs_path}/src/aaa_inc/apbs/apbs.h
+                ${apbs_path}/src/aaa_inc/apbs/vhal.h
+	        ${apbs_path}/src/aaa_inc/apbs/nosh.h
+	        ${apbs_path}/src/aaa_inc/apbs/vgrid.h
+	        ${apbs_path}/src/aaa_inc/apbs/mgparm.h
+	        ${apbs_path}/src/aaa_inc/apbs/pbeparm.h
+	        ${apbs_path}/src/aaa_inc/apbs/femparm.h
+		${apbs_path}/src/aaa_inc/apbs/vparam.h
+                ${apbs_path}/src/aaa_inc/apbs/vacc.h],
+              [a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Header files not found])
+fi
+
+AC_CHECK_FILE(${apbs_path}/contrib/include/maloc/maloc.h,[a="yes"],[a=""])
+if test -z "$a"; then
+        AC_MSG_ERROR([Could not find ${apbs_path}/contrib/include/maloc/maloc.h file])
+fi
+
+apbs_include="-I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
+AC_SUBST(apbs_include)
+
+dnl # -----------------------
+dnl # CHECK WHETHER YOU WANT TO DISABLE OPENMP SUPPORT
+dnl # -----------------------
+AC_MSG_CHECKING([for --disable-openmp])
+AC_ARG_ENABLE(
+	[openmp],
+	AS_HELP_STRING([--disable-openmp],[disables OpenMP compiler support]),,
+	[disable_openmp=yes]
+)
+if test x"$disable_openmp" != "xyes"; then
+    AC_MSG_RESULT([yes])
+else
+    AC_MSG_RESULT([no])
+	if [[ "${CC}" = "icc" ] && [ "${F77}" = "ifort" ]]; then
+		FFLAGS="${FFLAGS} -openmp -assume cc_omp"
+		LDFLAGS="${LDFLAGS} -static-intel"
+	fi
+	
+	if [[ "${CC}" = "gcc" ] && [ "${F77}" = "gfortran" ]]; then
+		gcc_version=`gcc --version`
+		gcc_complete_version=`echo ${gcc_version} | awk '{printf("%s",$3)}' | awk -F'.' '{print $1$2}'`
+		
+		if test ["${gcc_complete_version}" -ge 42]; then
+			FFLAGS="${FFLAGS} -fopenmp"
+		else
+		    AC_MSG_RESULT([WARNING])
+			AC_MSG_RESULT([WARNING Version of gcc/gfortran does not support OpenMP. Disabling.])
+			AC_MSG_RESULT([WARNING])
+		fi
+	fi
+fi
+
+##To add library path and libraies as a variable
+AC_SUBST(lib_path_list)
+AC_SUBST(lib_list)
+
+## Extra CPP FLAGS
+CPPFLAGS="$CPPFLAGS -c -fomit-frame-pointer -finline-functions -pthread -Wno-unused -msse2 -funroll-all-loops"
+
+## MAKEFILES
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([src/Makefile])
+
+## Configure output files
+AC_OUTPUT
+
+AC_MSG_NOTICE([
+g_mmpbsa to be compiled with following settings:  ${CC} ${CFLAGS} ${gmx_include} ${apbs_include}
+g_mmpbsa to be linked with following settings: ${F77} ${FFLAGS} ${lib_path_list} ${lib_list} ${LDFLAGS}
+])
