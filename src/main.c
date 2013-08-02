@@ -279,9 +279,9 @@ gmx_do_mmpbsa(int argc, char *argv[])
   matrix box;
   t_atoms *atoms;
   char *atomtype, *resname, *atomname, **modresname = NULL;
-  real *tmpEE, *tmpVdw;
+  real *tmpEE=NULL, *tmpVdw=NULL;
   real tmpArea = 0, tmpVolume = 0, Area = 0, Volume = 0, **radiusA = NULL, **radiusB = NULL, **radiusAB = NULL;
-  double *TempAtomAPolA, *TempAtomAPolB, *TempAtomAPolAB;
+  double *TempAtomAPolA=NULL, *TempAtomAPolB=NULL, *TempAtomAPolAB=NULL;
   real **atomAreaA=NULL, **atomAreaB=NULL,**atomAreaAB=NULL;
   t_AtomProp radtype, gamma;
   int eRadType = 0;
@@ -322,7 +322,7 @@ gmx_do_mmpbsa(int argc, char *argv[])
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT | PCA_BE_NICE, NFILE, fnm,
       asize(pa), pa, asize(desc), desc, 0, NULL, &oenv);
 
-  if(!fn2bTPX(ftp2fn(efTPS, NFILE, fnm)))
+  if(!fn2bTPX(ftp2fn(efTPX, NFILE, fnm)))
 	  gmx_fatal(FARGS, "tpr file is necessary\n");
 
   if ((!bPBSA) && (!bMM))
@@ -350,7 +350,7 @@ gmx_do_mmpbsa(int argc, char *argv[])
     }
 
 
-  read_tps_conf(ftp2fn(efTPS, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
+  read_tps_conf(ftp2fn(efTPX, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
   atoms = &(top.atoms);
 
   ////Modify residue name having same name but different structure////
@@ -567,7 +567,7 @@ gmx_do_mmpbsa(int argc, char *argv[])
   //BUILDING INDEX OF EACH RESIDUE FOR DECOMPOSITION CALCULATION
   int nres = 0, prev_res, curr_res; //nres = total number of residue
   int *resnmr = NULL, *ResIsize = NULL, *ResIstart = NULL; //resnmr = residue number, ResIsize = No. of atoms in each residue; Array indices according to nres
-  gmx_bool *bResA, *bResB;
+  gmx_bool *bResA=NULL, *bResB=NULL;
 
   if (bDCOMP)
     {
@@ -761,11 +761,11 @@ gmx_do_mmpbsa(int argc, char *argv[])
   //Reading trajectory file
   do
     {
-	  double *TempAtomAreaA, *TempAtomAreaB, *TempAtomAreaAB;
-	  double *TempAtomVolA, *TempAtomVolB, *TempAtomVolAB;
-	  double *TempAtomWcaA, *TempAtomWcaB, *TempAtomWcaAB;
-	  double *TempAtomPolA, *TempAtomPolB, *TempAtomPolAB;
-	  double *ResEnergyPol, *ResEnergyAPol;
+	  double *TempAtomAreaA=NULL, *TempAtomAreaB=NULL, *TempAtomAreaAB=NULL;
+	  double *TempAtomVolA=NULL, *TempAtomVolB=NULL, *TempAtomVolAB=NULL;
+	  double *TempAtomWcaA=NULL, *TempAtomWcaB=NULL, *TempAtomWcaAB=NULL;
+	  double *TempAtomPolA=NULL, *TempAtomPolB=NULL, *TempAtomPolAB=NULL;
+	  double *ResEnergyPol=NULL, *ResEnergyAPol=NULL;
 
 	  snew(TempAtomWcaA,isize[0]); snew(TempAtomWcaB,isize[1]); snew(TempAtomWcaAB,isize[2]);
 	  snew(TempAtomPolA,isize[0]); snew(TempAtomPolB,isize[1]); snew(TempAtomPolAB,isize[2]);
