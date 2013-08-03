@@ -546,9 +546,13 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   int   iat_xx,jat_xx;
 
  ////////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM/////
-  double *atom_vol;
-  if (mode & FLAG_ATOM_AREA)
-	  snew(atom_vol,nat);
+  double *atom_vol=NULL;
+  if (mode & FLAG_ATOM_AREA)	{
+	  if(atom_vol == NULL)
+		  snew(atom_vol,nat);
+	  else
+		  srenew(atom_vol,nat);
+  }
 ////////////////////////////////////////////////////////////////
 
   distribution = unsp_type(densit);
@@ -929,10 +933,12 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
     *lidots = dots;
   }
   if (mode & FLAG_ATOM_AREA) {
-    *at_area = atom_area;
-    ////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM//////
-        *at_vol = atom_vol;
-    /////////////////////////////////////////////////////////
+	////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM//////
+    if(at_area != NULL)
+    	*at_area = atom_area;
+    if(at_vol != NULL)
+    	*at_vol = atom_vol;
+   /////////////////////////////////////////////////////////
   }
 
 
