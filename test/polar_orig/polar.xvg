@@ -1,0 +1,42 @@
+# This file was created Tue Sep 17 23:26:45 2013
+# by the following command:
+# g_mmpbsa -f ../data/1EBZ.xtc -s ../data/1EBZ.tpr -i mmpbsa.mdp -n ../data/1EBZ.ndx -pbsa -decomp -pol polar.xvg -pcon contrib_pol.dat -nomme 
+#
+# g_mmpbsa is part of G R O M A C S:
+#
+# Groningen Machine for Chemical Simulation
+#
+@    title "Polar solvation energy"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "Energy (kJ/mol)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "Protein PB energy"
+@ s1 legend "BEC PB energy"
+@ s2 legend "Protein=BEC PB energy"
+          0.000      -5773.909	       -156.352	      -5618.778
+        500.000      -5997.458	       -167.312	      -5846.395
+       1000.000      -5894.192	       -169.493	      -5745.012
+       1500.000      -6016.903	       -169.860	      -5860.071
+       2000.000      -6133.890	       -160.694	      -5988.577
+       2500.000      -6145.625	       -162.830	      -5985.939
+       3000.000      -5903.187	       -156.027	      -5732.557
+       3500.000      -6058.268	       -162.494	      -5931.014
+       4000.000      -6102.356	       -157.377	      -5945.168
+       4500.000      -6101.519	       -157.431	      -5940.082
+       5000.000      -6265.494	       -162.247	      -6102.700
+       5500.000      -6204.807	       -168.341	      -6067.537
+       6000.000      -6216.235	       -174.073	      -6065.843
+       6500.000      -6192.023	       -162.153	      -6044.420
+       7000.000      -6168.590	       -168.032	      -6027.376
+       7500.000      -6212.893	       -153.430	      -6055.818
+       8000.000      -6241.852	       -154.987	      -6099.427
+       8500.000      -6550.849	       -153.322	      -6407.546
+       9000.000      -6515.995	       -169.557	      -6363.711
+       9500.000      -6349.398	       -164.621	      -6192.253
+      10000.000      -6422.679	       -158.866	      -6269.738

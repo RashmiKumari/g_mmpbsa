@@ -804,7 +804,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
             {
         	  if(APolarKeyWords.gamma != 0)
         	  {
-        		  if (Mod_nsc_dclm_pbc(x, radiusA[eSASRAD], isize[0], ndots, FLAG_VOLUME , &tmpArea, NULL, &tmpVolume, NULL, NULL, NULL, index[0], ePBC, NULL ) != 0)
+        		  if (Mod_nsc_dclm_pbc(x, radiusA[eSASRAD], isize[0], ndots, FLAG_ATOM_AREA , &tmpArea, NULL, &tmpVolume, NULL, NULL, NULL, index[0], ePBC, NULL ) != 0)
         			  gmx_fatal(FARGS, "Something wrong in the nsc_dclm_pbc\n");
         		  fprintf(fAPolar, "%15.3lf%15.3lf", t, (tmpArea*APolarKeyWords.gamma*100)+APolarKeyWords.sasaconst);
         	  }
@@ -1047,6 +1047,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   while (read_next_x(oenv, status, &t, natoms, x, box));
 
   cite(bPolar, bAPolar, APolarKeyWords);
+  remove("io.mc");
   fprintf(stderr,"\n\nThanks for using g_mmpbsa.\n\n");
   return 0;
 }

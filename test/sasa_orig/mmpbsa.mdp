@@ -1,0 +1,129 @@
+;Polar calculation: "yes" or "no"
+polar		= no
+
+;=============
+;PSIZE options
+;=============
+;Factor by which to expand molecular dimensions to get coarsegrid dimensions.
+cfac 		= 1.5
+
+;The desired fine mesh spacing (in A)
+gridspace 	= 0.5
+
+:Amount (in A) to add to molecular dimensions to get fine grid dimensions.
+fadd 		= 5
+
+;Maximum memory (in MB) available per-processor for a calculation.
+gmemceil 	= 4000
+
+;=============================================
+;APBS kwywords for polar solvation calculation
+;=============================================
+;Charge of positive ions
+pcharge 	= 1
+
+;Radius of positive charged ions
+prad		= 0.95
+
+;Concentration of positive charged ions
+pconc           = 0.150 
+
+;Charge of negative ions
+ncharge 	= -1
+
+;Radius of negative charged ions
+nrad		= 1.81
+
+;Concentration of negative charged ions
+nconc 		= 0.150
+
+;Solute dielectric constant
+pdie 		= 2
+
+;Solvent dielectric constant
+sdie 		= 80
+
+;Reference or vacuum dielectric constant
+vdie 		= 1
+
+;Solvent probe radius
+srad 		= 1.4
+
+;Method used to map biomolecular charges on grid. chgm = spl0 or spl2 or spl4
+chgm            = spl4
+
+;Model used to construct dielectric and ionic boundary. srfm = smol or spl2 or spl4
+srfm            = smol
+
+;Value for cubic spline window. Only used in case of srfm = spl2 or spl4.
+swin 		= 0.30
+
+;Numebr of grid point per A^2. Not used when (srad = 0.0) or (srfm = spl2 or spl4)
+sdens 		= 10
+
+;Temperature in K
+temp 		= 300
+
+;Type of boundary condition to solve PB equation. bcfl = zero or sdh or mdh or focus or map
+bcfl 		= mdh
+
+;Non-linear (npbe) or linear (lpbe) PB equation to solve
+PBsolver 	= lpbe
+
+
+;========================================================
+;APBS kwywords for Apolar/Non-polar solvation calculation
+;========================================================
+;Non-polar solvation calculation: "yes" or "no"
+apolar		= yes
+
+;Repulsive contribution to Non-polar 
+;===SASA model ====
+
+;Gamma (Surface Tension) kJ/(mol A^2)
+gamma           = 0.0226778
+
+;Probe radius for SASA (A)
+sasrad          = 1.4
+
+;Offset (c) kJ/mol
+sasaconst       = 3.84928
+
+;===SAV model===
+;Pressure kJ/(mol A^3)
+press           = 0
+
+;Probe radius for SAV (A)
+savrad          = 0
+
+;Offset (c) kJ/mol
+savconst        = 0
+
+;Attractive contribution to Non-polar
+;===WCA model ====
+;using WCA method: "yes" or "no"
+WCA             = no
+
+;Probe radius for WCA
+wcarad          = 1.20
+
+;bulk solvent density in A^3
+bconc		= 0.033428
+
+;displacment in A for surface area derivative calculation
+dpos		= 0.05
+
+;Quadrature grid points per A for molecular surface or solvent accessible surface
+APsdens		= 20
+
+;Quadrature grid spacing in A for volume integral calculations
+grid            = 0.45 0.45 0.45
+
+;Parameter to construct solvent related surface or volume
+APsrfm          = sacc
+
+;Cubic spline window in A for spline based surface definitions
+APswin          = 0.3
+
+;Temperature in K
+APtemp          = 300

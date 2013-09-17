@@ -547,7 +547,7 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 
  ////////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM/////
   double *atom_vol=NULL;
-  if (mode & FLAG_ATOM_AREA)	{
+  if (mode & FLAG_VOLUME)	{
 	  if(atom_vol == NULL)
 		  snew(atom_vol,nat);
 	  else
@@ -902,7 +902,7 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 	    }
 
 //////////////////////////////////////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM///////////////////////////////////////
-	    if (mode & FLAG_ATOM_AREA)
+	    if (mode & FLAG_VOLUME)
 	    	atom_vol[wkatm[iat]] = (aisq*(dx*(xi-xs)+dy*(yi-ys)+dz*(zi-zs)+ai* (real) i_ac) ) * (FOURPI/(3.* (real) n_dot));
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -936,6 +936,8 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 	////ADDED FOR SOLVENT ACCESSIBLE VOLUME OF EACH ATOM//////
     if(at_area != NULL)
     	*at_area = atom_area;
+  }
+  if (mode & FLAG_VOLUME) {
     if(at_vol != NULL)
     	*at_vol = atom_vol;
    /////////////////////////////////////////////////////////
