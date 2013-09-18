@@ -6,3 +6,7 @@ g_mmpbsa is developed using two widely used open source softwares i.e. GROMACS a
 This tool expected to be useful because (i) it is an open source tool and can be modified under the terms of the GNU public license, (ii) it is implemented through open source softwares i.e. GROMACS and APBS, making it accessible to large number of users, (iii) easy installation by downloading the compressed file (i.e. zip) with similar steps as required for other softwares having tar.gz format, (iv) it provides user to choose different van der Waal radii for solvation free energy calculation, (v) it has choice for selection of different nonpolar solvation model available till date, (vi) it calculates different components of binding energy and residue wise energy contribution to binding simultaneously and thus is computationally less expensive.
 
 This tool can be modified and/or redistributed under terms of GNU public license. In case of any problem one can contact us and we will try our best to provide the solution.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/RashmiKumari/g_mmpbsa/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
