@@ -8,7 +8,7 @@ The development of g_mmpbsa package is initiated under [Open Source Drug Discove
 * Easy installation by downloading the compressed file [(zip/tarball)](https://github.com/RashmiKumari/g_mmpbsa/releases) and steps are given in [wiki](https://github.com/RashmiKumari/g_mmpbsa/wiki).
 * It provides user to choose different van der Waal radii for solvation free energy calculation using implicit solvent models.
 * It has options for several non-polar solvation model such as SASA, SAV and Weeks–Chandler–Andersen (WCA).
-* Binding energy decomposition scheme is implemented through MM-PBSA scheme as contrast to other packages, in which scheme is implemented through MM-GBSA only. 
+* Binding energy decomposition scheme is implemented through MM--PBSA scheme as contrast to other packages, in which scheme is implemented through MM-GBSA only. 
 * It calculates different components of binding energy and residue wise energy contribution to binding simultaneously and thus is computationally less expensive.
 
 This tool can be modified and/or redistributed under terms of GNU public license. In case of any problem one can contact us and we will try our best to provide the solution.
