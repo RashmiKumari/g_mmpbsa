@@ -15,6 +15,7 @@
   </head>
   <body>
     <div class="wrapper">
+
       <header>
         <h1 class="header">g_mmpbsa</h1>
         <p class="header">MM/PBSA method for GROMACS.</p>
@@ -23,15 +24,35 @@
           <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
           <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
           <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
-        </ul>
-
+        </ul
+	  	
         <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
 
 
       </header>
+	  
       <section>
-        <h4>
-<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h4>
+	  <nav>
+	  	<ul>
+			<li class="navigation"><a href="index.html">Introduction</a></li>
+			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+			<li class="navigation"><a href="How-to-Run.html">How to run?</a>
+				<ul>
+					<li class="navigation"><a href="Input-Files.html">Input-Files</a></li>
+					<li class="navigation"><a href="Output-Files.html">Output-Files</a></li>
+				</ul>
+			</li>
+			<li class="navigation"><a href="Usage.html">Usage</a></li>
+			<li class="navigation"><a href="#">Parameters</a>
+				<ul>
+					<li class="navigation"><a href="Polar-solvation-input-parameters.html">Polar solvation parameters</a></li>
+					<li class="navigation"><a href="Non-polar-solvation-input-parameters.html">Non-polar solvation parameters</a></li>
+				</ul>
+			</li>
+		</ul>
+		</nav>
+
+        <h4> <a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h4>
 
 <p>The development of g_mmpbsa package is initiated under <a href="http://www.osdd.net/">Open Source Drug Discovery Consortium (OSDD)</a> which is a collaborative platform to discover new drugs for neglected tropical diseases like Malaria, Tuberculosis, Leshmaniasis, etc. g_mmpbsa is developed using two widely used open source software i.e. <a href="http://www.gromacs.org/">GROMACS</a> and     <a href="http://www.poissonboltzmann.org/apbs">APBS</a> and it has similar user interface like other GROMACS tools. The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme. The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.</p>
 
