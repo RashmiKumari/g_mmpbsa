@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>g_mmpbsa by RashmiKumari</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+
+      <header>
+        <h1 class="header">g_mmpbsa</h1>
+        <p class="header">MM/PBSA method for GROMACS.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
+        </ul
+	  	
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
+
+
+      </header>
+	  
+      <section>
+	  <nav>
+	  	<ul>
+			<li class="navigation"><a href="index.html">Introduction</a></li>
+			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+			<li class="navigation"><a href="How-to-Run.html">How to run?</a>
+				<ul>
+					<li class="navigation"><a href="Input-Files.html">Input-Files</a></li>
+					<li class="navigation"><a href="Output-Files.html">Output-Files</a></li>
+				</ul>
+			</li>
+			<li class="navigation"><a href="Usage.html">Usage</a></li>
+			<li class="navigation"><a href="#">Parameters</a>
+				<ul>
+					<li class="navigation"><a href="Polar-solvation-input-parameters.html">Polar solvation parameters</a></li>
+					<li class="navigation"><a href="Non-polar-solvation-input-parameters.html">Non-polar solvation parameters</a></li>
+				</ul>
+			</li>
+		</ul>
+		</nav>
+
+		<hr>
+        <h4> <a name="Requirement" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Requirement</h4>
+
+<h5>1. GROMACS 4.5.x</h5>
+
+<pre><code> Required Libraries : libgmx.a, libgmxana.a and libmd.a </code></pre>
+
+<p><a href="http://www.gromacs.org/">GROMACS</a> should be compiled and installed from the source-code. Static library is required for the compilation. </p>
+
+<h5>2. APBS 1.2.x or 1.3.x</h5>
+
+<pre><code>Required Libraries : libapbsmainroutines.a, libapbs.a, libapbsblas.a, 
+                     libmaloc.a, libapbsgen.a and libz.a </code></pre>
+
+<p><a href="http://www.poissonboltzmann.org/apbs">APBS</a> should be compiled and installed from the source-code. Downloaded binaries and libraries would not work as some required libraries are missing.</p>
+
+<h5>Parallel support</h5>
+
+<p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x or 1.3.x. This parallel support is enabled by default and all processors/core will be used during run-time.</p>
+
+<p>To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
+<pre><code> export OMP_NUM_THREADS=X </code></pre>
+where <code>X</code> is number of core/processors.</p>
+
+<hr>
+
+<p><strong>Note:</strong>
+During installation and execution of program, errors may appear. Solution of the errors are given below in <a href="#list-of-errors">list</a> which will be regularly updated.</p>
+
+<hr>
+
+<h3>Download</h3>
+
+<p><strong>1. ZIP/TAR</strong></p>
+
+<p>The <a href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">ZIP</a> file or <a href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">TAR</a> for the tool can be downloaded from <a href="https://github.com/RashmiKumari/g_mmpbsa">github</a>. Also, these files can be downloaded from the left side of current webpage. After downloading the file, extract ZIP/TAR file. </p>
+
+<p><strong>2. Using git</strong></p>
+
+<pre><code> git clone https://github.com/RashmiKumari/g_mmpbsa </code></pre>
+
+<hr>
+
+<h3>Installation</h3>
+
+<h5>1. Configure to install</h5>
+
+<p>To get detailed options</p>
+
+<pre><code>./configure --help </code></pre>
+
+<p><strong><em>Defining Path to GROMACS and APBS headers and libraries files</em></strong></p>
+
+<p>Path to GROMACS include directory</p>
+
+<pre><code> --with-gmx-include=/opt/gromacs-4.5.5/include </code></pre>
+
+<p>Path to GROMACS Libraries files</p>
+
+<pre><code> --with-gmx-lib=/opt/gromacs-4.5.5/lib </code></pre>
+
+<p>Path to APBS Libraries files</p>
+
+<pre><code> --with-apbs-lib=/usr/local/lib </code></pre>
+
+<p>Path to APBS source directory</p>
+
+<pre><code> --with-apbs=/opt/apbs-1.3-source </code></pre>
+
+<p>Use above options/path to configure</p>
+
+<pre><code> ./configure --with-gmx-include=/opt/gromacs-4.5.5/include --with-gmx-lib=/opt/gromacs-4.5.5/lib --with-apbs-lib=/usr/local/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
+
+<h5>2. make</h5>
+
+<pre><code> make </code></pre>
+
+<h5>3. Install</h5>
+
+<pre><code> make install </code></pre>
+
+<hr>
+
+<h3 id="list-of-errors">List of Errors</h3>
+
+<ul>
+<li>Static gfortran library missing
+<pre><code> /usr/bin/ld: cannot find -lgfortran </code></pre>
+Please, install static gfortran library file &quot; <strong>libgfortran.a</strong> &quot;.</li>
+</ul>
+
+<hr>
+
+<ul>
+<li>During execution of g_mmpbsa, error of shared object file.
+<pre><code> ./g_mmpbsa: error while loading shared libraries: libgmx.so.6: cannot open shared object file: No such file or directory </code></pre>
+Try to locate file libgmx.so.6 and put this path in library path. For example, if libgmx.so.6 is present in &quot;/usr/local/gromacs/lib&quot; directory, please follow this step:
+<pre><code> export LD_LIBRARY_PATH=/usr/local/gromacs/lib </code></pre></li>
+</ul>
+
+<hr>      
+</section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>

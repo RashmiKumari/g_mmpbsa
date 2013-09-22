@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>g_mmpbsa by RashmiKumari</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+
+      <header>
+        <h1 class="header">g_mmpbsa</h1>
+        <p class="header">MM/PBSA method for GROMACS.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
+        </ul
+	  	
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
+
+
+      </header>
+	  
+      <section>
+	  <nav>
+	  	<ul>
+			<li class="navigation"><a href="index.html">Introduction</a></li>
+			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+			<li class="navigation"><a href="How-to-Run.html">How to run?</a>
+				<ul>
+					<li class="navigation"><a href="Input-Files.html">Input-Files</a></li>
+					<li class="navigation"><a href="Output-Files.html">Output-Files</a></li>
+				</ul>
+			</li>
+			<li class="navigation"><a href="Usage.html">Usage</a></li>
+			<li class="navigation"><a href="#">Parameters</a>
+				<ul>
+					<li class="navigation"><a href="Polar-solvation-input-parameters.html">Polar solvation parameters</a></li>
+					<li class="navigation"><a href="Non-polar-solvation-input-parameters.html">Non-polar solvation parameters</a></li>
+				</ul>
+			</li>
+		</ul>
+		</nav>
+
+        <h3> <a name="Polar-Solvation Input Parameters" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Polar-Solvation Input Parameters</h3>
+
+
+<pre><code> polar          = yes </code></pre>
+
+<p>This will allow the calculation of polar solvation energy. The value can change to “no” if one doesn’t want to do polar calculation.</p>
+
+<hr>
+
+<pre><code> cfac           = 2 </code></pre>
+
+<p>The factor by which molecular dimensions should expand to get a coarse grid dimensions. For detail see help of a APBS script <code>apbs-1.3-source/tools/manip/psize.py</code> (psize.py -h).</p>
+
+<hr>
+
+<pre><code> fadd           = 20 </code></pre>
+
+<p>The amount (in Å) to add to molecular dimensions to get a fine grid dimensions. For detail see help of a APBS script <code>apbs-1.3-source/tools/manip/psize.py</code> (psize.py -h).</p>
+
+<hr>
+
+<pre><code> gridspace      = 0.2 </code></pre>
+
+<p>It specifies the value (in Å)  for  fine grid spacing. For detail see help of a APBS script <code>apbs-1.3-source/tools/manip/psize.py</code> (psize.py -h).</p>
+
+<hr>
+
+<pre><code> gmemceil       = 4000 </code></pre>
+
+<p>Usage: Sets memory (in MB) which will be used per-processor for a calculation. For detail see help of a APBS script <code>apbs-1.3-source/tools/manip/psize.py</code> (psize.py -h).</p>
+
+<hr>
+
+<pre><code> pcharge        = 1 </code></pre>
+
+<p>The charge of positive ions in bulk solution.</p>
+
+<hr>
+
+<pre><code> prad           = 0.95 </code></pre>
+
+<p>Radius of positive ions.</p>
+
+<hr>
+
+<pre><code> pconc          = 0.150 </code></pre>
+
+<p>Concentration of positive ions.</p>
+
+<hr>
+
+<pre><code> ncharge        = -1 </code></pre>
+
+<p>The charge of negative ions in bulk solution.</p>
+
+<hr>
+
+<pre><code> nrad           = 1.81 </code></pre>
+
+<p>Radius of negative ions.</p>
+
+<hr>
+
+<pre><code> nconc          = 0.150 </code></pre>
+
+<p>Concentration of negative ions.</p>
+
+<hr>
+
+<pre><code> pdie           = 4 </code></pre>
+
+<p>The value of solute dielectric constant. This can be change depending on the solute used for calculation. For highly charged solute high dielectric value will produce more accurate polar solvation energy.</p>
+
+<hr>
+
+<pre><code> sdie           = 80 </code></pre>
+
+<p>The value of solvent dielectric constant. </p>
+
+<hr>
+
+<pre><code> vdie           = 1 </code></pre>
+
+<p>The value of vacuum dielectric constant.</p>
+
+<hr>
+
+<pre><code> srad           = 1.4 </code></pre>
+
+<p>This specify the radius (in Å)  of solvent molecules. This is used in case of probe-based surface definition. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/srad">srad</a>.</p>
+
+<hr>
+
+<pre><code> swin           = 0.30 </code></pre>
+
+<p>This specify the value for cubic spline window for spline-based surface definitions. Not used when probe-based surface are used in calculation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/swin">swin</a>.</p>
+
+<hr>
+
+<pre><code> srfm           = smol </code></pre>
+
+<p>This specify the model used to construct the dielectric and ion-accessibility coefficients. The accepted keywords are <code>mol</code>, <code>smol</code>, <code>spl2</code> and <code>spl4</code> and it may affect the polar energy calculation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/srfm">srfm</a>.</p>
+
+<hr>
+
+<pre><code> sdens          = 10 </code></pre>
+
+<p>Specify the number of grid points per Å<sup>2</sup> for constructing the molecular surface or solvent accessible surface. Not taken in consideration when srad is “0.0” or srfm is “spl2”. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/sdens">sdens</a>.</p>
+
+<hr>
+
+<pre><code> temp           = 300 </code></pre>
+
+<p>This specify the temperature used for Poisson-Boltzmann calculation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/temp">temperature</a>.</p>
+
+<hr>
+
+<pre><code> chgm            = spl4 </code></pre>
+
+<p>This specify the method used to map the biomolecular point charges to the grid for a multigrid Poisson-Boltzmann calculation. The accepted keywords are <code>spl0</code>, <code>spl2</code> and <code>spl4</code>. The effects of these values are not tested in this implementation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/chgm">chgm</a>.</p>
+
+<hr>
+
+<pre><code> bcfl            = mdh </code></pre>
+
+<p>It specifies the type of boundary conditions used to solve the Poisson-Boltzmann equation. The accepted keywords are <code>zero</code>, <code>sdh</code>, <code>mdh</code>, <code>focus</code>, and <code>map</code>, however, uses of <code>focus</code>, and <code>map</code> will terminate g_mmpbsa with error. The change in value may affect the polar energy calculation and is not checked in the current implementation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/elec-input-file-section/elec-keywords/bcfl">bcfl</a>.</p>
+
+<hr>
+
+<pre><code> PBsolver        = npbe</code></pre>
+
+<p>This specifies whether linear or nonlinear Poisson Boltzmann equation should be solved. The accepted keywords are <code>lpbe</code> and <code>npbe</code> for linear and traditional non-linear PB equation, respectively. The effects of different value on the polar calculation is checked during this implementation.</p>
+
+<hr>
+
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
