@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
   <head>
@@ -32,19 +31,20 @@
 
       </header>
 	  
-      <section>
+      <section>  
 	  <nav>
 	  	<ul>
 			<li class="navigation"><a href="index.html">Introduction</a></li>
 			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
 			<li class="navigation"><a href="How-to-Run.html">How to run?</a>
+			<li class="navigation"><a href="File-list.html">File List</a>
 				<ul>
 					<li class="navigation"><a href="Input-Files.html">Input-Files</a></li>
 					<li class="navigation"><a href="Output-Files.html">Output-Files</a></li>
 				</ul>
 			</li>
 			<li class="navigation"><a href="Usage.html">Usage</a></li>
-			<li class="navigation"><a href="#">Parameters</a>
+			<li class="navigation"><a href="Parameters.html">Parameters</a>
 				<ul>
 					<li class="navigation"><a href="Polar-solvation-input-parameters.html">Polar solvation parameters</a></li>
 					<li class="navigation"><a href="Non-polar-solvation-input-parameters.html">Non-polar solvation parameters</a></li>
@@ -53,24 +53,26 @@
 		</ul>
 		</nav>
 		
-<h4>Executing g_mmpbsa</h4>
+       <h4> <a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Executing g_mmpbsa</h4>
 
-<p>The tool is run from command line similar to other GROMACS module. All the inputs along with other options is provided on command line depending on the type of calculation. For single group calculation one group is selected from index file during calculation, while for double group calculation two separate group is selected from index file. </p>
 
-<p>To get extensive details of usage with options, please click on <a href="Usage.html">Usage</a>.</p>
+	<p>The tool is run from command line similar to other GROMACS module. All the inputs along with other options is provided on command line depending on the type of calculation. For single group calculation one group is selected from index file during calculation, while for double group calculation two separate group is selected from index file. </p>
 
-<hr>
+	<p>To get extensive details of usage with options, please click on <a href="Usage.html">Usage</a>.</p>
 
-<h4>Parallel support</h4>
+	<hr>
 
-<p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x or 1.3.x. This parallel support is enabled by default and all processors/core will be used during run-time.</p>
+	<h4>Parallel support</h4>
 
-<p>To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
-<pre><code> export OMP<em>NUM</em>THREADS=X </code></pre>
-where <code>X</code> is number of core/processors.</p>
+	<p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x or 1.3.x. This parallel support is enabled by default and all processors/core will be used during run-time.</p>
 
-<hr>
-</section>
+	<p>To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
+	<pre><code> export OMP_NUM_THREADS=X </code></pre>
+	where <code>X</code> is number of core/processors.</p>
+
+	<hr>
+
+	</section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
