@@ -82,11 +82,14 @@ h6 {
 	font-family: Arvo, Monaco, serif;
 	font-weight: 700;
 }
-
+p {
+text-align: justify;
+}
 a {
   color:#C30000;
   font-weight:200;
   text-decoration:none;
+  text-align: justify;
 }
 
 a:hover {
