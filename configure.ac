@@ -1,7 +1,13 @@
+
 AC_INIT(g_mmpbsa, version-1.0)
 AC_CONFIG_HEADER(config.h)
 AC_MSG_NOTICE([g_mmpbsa: A tool for MMPBSA with GROMACS])
 AM_INIT_AUTOMAKE([g_mmpbsa], [1.0])
+
+
+AC_CANONICAL_HOST
+LT_INIT([disable-shared])
+
 
 cclist="gcc"
 f77list="gfortran g95 g77"
@@ -29,12 +35,11 @@ if test ["$CC" = "gcc"]; then
 	fi
 fi
 
-dnl # To check Math Library
-if $CC -V 2>&1 | grep 'Intel Corporation' > /dev/null 2>&1; then
-  AC_MSG_NOTICE([Using built-in math library with intel compiler])
-else
-  AC_CHECK_LIB(m,sqrt,,AC_MSG_ERROR([No math library found]))
-fi
+# ------------
+# Math library
+# ------------
+AC_CHECK_LIB(m,sqrt,,AC_MSG_ERROR([No math library found]))
+
 
 
 dnl #----------------------------------------------
@@ -88,8 +93,10 @@ if test -z "$a"; then
 	AC_MSG_ERROR([Could not find GROMACS Header files in ${gmx_include_path}])
 fi
 
-gmx_include="-I${gmx_include_path} -static"
-AC_SUBST(gmx_include)
+CPPFLAGS="$CPPFLAGS -I${gmx_include_path}"
+
+#gmx_include="-I${gmx_include_path}"
+#AC_SUBST(gmx_include)
 
 #------------------------------------
 # To check the Path of GROMACS Library
@@ -147,8 +154,26 @@ else
 	fi
 fi
 
-lib_path_list="-L${gmx_lib_path}"
-lib_list="-lgmx -lgmxana -lmd -ldl -pthread"
+LIBS="$LIBS -lgmx -lgmxana -lmd -ldl"
+LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+
+#lib_path_list="-L${gmx_lib_path}"
+#lib_list="-lm -lgmx -lgmxana -lmd -ldl -lpthread"
+
+
+# ---------------------------------------------------------------------------------
+# To check ptherad library, require to make compaitable with gromacs installation
+# ---------------------------------------------------------------------------------
+#ACX_PTHREAD( , AC_MSG_ERROR([Cannot find POSIX threads - required for thread support using configure!]))
+#ACX_PTHREAD([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
+#ACX_PTHREAD([[, b=""]])
+#if test -z "$HAVE_PTHREAD"; then
+#	LIBS="$PTHREAD_LIBS $LIBS"
+#	CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+#	CC="$PTHREAD_CC "
+#fi
+	
+
 #------------------------------------
 # To check the Path of APBS Library
 #-----------------------------------
@@ -198,8 +223,11 @@ else
 	fi
 fi
 
-lib_path_list="${lib_path_list} -L${apbs_lib_path}"
-lib_list="${lib_list} -lapbsmainroutines -lapbs"
+LDFLAGS="$LDFLAGS -L${apbs_lib_path}"
+LIBS="$LIBS -lapbsmainroutines -lapbs"
+
+#lib_path_list="${lib_path_list} -L${apbs_lib_path}"
+#lib_list="${lib_list} -lapbsmainroutines -lapbs"
 
 #-------------------------------------------------
 # To check the Path of APBS Source Code Directory
@@ -241,8 +269,11 @@ if test -z "$a"; then
         AC_MSG_ERROR([Could not find ${apbs_path}/contrib/zlib/.libs/libz.a library file])
 fi
 
-lib_path_list="${lib_path_list} -L${apbs_path}/contrib/lib -L${apbs_path}/src/generic/.libs -L${apbs_path}/contrib/zlib/.libs"
-lib_list="${lib_list} -lapbsblas -lmaloc -lapbsgen -lz -static-libgfortran"
+LDFLAGS="$LDFLAGS -L${apbs_path}/contrib/lib -L${apbs_path}/src/generic/.libs -L${apbs_path}/contrib/zlib/.libs"
+LIBS="$LIBS -lapbsblas -lmaloc -lapbsgen -lz"
+
+#lib_path_list="${lib_path_list} -L${apbs_path}/contrib/lib -L${apbs_path}/src/generic/.libs -L${apbs_path}/contrib/zlib/.libs"
+#lib_list="${lib_list} -lapbsblas -lmaloc -lapbsgen -lz"
 
 #-------------------------------------------------
 # To check the Path of APBS Source Code Directory
@@ -268,8 +299,9 @@ if test -z "$a"; then
         AC_MSG_ERROR([Could not find ${apbs_path}/contrib/include/maloc/maloc.h file])
 fi
 
-apbs_include="-I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
-AC_SUBST(apbs_include)
+CPPFLAGS="$CPPFLAGS -I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
+#apbs_include="-I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
+#AC_SUBST(apbs_include)
 
 dnl # -----------------------
 dnl # CHECK WHETHER YOU WANT TO DISABLE OPENMP SUPPORT
@@ -304,11 +336,12 @@ else
 fi
 
 ##To add library path and libraies as a variable
-AC_SUBST(lib_path_list)
-AC_SUBST(lib_list)
+#AC_SUBST(lib_path_list)
+#AC_SUBST(lib_list)
 
 ## Extra CPP FLAGS
-CPPFLAGS="$CPPFLAGS -c -fomit-frame-pointer -finline-functions -pthread -Wno-unused -msse2 -funroll-all-loops"
+CPPFLAGS="$CPPFLAGS -c -std=gnu99 -fomit-frame-pointer -finline-functions -pthread -Wno-unused -Wunused-result -msse2 -funroll-all-loops -fPIC -DPIC"
+
 
 ## MAKEFILES
 AC_CONFIG_FILES([Makefile])
@@ -318,6 +351,6 @@ AC_CONFIG_FILES([src/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([
-g_mmpbsa to be compiled with following settings:  ${CC} ${CFLAGS} ${gmx_include} ${apbs_include}
-g_mmpbsa to be linked with following settings: ${F77} ${FFLAGS} ${lib_path_list} ${lib_list} ${LDFLAGS}
+g_mmpbsa to be compiled with following settings:  ${CC} ${CPPFLAGS}
+g_mmpbsa to be linked with following settings: ${F77} ${FFLAGS} ${LDFLAGS} ${LIBS}
 ])
