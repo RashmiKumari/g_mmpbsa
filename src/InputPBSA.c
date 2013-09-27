@@ -148,6 +148,7 @@ int ReadInput	(char *fnMdp, gmx_bool *bPolar, gmx_bool *bAPolar, t_PolKey *PolKe
 		RTYPE ("savconst",      APolKey->savconst,        0.0);
 		RTYPE ("savrad",        APolKey->savrad,          1.4);
 
+		APolKey->bWCA = FALSE;
 		STYPE("WCA",               wca,           NULL);
 		n= str_nelem(wca,MAXPTR,ptr);
 		if ( (n>1) || ((strcmp(ptr[0],"yes")!=0) && (strcmp(ptr[0],"no")!=0)) )
