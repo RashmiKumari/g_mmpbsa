@@ -16121,7 +16121,7 @@ fi
 #AC_SUBST(lib_list)
 
 ## Extra CPP FLAGS
-CPPFLAGS="$CPPFLAGS -c -std=gnu99 -fomit-frame-pointer -finline-functions -pthread -Wno-unused -Wunused-result -msse2 -funroll-all-loops -fPIC -DPIC"
+CPPFLAGS="$CPPFLAGS -c -std=gnu99 -fomit-frame-pointer -finline-functions -pthread -Wno-unused -msse2 -funroll-all-loops -fPIC -DPIC"
 
 
 ## MAKEFILES
