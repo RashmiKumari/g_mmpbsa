@@ -7,6 +7,8 @@ AM_INIT_AUTOMAKE([g_mmpbsa], [1.0])
 
 AC_CANONICAL_HOST
 LT_INIT([disable-shared])
+AC_PROG_EGREP
+AC_PROG_LN_S
 
 
 cclist="gcc"
@@ -154,7 +156,7 @@ else
 	fi
 fi
 
-LIBS="$LIBS -lgmx -lgmxana -lmd -ldl"
+LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -ldl"
 LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
 
 #lib_path_list="-L${gmx_lib_path}"

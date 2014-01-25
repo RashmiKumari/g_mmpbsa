@@ -105,11 +105,9 @@ void mBondi2 (t_AtomProp *mbondi2)	{
 }
 
 real GetRad (char *atomtype, t_AtomProp *radtype, real rvdw)	{
-	char *a, *b;
+	char a[2], b[3];
 	int i =0, done=0;
 	real r =0;
-	a = (char*) malloc(sizeof(char)*1);
-	b = (char*) malloc(sizeof(char)*2);
 
 	substring(0,1, atomtype,a);
 	for(i=0;i<=radtype->n;i++)	{
