@@ -24,4 +24,5 @@ Eisenhaber _et al._ [The double cubic lattice method: Efficient approaches to nu
 Wagoner _et al._ [Assessing implicit models for nonpolar mean solvation forces: The importance of dispersion and volume terms.](http://www.pnas.org/content/103/22/8331.abstract) _Proc. Natl. Acad. Sci. USA_ (2006) 103:8331-8336.
 ***
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/RashmiKumari/g_mmpbsa/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
+***
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/b4a54ceb8ced19bac6811f06f58f000f "githalytics.com")](http://githalytics.com/RashmiKumari/g_mmpbsa)
