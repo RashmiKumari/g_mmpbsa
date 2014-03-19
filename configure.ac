@@ -97,12 +97,10 @@ fi
 
 CPPFLAGS="$CPPFLAGS -I${gmx_include_path}"
 
-#gmx_include="-I${gmx_include_path}"
-#AC_SUBST(gmx_include)
 
-#------------------------------------
-# To check the Path of GROMACS Library
-#-----------------------------------
+dnl ------------------------------------
+dnl To check the Path of GROMACS Library
+dnl -----------------------------------
 AC_MSG_CHECKING([for --with-gmx-lib option])
 AC_ARG_WITH(
                 [gmx-lib],
@@ -113,18 +111,19 @@ AC_ARG_WITH(
 if test x"$gmx_lib_path" != "xno" -a -n "$gmx_lib_path"; then
 	AC_MSG_RESULT([${gmx_lib_path}])
 
-	#       libgmx.a
+dnl       libgmx.a
 	AC_CHECK_FILE(${gmx_lib_path}/libgmx.a,[a="yes"],[a=""])
 	if test -z "$a"; then
         	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmx.a library file])
 	fi
 
-	#       libgmxana.a
+dnl       libgmxana.a
 	AC_CHECK_FILE(${gmx_lib_path}/libgmxana.a,[a="yes"],[a=""])
 	if test -z "$a"; then
         	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmxana.a library file])
 	fi
-	#       libmd.a
+	
+dnl       libmd.a
 	AC_CHECK_FILE(${gmx_lib_path}/libmd.a,[a="yes"],[a=""])
 	if test -z "$a"; then
         	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libmd.a library file])
@@ -156,8 +155,57 @@ else
 	fi
 fi
 
-LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -ldl"
-LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+dnl ---------------------------
+dnl Checking for GROMACS version
+dnl ----------------------------
+AC_MSG_NOTICE([checking for GROMACS-4.5.x or GROMACS-4.6.x])
+AC_MSG_CHECKING([for --enable-gmx46])
+AC_ARG_ENABLE(
+	[gmx46],
+	AS_HELP_STRING([--enable-gmx46],[compile g_mmpbsa for GROMACS-4.6.x]),,
+	[enable_gmx46=yes]
+)
+if test x"$enable_gmx46" == "xyes"; then
+	AC_MSG_RESULT([yes])
+	AC_MSG_NOTICE([g_mmpbsa will be compiled for GROMACS-4.6.x])
+	
+	AC_MSG_NOTICE([checking for fftw3f Libraries in standard location])
+	AC_CHECK_FILE([/usr/local/lib/libfftw3f.a], [a="yes"],[a="no"])
+	if test x"$a" = "xyes"; then
+        	fftw_path="/usr/local/lib"
+	fi
+
+	if test x"$a" = "xno" ; then
+        	AC_CHECK_FILE([${HOME}/lib/libfftw3f.a], [b="yes"],[b="no"])
+	fi
+
+	if test x"$b" = "xyes"; then
+        	fftw_path="${HOME}/lib"
+	fi
+	
+	if test x"$b" = "xno" ; then
+        	AC_CHECK_FILE([/usr/lib/libfftw3f.a], [c="yes"],[c="no"])
+	fi
+
+	if test x"$c" = "xyes"; then
+        	fftw_path="/usr/lib"
+	fi
+
+	if test [ x"$a" = "xno" ] -a  [ x"$b" = "xno" ] -a [ x"$c" = "xno" ] ; then
+		AC_MSG_ERROR([WARNING: libfftw3f.a not found in standard location. 
+                Please, provide path. e.g. export LDFLAGS=-L/path/to/lib])
+		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+		LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+	else
+		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+		LDFLAGS="$LDFLAGS -L${fftw_path} -L${gmx_lib_path}"
+	fi
+	
+else
+	AC_MSG_NOTICE([g_mmpbsa will be compiled for GROMACS-4.5.x])
+	LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -ldl"
+	LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+fi
 
 #lib_path_list="-L${gmx_lib_path}"
 #lib_list="-lm -lgmx -lgmxana -lmd -ldl -lpthread"
@@ -302,8 +350,6 @@ if test -z "$a"; then
 fi
 
 CPPFLAGS="$CPPFLAGS -I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
-#apbs_include="-I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
-#AC_SUBST(apbs_include)
 
 dnl # -----------------------
 dnl # CHECK WHETHER YOU WANT TO DISABLE OPENMP SUPPORT

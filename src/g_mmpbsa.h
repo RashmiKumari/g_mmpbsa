@@ -40,7 +40,7 @@
 #include "statutil.h"
 #include "typedefs.h"
 #include "smalloc.h"
-#include "copyrite.h"
+//#include "copyrite.h"
 #include "vec.h"
 #include "tpxio.h"
 #include "rmpbc.h"

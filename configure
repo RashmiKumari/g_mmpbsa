@@ -736,6 +736,7 @@ with_sysroot
 enable_libtool_lock
 with_gmx_include
 with_gmx_lib
+enable_gmx46
 with_apbs_lib
 with_apbs
 enable_openmp
@@ -1378,6 +1379,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-gmx46          compile g_mmpbsa for GROMACS-4.6.x
   --disable-openmp        disables OpenMP compiler support
 
 Optional Packages:
@@ -15215,12 +15217,7 @@ fi
 
 CPPFLAGS="$CPPFLAGS -I${gmx_include_path}"
 
-#gmx_include="-I${gmx_include_path}"
-#AC_SUBST(gmx_include)
 
-#------------------------------------
-# To check the Path of GROMACS Library
-#-----------------------------------
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for --with-gmx-lib option" >&5
 $as_echo_n "checking for --with-gmx-lib option... " >&6; }
 
@@ -15235,7 +15232,6 @@ if test x"$gmx_lib_path" != "xno" -a -n "$gmx_lib_path"; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${gmx_lib_path}" >&5
 $as_echo "${gmx_lib_path}" >&6; }
 
-	#       libgmx.a
 	as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmx.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libgmx.a" >&5
 $as_echo_n "checking for ${gmx_lib_path}/libgmx.a... " >&6; }
@@ -15263,7 +15259,6 @@ fi
         	as_fn_error $? "Could not find ${gromacs_lib_path}/libgmx.a library file" "$LINENO" 5
 	fi
 
-	#       libgmxana.a
 	as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmxana.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libgmxana.a" >&5
 $as_echo_n "checking for ${gmx_lib_path}/libgmxana.a... " >&6; }
@@ -15290,7 +15285,7 @@ fi
 	if test -z "$a"; then
         	as_fn_error $? "Could not find ${gromacs_lib_path}/libgmxana.a library file" "$LINENO" 5
 	fi
-	#       libmd.a
+
 	as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libmd.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libmd.a" >&5
 $as_echo_n "checking for ${gmx_lib_path}/libmd.a... " >&6; }
@@ -15493,8 +15488,125 @@ fi
 	fi
 fi
 
-LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -ldl"
-LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GROMACS-4.5.x or GROMACS-4.6.x" >&5
+$as_echo "$as_me: checking for GROMACS-4.5.x or GROMACS-4.6.x" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for --enable-gmx46" >&5
+$as_echo_n "checking for --enable-gmx46... " >&6; }
+# Check whether --enable-gmx46 was given.
+if test "${enable_gmx46+set}" = set; then :
+  enableval=$enable_gmx46;
+else
+  enable_gmx46=yes
+
+fi
+
+if test x"$enable_gmx46" == "xyes"; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: g_mmpbsa will be compiled for GROMACS-4.6.x" >&5
+$as_echo "$as_me: g_mmpbsa will be compiled for GROMACS-4.6.x" >&6;}
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw3f Libraries in standard location" >&5
+$as_echo "$as_me: checking for fftw3f Libraries in standard location" >&6;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libfftw3f.a" >&5
+$as_echo_n "checking for /usr/local/lib/libfftw3f.a... " >&6; }
+if ${ac_cv_file__usr_local_lib_libfftw3f_a+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libfftw3f.a"; then
+  ac_cv_file__usr_local_lib_libfftw3f_a=yes
+else
+  ac_cv_file__usr_local_lib_libfftw3f_a=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libfftw3f_a" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libfftw3f_a" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libfftw3f_a" = xyes; then :
+  a="yes"
+else
+  a="no"
+fi
+
+	if test x"$a" = "xyes"; then
+        	fftw_path="/usr/local/lib"
+	fi
+
+	if test x"$a" = "xno" ; then
+        	as_ac_File=`$as_echo "ac_cv_file_${HOME}/lib/libfftw3f.a" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${HOME}/lib/libfftw3f.a" >&5
+$as_echo_n "checking for ${HOME}/lib/libfftw3f.a... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${HOME}/lib/libfftw3f.a"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  b="yes"
+else
+  b="no"
+fi
+
+	fi
+
+	if test x"$b" = "xyes"; then
+        	fftw_path="${HOME}/lib"
+	fi
+
+	if test x"$b" = "xno" ; then
+        	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/lib/libfftw3f.a" >&5
+$as_echo_n "checking for /usr/lib/libfftw3f.a... " >&6; }
+if ${ac_cv_file__usr_lib_libfftw3f_a+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/lib/libfftw3f.a"; then
+  ac_cv_file__usr_lib_libfftw3f_a=yes
+else
+  ac_cv_file__usr_lib_libfftw3f_a=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_lib_libfftw3f_a" >&5
+$as_echo "$ac_cv_file__usr_lib_libfftw3f_a" >&6; }
+if test "x$ac_cv_file__usr_lib_libfftw3f_a" = xyes; then :
+  c="yes"
+else
+  c="no"
+fi
+
+	fi
+
+	if test x"$c" = "xyes"; then
+        	fftw_path="/usr/lib"
+	fi
+
+	if test  x"$a" = "xno"  -a   x"$b" = "xno"  -a  x"$c" = "xno"  ; then
+		as_fn_error $? "WARNING: libfftw3f.a not found in standard location.
+                Please, provide path. e.g. export LDFLAGS=-L/path/to/lib" "$LINENO" 5
+		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+		LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+	else
+		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+		LDFLAGS="$LDFLAGS -L${fftw_path} -L${gmx_lib_path}"
+	fi
+
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: g_mmpbsa will be compiled for GROMACS-4.5.x" >&5
+$as_echo "$as_me: g_mmpbsa will be compiled for GROMACS-4.5.x" >&6;}
+	LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -ldl"
+	LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
+fi
 
 #lib_path_list="-L${gmx_lib_path}"
 #lib_list="-lm -lgmx -lgmxana -lmd -ldl -lpthread"
@@ -16153,8 +16265,6 @@ if test -z "$a"; then
 fi
 
 CPPFLAGS="$CPPFLAGS -I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
-#apbs_include="-I${apbs_path}/src/aaa_inc -I${apbs_path}/contrib/include"
-#AC_SUBST(apbs_include)
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for --disable-openmp" >&5
 $as_echo_n "checking for --disable-openmp... " >&6; }
