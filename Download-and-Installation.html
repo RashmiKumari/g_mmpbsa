@@ -158,11 +158,11 @@ During installation and execution of program, errors may appear. Solution of the
 <p> <strong> For GROMACS-4.6.x,</strong>
 	<code> --enable-gmx46 </code> and path to <code> libfftw3f.a </code> is required. 
 	During configure, <code> libfftw3f.a </code>will be searched in <code> /usr/lib, usr/local/lib and ${HOME}/lib </code>.
-	If this file is not present in these directories, use <code> LDFLAGS </code> to declare the path.
+	If this file is not present in these directories, use environment variable <code> LDFLAGS </code> to declare the path.
 	For example in bash:
 </p>
 
-<pre><code> export LDFLAGS=/path/to/fftw3/lib </code></pre>
+<pre><code> export LDFLAGS=-L/path/to/fftw3/lib </code></pre>
 
 <pre><code> ./configure --enable-gmx46 --with-gmx-include=/opt/gromacs_465/include --with-gmx-lib=/opt/gromacs_465/lib --with-apbs-lib=/home/rajendra/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
 
