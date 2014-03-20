@@ -67,11 +67,29 @@
 
 <h4> <a name="Requirement" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Requirement</h4>
 
-<h5>1. GROMACS 4.5.x</h5>
+<h5>1. GROMACS 4.5.x/4.6.x</h5>
 
 <pre><code> Required Libraries : libgmx.a, libgmxana.a and libmd.a </code></pre>
 
 <p><a href="http://www.gromacs.org/">GROMACS</a> should be compiled and installed from the source-code. Static library is required for the compilation. </p>
+
+<p> <strong> For GROMACS-4.6.x,</strong> additional FFTW library is required. </p>
+
+<pre><code> Required Libraries : libgmx.a, libgmxana.a, libmd.a and libfftw3f.a </code></pre>
+
+<p> By default, during compilation of GROMACS-4.6.x, only shared libraries are built. 
+	Therefore, <code> libgmx.a, libgmxana.a and libmd.a</code> files will be missing. 
+	To built these libraries, use <code> -DBUILD_SHARED_LIBS=OFF </code> with <code> cmake </code> 
+	during installation of GROMACS-4.6.x.
+</p> 
+
+<p> g_mmpbsa cannot use GPU and cannot be compiled with CUDA. 
+	If CUDA is in PATH variable, GROMACS-4.6.x compiled by default with CUDA for GPU acceleration. 
+	To avoid error in g_mmpbsa compilation, use <code> -DGMX_GPU=off </code> with <code> cmake </code> 
+	during installation of GROMACS-4.6.x.
+</p> 
+
+<p> <strong> Currently, double precision GROMACS is not supported.</strong> </p>
 
 <h5>2. APBS 1.2.x or 1.3.x</h5>
 
@@ -136,6 +154,17 @@ During installation and execution of program, errors may appear. Solution of the
 <p>Use above options/path to configure</p>
 
 <pre><code> ./configure --with-gmx-include=/opt/gromacs-4.5.5/include --with-gmx-lib=/opt/gromacs-4.5.5/lib --with-apbs-lib=/usr/local/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
+
+<p> <strong> For GROMACS-4.6.x,</strong>
+	<code> --enable-gmx46 </code> and path to <code> libfftw3f.a </code> is required. 
+	During configure, <code> libfftw3f.a </code>will be searched in <code> /usr/lib, usr/local/lib and ${HOME}/lib </code>.
+	If this file is not present in these directories, use <code> LDFLAGS </code> to declare the path.
+	For example in bash:
+</p>
+
+<pre><code> export LDFLAGS=/path/to/fftw3/lib </code></pre>
+
+<pre><code> ./configure --enable-gmx46 --with-gmx-include=/opt/gromacs_465/include --with-gmx-lib=/opt/gromacs_465/lib --with-apbs-lib=/home/rajendra/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
 
 <h5>2. make</h5>
 
