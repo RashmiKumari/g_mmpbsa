@@ -1,6 +1,8 @@
 #### Introduction
 The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)](http://www.osdd.net/) which is a collaborative platform to discover new drugs for neglected tropical diseases like Malaria, Tuberculosis, Leshmaniasis, etc. g_mmpbsa is developed using two widely used open source software i.e. [GROMACS](http://www.gromacs.org/) and     [APBS](http://www.poissonboltzmann.org/apbs) and it has similar user interface like other GROMACS tools. The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme. The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
 
+### For complete manual, please visit [g_mmpbsa](http://rashmikumari.github.io/g_mmpbsa/).
+
 ***
 #### Features
 * It is an open source tool and can be modified under the terms of the GNU public license 
@@ -13,6 +15,7 @@ The development of g_mmpbsa package is initiated under [Open Source Drug Discove
 
 This tool can be modified and/or redistributed under terms of GNU public license. In case of any problem one can contact us and we will try our best to provide the solution.
 ***
+
 #### References
 ##### GROMACS
 Pronk _et al._ [GROMACS 4.5: a high-throughput and highly parallel open source molecular simulation toolkit](http://bioinformatics.oxfordjournals.org/content/29/7/845.abstract). _Bioinformatics_ (2013) 29:845-854.
