@@ -2,6 +2,7 @@
 The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)](http://www.osdd.net/) which is a collaborative platform to discover new drugs for neglected tropical diseases like Malaria, Tuberculosis, Leshmaniasis, etc. g_mmpbsa is developed using two widely used open source software i.e. [GROMACS](http://www.gromacs.org/) and     [APBS](http://www.poissonboltzmann.org/apbs) and it has similar user interface like other GROMACS tools. The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme. The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
 
 #### For complete documentation, please visit [g_mmpbsa](http://rashmikumari.github.io/g_mmpbsa/).
+#### Please post problems and queries in [g_mmpbsa forum](https://groups.google.com/d/forum/g_mmpbsa).
 
 ***
 #### Features
@@ -13,10 +14,14 @@ The development of g_mmpbsa package is initiated under [Open Source Drug Discove
 * Binding energy decomposition scheme is implemented through MM-PBSA scheme as contrast to other packages, in which scheme is implemented through MM-GBSA only. 
 * It calculates different components of binding energy and residue wise energy contribution to binding simultaneously and thus is computationally less expensive.
 
-This tool can be modified and/or redistributed under terms of GNU public license. In case of any problem one can contact us and we will try our best to provide the solution.
+This tool can be modified and/or redistributed under terms of GNU public license. 
 ***
 
-#### References
+#### Citations
+
+##### g_mmpbsa
+Kumari _et al._ [g\_mmpbsa - A GROMACS tool for high-throughput MM-PBSA calculations] (http://pubs.acs.org/doi/abs/10.1021/ci500020m) _J. Chem. Inf. Model._ (2014).
+
 ##### GROMACS
 Pronk _et al._ [GROMACS 4.5: a high-throughput and highly parallel open source molecular simulation toolkit](http://bioinformatics.oxfordjournals.org/content/29/7/845.abstract). _Bioinformatics_ (2013) 29:845-854.
 ##### APBS
