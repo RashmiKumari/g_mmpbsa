@@ -19,7 +19,7 @@ This tool can be modified and/or redistributed under terms of GNU public license
 
 #### Citations
 
-##### g_mmpbsa
+##### _g\_mmpbsa_
 Kumari _et al._ [g\_mmpbsa - A GROMACS tool for high-throughput MM-PBSA calculations] (http://pubs.acs.org/doi/abs/10.1021/ci500020m) _J. Chem. Inf. Model._ (2014).
 
 ##### GROMACS
