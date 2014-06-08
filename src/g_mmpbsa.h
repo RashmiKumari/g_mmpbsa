@@ -134,7 +134,9 @@ static const char *APsrfm_words[] = { "sacc", NULL};
 // energy_mm.c
 int	energy_pair(t_non_bonded *param, t_topology *top, atom_id *index, int isize, int *splitIndex, gmx_bool bDiff);
 
-void Vac_MM(rvec *x, t_topology *top, t_non_bonded param, real pdie, gmx_bool bDiff, gmx_bool bDCOMP, real *EE, real *Vdw);
+void Vac_MM(rvec *x, t_topology *top, t_non_bonded param, real pdie, gmx_bool bDiff, gmx_bool bDCOMP, double *EE, double *Vdw);
+
+void Vac_MM_without_14(rvec *x, t_topology *top, atom_id *indexA, int isizeA, atom_id *indexB, int isizeB, real pdie, gmx_bool bDCOMP, double *EE, double *Vdw);
 
 // radius.c
 typedef struct {

@@ -1,12 +1,12 @@
 
-AC_INIT(g_mmpbsa, version-1.0)
+AC_INIT(g_mmpbsa, version-1.1)
 AC_CONFIG_HEADER(config.h)
 AC_MSG_NOTICE([g_mmpbsa: A tool for MMPBSA with GROMACS])
-AM_INIT_AUTOMAKE([g_mmpbsa], [1.0])
+AM_INIT_AUTOMAKE([g_mmpbsa], [1.1])
 
 
 AC_CANONICAL_HOST
-LT_INIT([disable-shared])
+dnl # LT_INIT([disable-shared])
 AC_PROG_EGREP
 AC_PROG_LN_S
 

@@ -238,7 +238,8 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   /* Command-line arguments */
   static real rvdw = 1.0, pdie = 1 ;
   static int ndots = 24;
-  static gmx_bool bDIFF = TRUE, bMM = TRUE, bDCOMP = FALSE, bPBSA = FALSE, bFocus = FALSE ;
+  static gmx_bool bDIFF = TRUE, bMM = TRUE, bDCOMP = FALSE, bPBSA = FALSE, bFocus = FALSE;
+  gmx_bool bIncl14 = FALSE ;
   static const char *rtype[] = { NULL, "bondi", "mbondi", "mbondi2", "amber", NULL };
 
   t_pargs pa[] =
@@ -246,8 +247,9 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
           { "-rad",    FALSE,  etENUM, { rtype   }, "van der Waal radius type" },
           { "-rvdw",   FALSE,  etREAL, { &rvdw   }, "Default van der Waal radius (in nm) if not found" },
           { "-mme",    TRUE,   etBOOL, { &bMM    }, "To calculate vacuum molecular mechanics energy" },
-          { "-focus",  TRUE,   etBOOL, { &bFocus }, "To enable focusing on the specfic region of molecule, group of atoms must be provided in index file" },
           { "-pdie",   TRUE,   etREAL, { &pdie   }, "Dielectric constant of solute. Should be same as of polar solvation" },
+          { "-incl_14",FALSE,  etBOOL, { &bIncl14}, "Include 1-4 atom-pairs, exclude 1-2 and 1-3 atom pairs during MM calculation. Should be \"yes\" when groups are bonded with each other." },
+          { "-focus",  TRUE,   etBOOL, { &bFocus }, "To enable focusing on the specfic region of molecule, group of atoms must be provided in index file" },
           { "-pbsa",   FALSE,  etBOOL, { &bPBSA  }, "To calculate polar and/or non-polar solvation energy" },
           { "-ndots",  FALSE,  etINT,  { &ndots  }, "Number of dots per sphere in the calculation of SASA, more dots means more accuracy" },
           { "-diff",   TRUE,   etBOOL, { &bDIFF  }, "Calculate the energy difference between two group otherwise only calculates for one group" },
@@ -282,7 +284,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   matrix box;
   t_atoms *atoms;
   char *atomtype, *resname, *atomname, **modresname = NULL;
-  real *tmpEE=NULL, *tmpVdw=NULL;
+  double *tmpEE=NULL, *tmpVdw=NULL;
   real tmpArea = 0, tmpVolume = 0, Area = 0, Volume = 0, **radiusA = NULL, **radiusB = NULL, **radiusAB = NULL;
   double *TempAtomAPolA=NULL, *TempAtomAPolB=NULL, *TempAtomAPolAB=NULL;
   real **atomAreaA=NULL, **atomAreaB=NULL,**atomAreaAB=NULL;
@@ -328,7 +330,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 	  gmx_fatal(FARGS, "tpr file is necessary\n");
 
   if ((!bPBSA) && (!bMM))
-    gmx_fatal(FARGS, "No calculation opted. Either use \"-pbsa\" or \"-mm\" option.\n");
+    gmx_fatal(FARGS, "No calculation opted. Use either \"-pbsa\" or \"-mm\" option.\n");
 
   if (bPBSA)
     {
@@ -354,6 +356,13 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 
   read_tps_conf(ftp2fn(efTPX, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
   atoms = &(top.atoms);
+
+  if ((bMM) && (!bDIFF) && (!bIncl14))
+	{
+	  	  printf("\n\nWARNING: For single group calculations, 1-4 interactions are also included.\n\n");
+	  	  bIncl14 = TRUE;
+	}
+
 
   ////Modify residue name having same name but different structure////
   ////Important for APBS Parameter file prepared for non-polar solvation energy////
@@ -395,6 +404,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
       snew(isize, 1);
       snew(index, 1);
       snew(grpnm, 1);
+      printf("\nEnter a group number for energy calculation:\n");
       get_index(atoms, ftp2fn_null(efNDX, NFILE, fnm), 1, &isize[0], &index[0], grpnm);
 //////////END////
 
@@ -461,11 +471,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
       snew(index, 2);
       snew(grpnm, 2);
       printf(
-          "\n\n\nEnter the group number for Protein or first Protein or first group\n\n");
+          "\n\n\nEnter the group number for Protein or first Protein or first group:\n");
       get_index(atoms, ftp2fn_null(efNDX, NFILE, fnm), 1, &isize[0], &index[0],
           &grpnm[0]);
       printf(
-          "\n\n\nEnter the group number of Ligand or second Protein or second group\n\n");
+          "\n\n\nEnter the group number of Ligand or second Protein or second group:\n");
       get_index(atoms, ftp2fn_null(efNDX, NFILE, fnm), 1, &isize[1], &index[1],
           &grpnm[1]);
 /////////END/////
@@ -512,10 +522,18 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
           legVacMM[2] = strdup(buf);
           sprintf(buf, "%s Elec. Energy", grpnm[1]);
           legVacMM[3] = strdup(buf);
-          sprintf(buf, "%s+%s VdW Energy", grpnm[0], grpnm[1]);
-          legVacMM[4] = strdup(buf);
-          sprintf(buf, "%s+%s Elec. Energy", grpnm[0], grpnm[1]);
-          legVacMM[5] = strdup(buf);
+          if(bIncl14)	{
+        	  sprintf(buf, "%s+%s VdW Energy", grpnm[0], grpnm[1]);
+        	  legVacMM[4] = strdup(buf);
+        	  sprintf(buf, "%s+%s Elec. Energy", grpnm[0], grpnm[1]);
+        	  legVacMM[5] = strdup(buf);
+          }
+          else	{
+              sprintf(buf, "%s-%s VdW Energy", grpnm[0], grpnm[1]);
+              legVacMM[4] = strdup(buf);
+              sprintf(buf, "%s-%s Elec. Energy", grpnm[0], grpnm[1]);
+              legVacMM[5] = strdup(buf);
+          }
           sprintf(buf, "%s-%s Total Energy", grpnm[0], grpnm[1]);
           legVacMM[6] = strdup(buf);
         }
@@ -633,7 +651,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
     }
 
   t_non_bonded paramNonBond;
-  if (bMM)
+  if ((bMM) && (bIncl14))
     printf("\nGenerating non-bonded pair and 1-4 pair list...\n");
   if (!bDIFF)
     {
@@ -657,7 +675,8 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
       if (bMM)
         {
 ////////////Generation of NON BONDED PAIRs and 1-4 PAIRs List for difference calculation
-    	  energy_pair(&paramNonBond, &top, index[2], isize[2], &isize[0], bDIFF);
+    	  if (bIncl14)
+    		  energy_pair(&paramNonBond, &top, index[2], isize[2], &isize[0], bDIFF);
 ///////////END///
           fnVacMM = opt2fn("-mm", NFILE, fnm);
           snew(tmpEE,3);
@@ -830,16 +849,30 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
         	  fflush(fAPolar);
             } //bApolar End
         } //Single calculation end
+
       else //Difference calculation start
         {
           if (bMM)
             {
-              Vac_MM(x, &top, paramNonBond, pdie, bDIFF, bDCOMP, tmpEE, tmpVdw);
+        	  if(bIncl14)
+        		  Vac_MM(x, &top, paramNonBond, pdie, bDIFF, bDCOMP, tmpEE, tmpVdw);
+        	  else
+        		  Vac_MM_without_14(x, &top, index[0], isize[0], index[1], isize[1], pdie, bDCOMP, tmpEE, tmpVdw);
               fprintf(fVacMM, "%15.3lf%15.3lf%15.3lf", t, tmpVdw[0], tmpEE[0]);
               fprintf(fVacMM, "%15.3lf%15.3lf", tmpVdw[1], tmpEE[1]);
               fprintf(fVacMM, "%15.3lf%15.3lf%15.3lf\n", tmpVdw[2], tmpEE[2], (tmpVdw[2] + tmpEE[2]) - (tmpEE[0]+tmpVdw[0]+tmpEE[1]+tmpVdw[1]));
               fflush(fVacMM);
-            }
+              if(bDCOMP)
+              {
+            	  fprintf(fDecompMM, "%15.3lf", t);
+				  for(i=0; i<top.atoms.nres; i++)
+					  if((bResA[i]) || (bResB[i]))
+						  fprintf(fDecompMM, "%15.3lf", (tmpEE[i+3]+tmpVdw[i+3])/2);
+				  fprintf(fDecompMM, "\n");
+				  fflush(fDecompMM);
+              }
+            }// bMM End
+
           if (bPolar)
             {
         	  if(bDCOMP)	{
@@ -990,16 +1023,6 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 
       if (bDCOMP)
         {
-    	  if(bMM)	{
-          fprintf(fDecompMM, "%15.3lf", t);
-          Vac_MM(x, &top, paramNonBond, pdie, bDIFF, bDCOMP, tmpEE, tmpVdw);
-          for(i=0; i<top.atoms.nres; i++)
-			  if((bResA[i]) || (bResB[i]))
-				  fprintf(fDecompMM, "%15.3lf", (tmpEE[i+3]+tmpVdw[i+3])/2);
-          fprintf(fDecompMM, "\n");
-          fflush(fDecompMM);
-    	  }
-
           if(bPolar)	{
               fprintf(fDecompPol, "%15.3lf", t);
         	  decomp_calc_energy(top,isize[0], index[0], isize[1], index[1], isize[2], index[2],	\

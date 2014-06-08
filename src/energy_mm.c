@@ -173,11 +173,11 @@ int energy_pair(t_non_bonded *param, t_topology *top, atom_id *index, int isize,
 }
 
 
-void Vac_MM(rvec *x, t_topology *top, t_non_bonded param, real pdie, gmx_bool bDiff, gmx_bool bDCOMP, real *EE, real *Vdw)
+void Vac_MM(rvec *x, t_topology *top, t_non_bonded param, real pdie, gmx_bool bDiff, gmx_bool bDCOMP, double *EE, double *Vdw)
 {
 	rvec dx;
 	real colmb_factor = 138.935485;
-	real qi, qj, c6, c12, c6j, c12j,rij, c6ij, c12ij;
+	double qi, qj, c6, c12, c6j, c12j,rij, c6ij, c12ij;
 	int itypeA, itypeB, ntype = top->idef.atnr;
 	int i, j,k,l,n;
 	int atomA, atomB, resA, resB;
@@ -302,6 +302,79 @@ void Vac_MM(rvec *x, t_topology *top, t_non_bonded param, real pdie, gmx_bool bD
 				VdwRes[resA] += TempVdw;
 				VdwRes[resB] += TempVdw;
 			}
+	}
+
+	if(bDCOMP)
+		for (i=0; i<nres; i++)
+		{
+			EE[i+3] = EERes[i];
+			Vdw[i+3] = VdwRes[i];
+		}
+}
+
+void Vac_MM_without_14(rvec *x, t_topology *top, atom_id *indexA, int isizeA, atom_id *indexB, int isizeB, real pdie, gmx_bool bDCOMP, double *EE, double *Vdw){
+
+	int i, j=0, k,l,n;
+	rvec dx;
+	real colmb_factor = 138.935485;
+	double qi, qj, c6, c12, c6j, c12j,rij, c6ij, c12ij;
+	int itypeA, itypeB, ntype = top->idef.atnr;
+	int resA, resB;
+	real TempEE, TempVdw;
+	int nres = top->atoms.nres;
+
+	real *EERes, *VdwRes;
+
+	EE[0] = 0; Vdw[0] = 0;
+	EE[1] = 0; Vdw[1] = 0;
+	EE[2] = 0; Vdw[2] = 0;
+
+
+	snew(EERes,nres);
+	snew(VdwRes,nres);
+	if(bDCOMP)
+		for (i=0; i<nres;i++)
+		{
+			EE[i+3] = 0;
+			Vdw[i+3] = 0;
+			EERes[i] = 0;
+			VdwRes[i] = 0;
+		}
+
+	for(i=0;i<isizeA;i++)
+	{
+		for(j=0;j<isizeB;j++)	{
+
+			resA = top->atoms.atom[indexA[i]].resind;
+			resB = top->atoms.atom[indexB[j]].resind;
+
+			rij = sqrt(pow((x[indexA[i]][0]-x[indexB[j]][0]),2)+pow((x[indexA[i]][1]-x[indexB[j]][1]),2) + pow((x[indexA[i]][2]-x[indexB[j]][2]),2));
+
+			itypeA = top->atoms.atom[indexA[i]].type;
+			itypeB = top->atoms.atom[indexB[j]].type;
+
+			if(itypeA<=itypeB)	{
+				c6 = top->idef.iparams[itypeA*ntype+itypeB].lj.c6;
+				c12 = top->idef.iparams[itypeA*ntype+itypeB].lj.c12;
+			}
+			else	{
+				c6 = top->idef.iparams[itypeB*ntype+itypeA].lj.c6;
+				c12 = top->idef.iparams[itypeB*ntype+itypeA].lj.c12;
+			}
+			TempEE = ((colmb_factor/pdie) * (top->atoms.atom[indexA[i]].q*top->atoms.atom[indexB[j]].q))/rij;
+			TempVdw = (c12/pow(rij,12)) - (c6/pow(rij,6));
+
+			EE[2] += TempEE;
+			Vdw[2] += TempVdw;
+
+			if(bDCOMP)
+			{
+				EERes[resA] += TempEE;
+				EERes[resB] += TempEE;
+				VdwRes[resA] += TempVdw;
+				VdwRes[resB] += TempVdw;
+			}
+		}
 	}
 
 	if(bDCOMP)
