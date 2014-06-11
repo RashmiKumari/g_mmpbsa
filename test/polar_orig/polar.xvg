@@ -1,10 +1,10 @@
-# This file was created Tue Sep 17 23:26:45 2013
+# This file was created Wed Jun 11 20:44:27 2014
 # by the following command:
-# g_mmpbsa -f ../data/1EBZ.xtc -s ../data/1EBZ.tpr -i mmpbsa.mdp -n ../data/1EBZ.ndx -pbsa -decomp -pol polar.xvg -pcon contrib_pol.dat -nomme 
+# g_mmpbsa -f ../data/1EBZ.xtc -s ../data/1EBZ.tpr -n ../data/1EBZ.ndx -i mmpbsa.mdp -nomme -pbsa -decomp 
 #
 # g_mmpbsa is part of G R O M A C S:
 #
-# Groningen Machine for Chemical Simulation
+# GROtesk MACabre and Sinister
 #
 @    title "Polar solvation energy"
 @    xaxis  label "Time (ps)"

@@ -91,10 +91,10 @@ sasaconst       = 0
 
 ;===SAV model===
 ;Pressure kJ/(mol A^3)
-press           = 0.10
+press           = 0.234304
 
 ;Probe radius for SAV (A)
-savrad          = 2.9
+savrad          = 1.29
 
 ;Offset (c) kJ/mol
 savconst        = 0

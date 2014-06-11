@@ -41,9 +41,6 @@ import argparse
 import sys
 import os
 import math
-import scikits.bootstrap as bs
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
 
 def main():
 	args = ParseOptions()

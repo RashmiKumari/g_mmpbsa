@@ -87,14 +87,14 @@ gamma           = 0.0226778
 sasrad          = 1.4
 
 ;Offset (c) kJ/mol
-sasaconst       = -4.217472
+sasaconst       = 3.84928
 
 ;===SAV model===
 ;Pressure kJ/(mol A^3)
-press           = 0.10
+press           = 0
 
 ;Probe radius for SAV (A)
-savrad          = 2.9
+savrad          = 0
 
 ;Offset (c) kJ/mol
 savconst        = 0
