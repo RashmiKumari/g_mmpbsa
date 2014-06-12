@@ -49,124 +49,114 @@
 	  	<ul>
 			<li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
 			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
-			<li class="navigation"><a href="How-to-Run.html">How to run?</a>
-			<li class="navigation"><a href="File-list.html">File List</a>
-				<ul>
-					<li class="navigation"><a href="Input-Files.html">Input-Files</a></li>
-					<li class="navigation"><a href="Output-Files.html">Output-Files</a></li>
-				</ul>
-			</li>
+			<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
+			<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
 			<li class="navigation"><a href="Usage.html">Usage</a></li>
-			<li class="navigation"><a href="Parameters.html">Parameters</a>
-				<ul>
-					<li class="navigation"><a href="Polar-solvation-input-parameters.html">Polar solvation parameters</a></li>
-					<li class="navigation"><a href="Non-polar-solvation-input-parameters.html">Non-polar solvation parameters</a></li>
-				</ul>
-			</li>
+			<li class="navigation"><a href="Parameters.html">Parameters</a></li>
 		</ul>
 		</nav>
 
-        <h3> <a name="Non-polar-solvation-input-parameters" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Non-polar Solvation Input Parameters</h3>
+        <h4> <a name="Non-polar-solvation-input-parameters" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a> Input Keywords for Non-polar Solvation Energy</h4>
 
-<pre><code> apolar            = yes </code></pre>
+<pre><code id="apolar"> apolar            = yes </code></pre>
 
 <p>This will specify whether or not to do non-polar calculation. The value “yes” will allow the calculation while value “no” will not allow the calculation.</p>
 
 <hr>
 
-<h3>SASA model</h3>
+<h5 id="sasa_model">SASA model</h5>
 
-<pre><code> gamma            =  0.02267 </code></pre>
+<pre><code id="gamma"> gamma            =  0.02267 </code></pre>
 
 <p>This specifies the surface tension proportionality term (kJ mol <sup>-1</sup> Å <sup>-2</sup> ) of the solvent. The value can be set to zero to exclude SASA contribution to nonpolar solvation energy calculation.</p>
 
 <hr>
 
-<pre><code> sasaconst        = 3.84928 </code></pre>
+<pre><code id="sasaconst"> sasaconst        = 3.84928 </code></pre>
 
 <p>Offset or constant &#39;c&#39; in (kJ mol<sup>-1</sup>) from <em>E</em> =  <em>&gamma;</em> * <em>SASA</em> + <em>c</em></p>
 
 <hr>
 
-<pre><code> sasrad           = 1.4 </code></pre>
+<pre><code id="sasrad"> sasrad           = 1.4 </code></pre>
 
 <p>Solvent probe radius in Å to calculate solvent accessible surface area.</p>
 
 <hr>
 
-<h3>SAV model</h3>
+<h5 id="sav_model">SAV model</h5>
 
-<pre><code> press            = 0.10 </code></pre>
+<pre><code id="press"> press            = 0.10 </code></pre>
 
 <p>This specifies the solvent pressure proportionality term (kJ mol<sup>-1</sup> Å<sup>-3</sup>). The value can set to zero to exclude SAV contribution to nonpolar solvation energy calculation.</p>
 
 <hr>
 
-<pre><code> savrad           = 2.9 </code></pre>
+<pre><code id="savrad"> savrad           = 2.9 </code></pre>
 
 <p>Solvent probe radius in Å to calculate solvent accessible volume.</p>
 
 <hr>
 
-<pre><code> savconst         = 0 </code></pre>
+<pre><code id="savconst"> savconst         = 0 </code></pre>
 
 <p>Offset or constant &#39;c&#39; in kJ/mol from <em>E</em> = ( <var>p</var> * <em>SAV</em> ) + <var>c</var></p>
 
 <hr>
 
-<h3>Continuum/Integral based model (WCA):</h3>
+<h5 id="wca_like">Continuum/Integral based model (WCA-like)</h5>
 
-<pre><code> WCA              = yes </code></pre>
+<pre><code id="WCA"> WCA              = yes </code></pre>
 
 <p>Switch for WCA method: &quot;yes&quot; or &quot;no&quot;</p>
 
 <hr>
 
-<pre><code> wcarad           = 1.25 </code></pre>
+<pre><code id="wcarad"> wcarad           = 1.25 </code></pre>
 
-<p>Solvent probe radius for WCA method. This specify the radius of solvent molecules and used to define various solvent-related surfaces and volumes. This keyword is ignored when srfm is “spl2”. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/srad">wcarad</a>.</p>
-
-<hr>
-
-<pre><code> bconc            =  0.033428 </code></pre>
-
-<p>This parameter specifies the bulk solvent density in Å<sup>-3</sup>.   This can set to zero to eliminate integral contributions to nonpolar solvation energy calculation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/bconc">bconc</a>. </p>
+<p>Solvent probe radius for WCA method. This specify the radius of solvent molecules and used to define various solvent-related surfaces and volumes. This keyword is ignored when srfm is “spl2”. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/srad" target="_blank">wcarad</a>. </strong></p>
 
 <hr>
 
-<pre><code> dpos             = 0.05 </code></pre>
+<pre><code id="bconc"> bconc            =  0.033428 </code></pre>
 
-<p>This specify the displacement in Å of the atomic positions for surface area derivative calculation using finite difference method. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/dpos">dpos</a>.</p>
-
-<hr>
-
-<pre><code> grid             = 0.4 0.4 0.4 </code></pre>
-
-<p>This parameter specifies the quadrature grid spacing in Å for volume integral calculations. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/grid">grid</a>.</p>
+<p>This parameter specifies the bulk solvent density in Å<sup>-3</sup>.   This can set to zero to eliminate integral contributions to nonpolar solvation energy calculation. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/bconc" target="_blank">bconc</a>. </strong></p>
 
 <hr>
 
-<pre><code> APsdens          = 200 </code></pre>
+<pre><code id="dpos"> dpos             = 0.05 </code></pre>
 
-<p>This specifies the number of quadrature points per Å<sup>2</sup>  to use for molecular surface or solvent accessible surface. The parameter is ignored when the srad is “0.0” or when srfm is “spl2”. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/sdens">APsdens</a>.</p>
-
-<hr>
-
-<pre><code> APsrfm           = sacc </code></pre>
-
-<p>This parameter specifies the model used to construct the solvent-related surface and volume. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/srfm">APsrfm</a>.</p>
+<p>This specify the displacement in Å of the atomic positions for surface area derivative calculation using finite difference method. <strong>For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/dpos" target="_blank">dpos</a>. </strong></p>
 
 <hr>
 
-<pre><code> APswin           = 0.3 </code></pre>
+<pre><code id="grid"> grid             = 0.4 0.4 0.4 </code></pre>
 
-<p>This specify the size of spline window in Å for  spline-based surface definitions. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/swin">APswin</a></p>
+<p>This parameter specifies the quadrature grid spacing in Å for volume integral calculations. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/grid" target="_blank">grid</a>. </strong></p>
 
 <hr>
 
-<pre><code> APtemp           = 300 </code></pre>
+<pre><code id="APsdens"> APsdens          = 200 </code></pre>
 
-<p>This parameter specifies the temperature for apolar calculation. For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/temp">Temperature</a></p>
+<p>This specifies the number of quadrature points per Å<sup>2</sup>  to use for molecular surface or solvent accessible surface. The parameter is ignored when the srad is “0.0” or when srfm is “spl2”. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/sdens" target="_blank">APsdens</a>. </strong></p>
+
+<hr>
+
+<pre><code id="APsrfm"> APsrfm           = sacc </code></pre>
+
+<p>This parameter specifies the model used to construct the solvent-related surface and volume. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/srfm" target="_blank">APsrfm</a>. </strong></p>
+
+<hr>
+
+<pre><code id="APswin"> APswin           = 0.3 </code></pre>
+
+<p>This specify the size of spline window in Å for  spline-based surface definitions. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/swin" target="_blank">APswin</a>. </strong></p>
+
+<hr>
+
+<pre><code id="APtemp"> APtemp           = 300 </code></pre>
+
+<p>This parameter specifies the temperature for apolar calculation. <strong> For more details, click on <a href="http://www.poissonboltzmann.org/apbs/user-guide/running-apbs/input-files/apolar-input-file-section/apolar-keywords/temp" target="_blank">Temperature</a>. </strong> </p>
 
 <hr>
       </section>
