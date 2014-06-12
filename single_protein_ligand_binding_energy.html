@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>g_mmpbsa by RashmiKumari</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+    	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  		ga('create', 'UA-48631281-1', 'rashmikumari.github.io');
+  		ga('send', 'pageview');
+	</script>
+
+  </head>
+  <body>
+    <div class="wrapper">
+
+      <header>
+        <h1 class="header">g_mmpbsa</h1>
+        <p class="header">MM/PBSA method for GROMACS.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
+        </ul>
+	  	
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
+
+
+      </header>
+	  
+      <section>
+	  <nav>
+	  	<ul>
+			<li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
+			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+			<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
+			<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
+			<li class="navigation"><a href="Usage.html">Usage</a></li>
+			<li class="navigation"><a href="Parameters.html">Parameters</a></li>
+		</ul>
+		</nav>
+
+		<h5> Download Tutorial Package </h5>
+		<p> To download the tutorial package, click on this <a href="tutorial.tar.gz"><strong>link</strong></a>. This package contains required file for the tutorial.</p>
+		<p>Untar this package by following command: </p>
+
+<pre><code>tar -zxvf tutorial.tar.gz
+cd tutorial
+cd 1EBZ</code></pre>
+
+		<p> This directory contains topology-parameter (<em>tpr</em>), atom-index (<em>ndx</em>), and trajectory (<em>xtc</em>) files of  a HIV-1 protease inhibitor complex.
+		</P>
+
+		<h5> GMXLIB environment variable </h5>
+		<p> If GROMACS is installed at custom location, set the GMXLIB environment variable:</p>
+
+<pre><code>export GMXLIB=/opt/gromacs/share/gromacs/top</code></pre>
+
+		<h5> Calculation of three energy componenets </h5>
+		<p>The binding energy consists of three energetic terms, (a) potential energy in vacuum, (b) polar-solvation energy and (c) non-polar solvation energy. These energetic terms could be calculated in either three or one step.
+		</p>
+
+		<h5> Three steps calculation </h5>
+
+		<p> <strong> (a) Calculation of potential energy in Vacuum </strong> </p>
+
+		<p> Execute the following command, select <strong>1</strong> and <strong>13</strong> group number for protein and ligand, respectively:
+		</P>
+
+<pre><code>g_mmpbsa -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -pdie 2 -decomp</pre></code>
+
+		<p> Two files <code>energy_MM.xvg</code> and <code>contrib_MM.dat</code> are generated as outputs. Both files could be generated with different name by <code>-mm filename1.xvg</code> and <code>-mmcon filename2.dat</code>. <code>energy_MM.xvg</code> file contains van der Waals, electrostatic interactions, and net non-bonded potential energy between the protein and inhibitor. <code>contrib_MM.dat</code> contains contribution of each residue to the calculated net non-bonded interaction energy.
+		</p>
+
+		<p><strong>(b) Calculation of polar solvation energy</strong> </p>
+
+		<p>To calculate the polar solvation energy, an input file (e.g. tutorial/polar.mdp) is required. This file contains input parameters that are used in the calculation of polar solvation energy. To get the details of the input parameters, please click on this <a href="Parameters.html"><strong>link</strong></a>.
+		</p>
+
+		<p>Execute the following command, select <strong>1</strong> and <strong>13</strong> group number for protein and ligand, respectively:</p>
+
+<pre><code>g_mmpbsa -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -i ../polar.mdp -nomme -pbsa -decomp</code></pre>
+
+		<p>Two files <code>polar.xvg</code> and <code>contrib_pol.dat</code> are generated as outputs. Both files could be generated with different name by <code>-pol filename1.xvg</code> and <code>-pcon filename2.dat</code>.  <code>polar.xvg</code> contains polar solvation energies for unbound protein, unbound inhibitor and protein-inhibtor complex. <code>contrib_pol.dat</code> contains contribution of each residue to the calculated net polar solvation energy.
+		</p>
+
+		<p><strong>(c) Calculation of non-polar solvation energy</strong></p>
+
+		<p> To calculate the non-polar solvation energy, an input file (e.g. tutorial/apolar_sasa.mdp) is required. This file contains parameters that are used in the calculation of non-polar solvation energy. To get the details of the input parameters, please click on this <a href="Parameters.html"><strong>link</strong></a>. There are several type of non-polar models that are discussed in this <a href="http://pubs.acs.org/doi/abs/10.1021/ci500020m" target="_blank"><strong>publication</strong></a> (see Table 1 for values). Here, SASA-only and SAV-only model are used for which input parameter files are provided.
+		</p>
+
+		<p><strong>For SASA-only model:</strong></p> 
+		<p>Execute the following command, select <strong>1</strong> and <strong>13</strong> group number for protein and ligand, respectively:
+		</p>
+
+<pre><code>g_mmpbsa -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -i ../apolar_sasa.mdp -nomme -pbsa -decomp -apol sasa.xvg -apcon sasa_contrib.dat</code></pre>
+
+		<p>Two files <code>sasa.xvg</code> and <code>sasa_contrib.dat</code> are generated as outputs. <code>sasa.xvg</code> contains non-polar solvation energy for unbound protein, unbound inhibitor and protein-inhibtor complex. <code>sasa_contrib.dat</code> contains contribution of each residue to the calculated net polar-solvation energy.
+		</p>
+
+		<p><strong>For SAV-only model:</strong></p> 
+		<p>Execute the following command, select <strong>1</strong> and <strong>13</strong> group number for protein and ligand, respectively:
+		</p>
+
+<pre><code>g_mmpbsa -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -i ../apolar_sav.mdp -nomme -pbsa -decomp -apol sav.xvg -apcon sav_contrib.dat</code></pre>
+
+		<h5>One step calculation</h5>
+
+		<p>Execute the following command, select <strong>1</strong> and <strong>13</strong> group number for protein and ligand, respectively:
+		</p>
+
+<pre><code>g_mmpbsa -f 1EBZ.xtc -s 1EBZ.tpr -n 1EBZ.ndx -i ../pbsa.mdp -pdie 2 -pbsa -decomp</code></pre>
+
+		<p><code>pbsa.mdp</code> contains input parameters for both polar and SASA-only non-polar solvation energies. All three energetic terms are calculated by using the above single command and all output files are generated.
+		</p>
+
+		<h5>Average Binding Energy Calculation</h5>
+
+		<p>To calculate average binding energy, a python script <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/tools/MmPbSaStat.py" target="_blank"> <strong> MmPbSaStat.py </strong> </a> is provided in the <em>g_mmpbsa</em> package. For details about this script, please click on this <a href="Usage.html#mmpbsastatpy"><strong>link</strong></a>. To execute this script, above obtained files are required as the inputs.
+		</p>
+
+		<p>To calculate average binding energy by direct method, execute following command:
+		</p>
+
+<pre><code>python MmPbSaStat.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg (or sasa.xvg)</code></pre>
+
+		<p>Two output files <code>full_energy.dat</code> and <code>summary_energy.dat</code> are obtained. <code>summary_energy.dat</code> contains average and standard deviations of all energetic components including the binding energy as follows:
+		</p>
+
+<pre><code>#Complex Number:    1 
+=============== 
+   SUMMARY   
+=============== 
+
+
+ van der Waal energy      =        -334.587   +/-   15.514 kJ/mol 
+
+ Electrostattic energy    =        -159.380   +/-   15.810 kJ/mol 
+ 
+ Polar solvation energy   =         313.698   +/-   10.174 kJ/mol 
+
+ SASA energy              =         -30.431   +/-    0.996 kJ/mol 
+
+ SAV energy               =           0.000   +/-    0.000 kJ/mol 
+
+ WCA energy               =           0.000   +/-    0.000 kJ/mol 
+
+ Binding energy           =        -210.699   +/-   19.745 kJ/mol 
+
+=============== 
+    END     
+=============== 
+</code></pre>
+
+		<p><code>full_energy.dat</code> contains the values of energetic terms as a function of time. Last four columns contains  &Delta;<em>E</em><sub>MM</sub>, &Delta;<em>G</em><sub>polar</sub>, &Delta;<em>G</em><sub>nonpolar</sub> and &Delta;<em>G</em><sub>binding</sub> as a function of time. These quantities could be plotted with xmgrace/matplotlib/gnuplot. The respective four files in xmgrace format (<em>agr</em>) are provided in <code>tutorial/1EBZ/output</code>
+		</p>
+
+		<div class="result">
+		<img src="../images/binding_energy.png" height="220"/>
+		<img src="../images/Emm_energy.png" height="220"/>
+		</div>
+		
+		<div class="result">
+		<img src="../images/polar_energy.png" height="220"/>
+		<img src="../images/nonpolar_energy.png" height="220"/>
+		</div>
+
+
+		</p>To calculate average binding energy by using bootstrap analysis, execute following command:
+		</p>
+
+<pre><code>python MmPbSaStat.py -bs -nbs 2000 -m energy_MM.xvg -p polar.xvg -a apolar.xvg (or sasa.xvg)</code></pre>
+
+		<p>Again, two output files <code>full_energy.dat</code> and <code>summary_energy.dat</code> are genrated as outputs. <code>full_energy.dat</code> is similar to that of the above one. However, <code>summary_energy.dat</code> contains average and standard error of all energetic components including the binding energy.  Average values in <code>summary_energy.dat</code> are slightly different from the above one. For more details about this method, please follow this <a href="http://pubs.acs.org/doi/abs/10.1021/ci500020m" target="_blank"><strong>publication</strong></a>.
+		</p>
+		
+		<p></p>
+		<hr>
+		
+		</section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
