@@ -1,18 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>g_mmpbsa by RashmiKumari</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>    <![endif]-->
     <script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -22,181 +19,151 @@
   		ga('create', 'UA-48631281-1', 'rashmikumari.github.io');
   		ga('send', 'pageview');
 	</script>
-    
   </head>
   <body>
     <div class="wrapper">
-
       <header>
         <h1 class="header">g_mmpbsa</h1>
         <p class="header">MM/PBSA method for GROMACS.</p>
-
         <ul>
-          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download
+              ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download
+              TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View
+              On GitHub</a></li>
         </ul>
-	  	
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
-
-
+        <p class="header">This project is maintained by <a class="header name"
+            href="https://github.com/RashmiKumari">RashmiKumari</a></p>
       </header>
-	  
       <section>
-	  <nav>
-	  	<ul>
-			<li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
-			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
-			<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
-			<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
-			<li class="navigation"><a href="Usage.html">Usage</a></li>
-			<li class="navigation"><a href="Parameters.html">Parameters</a>	</li>
-		</ul>
-		</nav>
-
-
-<h4> <a name="Requirement" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Requirement</h4>
-
-<h5>1. GROMACS 4.5.x/4.6.x</h5>
-
-<pre><code> Required Libraries : libgmx.a, libgmxana.a and libmd.a </code></pre>
-
-<p><a href="http://www.gromacs.org/">GROMACS</a> should be compiled and installed from the source-code. Static library is required for the compilation. </p>
-
-<p> <strong> For GROMACS-4.6.x,</strong> additional FFTW library is required. </p>
-
-<pre><code> Required Libraries : libgmx.a, libgmxana.a, libmd.a and libfftw3f.a </code></pre>
-
-<p> By default, during compilation of GROMACS-4.6.x, only shared libraries are built. 
-	Therefore, <code> libgmx.a, libgmxana.a and libmd.a</code> files will be missing. 
-	To built these libraries, use <code> -DBUILD_SHARED_LIBS=OFF </code> with <code> cmake </code> 
-	during installation of GROMACS-4.6.x.
-</p> 
-
-<p> g_mmpbsa cannot use GPU and cannot be compiled with CUDA. 
-	If CUDA is in PATH variable, GROMACS-4.6.x compiled by default with CUDA for GPU acceleration. 
-	To avoid error in g_mmpbsa compilation, use <code> -DGMX_GPU=off </code> with <code> cmake </code> 
-	during installation of GROMACS-4.6.x.
-</p> 
-
-<p> <strong> Currently, double precision GROMACS is not supported.</strong> </p>
-
-<h5>2. APBS 1.2.x or 1.3.x</h5>
-
-<pre><code>Required Libraries : libapbsmainroutines.a, libapbs.a, libapbsblas.a, 
+        <nav>
+          <ul>
+            <li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
+            <li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+            <li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
+            <li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
+            <li class="navigation"><a href="Usage.html">Usage</a></li>
+            <li class="navigation"><a href="Parameters.html">Parameters</a> </li>
+          </ul>
+        </nav>
+        <h4> <a name="Requirement" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Requirement</h4>
+        <h5>1. GROMACS 4.5.x/4.6.x</h5>
+        <pre><code> Required Libraries : libgmx.a, libgmxana.a and libmd.a<br>or<br></code><code> Required Libraries : libgmx.so, libgmxana.so and libmd.so</code></pre>
+        <p><a href="http://www.gromacs.org/">GROMACS</a> should be compiled and
+          installed from the source-code. </p>
+        <p> <em>g_mmpbsa</em> cannot use GPU and cannot be compiled with CUDA.
+          If CUDA is in PATH variable, GROMACS-4.6.x compiled by default with
+          CUDA for GPU acceleration. To avoid error in g_mmpbsa compilation, use
+          <code> -DGMX_GPU=off</code> with <code> cmake</code><span style="color: black;"><span
+              style="font-family: Monaco,&quot;Bitstream Vera Sans Mono&quot;,&quot;Lucida Console&quot;,Terminal,monospace;">
+            </span></span>during installation of GROMACS-4.6.x. </p>
+        <p> <strong> Currently, double precision GROMACS is not supported.</strong>
+        </p>
+        <h5>2. APBS 1.2.x or 1.3.x</h5>
+        <pre><code>Required Libraries : libapbsmainroutines.a, libapbs.a, libapbsblas.a, 
                      libmaloc.a, libapbsgen.a and libz.a </code></pre>
-
-<p><a href="http://www.poissonboltzmann.org/apbs">APBS</a> should be compiled and installed from the source-code. Downloaded binaries and libraries would not work as some required libraries are missing.</p>
-
-<h5>Parallel support</h5>
-
-<p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x or 1.3.x. This parallel support is enabled by default and all processors/core will be used during run-time.</p>
-
-<p>To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
-<pre><code> export OMP_NUM_THREADS=X </code></pre>
-where <code>X</code> is number of core/processors.</p>
-
-<hr>
-
-<p><strong>Note:</strong>
-During installation and execution of program, errors may appear. Solution of the errors are given below in <a href="#list-of-errors">list</a> which will be regularly updated.</p>
-
-<hr>
-
-<h3>Download</h3>
-
-<p><strong>1. ZIP/TAR</strong></p>
-
-<p>The <a href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">ZIP</a> file or <a href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">TAR</a> for the tool can be downloaded from <a href="https://github.com/RashmiKumari/g_mmpbsa">github</a>. Also, these files can be downloaded from the left side of current webpage. After downloading the file, extract ZIP/TAR file. </p>
-
-<p><strong>2. Using git</strong></p>
-
-<pre><code> git clone https://github.com/RashmiKumari/g_mmpbsa </code></pre>
-
-<hr>
-
-<h3>Installation</h3>
-
-<p>
-	<strong>
-		Please post problems in <a href="https://groups.google.com/d/forum/g_mmpbsa">g_mmpbsa forum</a>, we will try our best to provide the solution.
-	</strong>
-</p>
-
-
-<h5>1. Configure to install</h5>
-
-<p>To get detailed options</p>
-
-<pre><code>./configure --help </code></pre>
-
-<p><strong><em>Defining Path to GROMACS and APBS headers and libraries files</em></strong></p>
-
-<p>Path to GROMACS include directory</p>
-
-<pre><code> --with-gmx-include=/opt/gromacs-4.5.5/include </code></pre>
-
-<p>Path to GROMACS Libraries files</p>
-
-<pre><code> --with-gmx-lib=/opt/gromacs-4.5.5/lib </code></pre>
-
-<p>Path to APBS Libraries files</p>
-
-<pre><code> --with-apbs-lib=/usr/local/lib </code></pre>
-
-<p>Path to APBS source directory</p>
-
-<pre><code> --with-apbs=/opt/apbs-1.3-source </code></pre>
-
-<p>Use above options/path to configure</p>
-
-<pre><code> ./configure --with-gmx-include=/opt/gromacs-4.5.5/include --with-gmx-lib=/opt/gromacs-4.5.5/lib --with-apbs-lib=/usr/local/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
-
-<p> <strong> For GROMACS-4.6.x,</strong>
-	<code> --enable-gmx46 </code> and path to <code> libfftw3f.a </code> is required. 
-	During configure, <code> libfftw3f.a </code>will be searched in <code> /usr/lib, usr/local/lib and ${HOME}/lib </code>.
-	If this file is not present in these directories, use environment variable <code> LDFLAGS </code> to declare the path.
-	For example in bash:
-</p>
-
-<pre><code> export LDFLAGS=-L/path/to/fftw3/lib </code></pre>
-
-<pre><code> ./configure --enable-gmx46 --with-gmx-include=/opt/gromacs_465/include --with-gmx-lib=/opt/gromacs_465/lib --with-apbs-lib=/usr/local/lib --with-apbs=/opt/apbs-1.3-source </code></pre>
-
-<h5>2. make</h5>
-
-<pre><code> make </code></pre>
-
-<h5>3. Install</h5>
-
-<pre><code> make install </code></pre>
-
-<hr>
-
-<h3 id="list-of-errors">List of Errors</h3>
-
-<ul>
-<li>Static gfortran library missing
-<pre><code> /usr/bin/ld: cannot find -lgfortran </code></pre>
-Please, install static gfortran library file &quot; <strong>libgfortran.a</strong> &quot;.</li>
-</ul>
-
-<hr>
-
-<ul>
-<li>During execution of g_mmpbsa, error of shared object file.
-<pre><code> ./g_mmpbsa: error while loading shared libraries: libgmx.so.6: cannot open shared object file: No such file or directory </code></pre>
-Try to locate file libgmx.so.6 and put this path in library path. For example, if libgmx.so.6 is present in &quot;/usr/local/gromacs/lib&quot; directory, please follow this step:
-<pre><code> export LD_LIBRARY_PATH=/usr/local/gromacs/lib </code></pre></li>
-</ul>
-
-<hr>      
-</section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+        <p><a href="http://www.poissonboltzmann.org/apbs">APBS</a> should be
+          compiled and installed from the source-code. Downloaded binaries and
+          libraries would not work as some required libraries are missing.</p>
+        <h5>Parallel support</h5>
+        <p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x
+          or 1.3.x. This parallel support is enabled by default and all
+          processors/core will be used during run-time.</p>
+        <p>To control the usage of processors/cores, number of threads can be
+          changed by defining environment variable. For example in bash, one can
+          write following command: </p>
+        <pre><code> export OMP_NUM_THREADS=X </code></pre>
+        where <code>X</code> is number of core/processors.
+        <hr>
+        <p><strong>Note:</strong> During installation and execution of program,
+          errors may appear. Solution of the errors are given below in <a href="#list-of-errors">list</a>
+          which will be regularly updated.</p>
+        <hr>
+        <h3>Download</h3>
+        <p><strong>1. ZIP/TAR</strong></p>
+        <p>The <a href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">ZIP</a>
+          file or <a href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">TAR</a>
+          for the tool can be downloaded from <a href="https://github.com/RashmiKumari/g_mmpbsa">github</a>.
+          Also, these files can be downloaded from the left side of current
+          webpage. After downloading the file, extract ZIP/TAR file. </p>
+        <p><strong>2. Using git</strong></p>
+        <pre><code> git clone https://github.com/RashmiKumari/g_mmpbsa </code></pre>
+        <hr>
+        <h3>Installation</h3>
+        <p> <strong> Please post problems in <a href="https://groups.google.com/d/forum/g_mmpbsa">g_mmpbsa
+              forum</a>, we will try our best to provide the solution. <br>
+          </strong></p>
+        <h4>1. Installation of GROMACS</h4>
+        <h5>GROMACS-4.5.x</h5>
+        <pre><code>tar -zxvf gromacs-4.5.5.tar.gz<br>cd gromacs-4.5.5
+./configure --prefix=/opt/gromacs
+make
+make install</code></pre>
+        <h5>GROMACS-4.5.7 and GROMACS-4.6.x</h5>
+        <pre><code>tar -zxvf gromacs-4.6.5.tar.gz<br>cd gromacs-4.6.5<br>mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=/opt/gromacs -DGMX_GPU=off
+make
+make install</code></pre>
+        <h4>2. Installation of APBS</h4>
+        <pre><code>tar -zxvf apbs-1.3-source.tar.gz<br>cd apbs-1.3-source<br>./configure --prefix=/opt/apbs
+make
+make install</code></pre>
+        <h4>3. Configure for g_mmpbsa</h4>
+        <p>To get detailed options</p>
+        <pre><code>./configure --help </code></pre>
+        <p><strong><em>Defining Path to GROMACS and APBS headers and libraries files</em></strong></p>
+        <p>Path to GROMACS include directory</p>
+        <pre><code> --with-gmx-include=/opt/gromacs/include </code></pre>
+        <p>Path to GROMACS Libraries files</p>
+        <pre><code> --with-gmx-lib=/opt/gromacs/lib </code></pre>
+        <p>Path to APBS Libraries files</p>
+        <pre><code> --with-apbs-lib=/opt/apbs/lib </code></pre>
+        <p>Path to APBS source directory</p>
+        <pre><code> --with-apbs=/path/to/apbs-1.3-source </code></pre>
+        <h5>For GROMACS-4.5.x</h5>
+        <pre><code> ./configure --disable-gmx46 --with-gmx-include=/opt/gromacs/include --with-gmx-lib=/opt/gromacs/lib --with-apbs-lib=/opt/apbs/lib --with-apbs=/path/to/apbs-1.3-source </code></pre>
+        <h5>For GROMACS-4.6.x</h5>
+        <pre><code> ./configure --enable-gmx46 --with-gmx-include=/opt/gromacs/include --with-gmx-lib=/opt/gromacs/lib --with-apbs-lib=/opt/apbs/lib --with-apbs=/path/to/apbs-1.3-source </code></pre>
+        <p>During configure, <code> libfftw3f.a</code> will be searched in
+          the&nbsp; standard locations. If this file is not present in these
+          locations, use environment variable <code> LDFLAGS</code> to define
+          the path. For example in bash: </p>
+        <pre><code> export LDFLAGS=-L/path/to/fftw3/lib </code></pre>
+        <h4>4. Compiling g_mmpbsa</h4>
+        <pre><code> make </code></pre>
+        <h4>5. Installing g_mmpbsa</h4>
+        <pre><code> make install </code></pre>
+        <hr>
+        <h3 id="list-of-errors">List of Errors</h3>
+        <ul>
+          <li>Static gfortran library missing
+            <pre><code> /usr/bin/ld: cannot find -lgfortran </code></pre>
+            Please, install static gfortran library file " <strong>libgfortran.a</strong>
+            ".</li>
+        </ul>
+        <hr>
+        <ul>
+          <li>During execution of g_mmpbsa, error of shared object file.
+            <pre><code>g_mmpbsa: error while loading shared libraries: libgmx.so.8: cannot open shared object file: No such file or directory</code></pre>
+            <p>Define the path of <code>libgmx.so</code>, <code><span>libmd.so</span></code>
+              and <code>libgmxana.so</code> files by <code>LD_LIBRARY_PATH</code>
+              environment variable in terminal or <code>.bashrc</code> as
+              following:</p>
+            <pre><code> export LD_LIBRARY_PATH=/opt/gromacs/lib </code></pre>
+          </li>
+        </ul>
+        <hr> </section>
+      <em>
+        <footer>
+          <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a>
+              using the Dinky theme</small></p>
+        </footer>
+      </em></div>
+    <em>
+      <!--[if !IE]><script>fixScale(document);</script><![endif]--><br>
+      <br>
+    </em>
   </body>
 </html>
