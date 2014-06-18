@@ -6,7 +6,6 @@ AM_INIT_AUTOMAKE([g_mmpbsa], [1.1])
 
 
 AC_CANONICAL_HOST
-dnl # LT_INIT([disable-shared])
 AC_PROG_EGREP
 AC_PROG_LN_S
 
@@ -110,24 +109,22 @@ AC_ARG_WITH(
 
 if test x"$gmx_lib_path" != "xno" -a -n "$gmx_lib_path"; then
 	AC_MSG_RESULT([${gmx_lib_path}])
-
-dnl       libgmx.a
-	AC_CHECK_FILE(${gmx_lib_path}/libgmx.a,[a="yes"],[a=""])
-	if test -z "$a"; then
-        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmx.a library file])
-	fi
-
-dnl       libgmxana.a
-	AC_CHECK_FILE(${gmx_lib_path}/libgmxana.a,[a="yes"],[a=""])
-	if test -z "$a"; then
-        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libgmxana.a library file])
-	fi
 	
-dnl       libmd.a
-	AC_CHECK_FILE(${gmx_lib_path}/libmd.a,[a="yes"],[a=""])
+	AC_CHECK_FILES([${gmx_lib_path}/libgmx.a
+		        ${gmx_lib_path}/libgmxana.a
+		        ${gmx_lib_path}/libmd.a ], [a="yes"],[a=""])
+
 	if test -z "$a"; then
-        	AC_MSG_ERROR([Could not find ${gromacs_lib_path}/libmd.a library file])
+        	AC_MSG_WARN([Could not find one or more of libgmx.a libgmxana.a and libmd.a library files at ${gmx_lib_path}])
+		AC_CHECK_FILES([${gmx_lib_path}/libgmx.so
+		       	        ${gmx_lib_path}/libgmxana.so
+		                ${gmx_lib_path}/libmd.so ], [b="yes"],[b="no"])
+		if test x"$b" = "xno"; then
+			AC_MSG_ERROR([Could not find one or more of libgmx.so libgmxana.so and libmd.so library files at ${gmx_lib_path}])
+		fi
 	fi
+
+
 else
 	AC_MSG_RESULT([no])
 	AC_MSG_NOTICE([WARNING: Path to GROMACS Libraries not provided])
@@ -137,6 +134,15 @@ else
 			/usr/local/lib/libmd.a ], [a="yes"],[a="no"])
 	if test x"$a" = "xyes"; then
         	gmx_lib_path="/usr/local/lib"
+	
+	else
+		AC_CHECK_FILES([/usr/local/lib/libgmx.so
+				/usr/local/lib/libgmxana.so
+				/usr/local/lib/libmd.so ], [a="yes"],[a="no"])
+		if test x"$a" = "xyes"; then
+			gmx_lib_path="/usr/local/lib"
+		fi
+
 	fi
 
 	if test x"$a" = "xno" ; then
@@ -147,6 +153,11 @@ else
 
 	if test x"$b" = "xyes"; then
         	gmx_lib_path="${HOME}/lib"
+	else	
+		AC_CHECK_FILES([/usr/local/lib/libgmx.so
+				/usr/local/lib/libgmxana.so
+				/usr/local/lib/libmd.so ], [b="yes"],[b="no"])
+
 	fi
 
 	if test [ x"$a" = "xno" ] -a  [ x"$b" = "xno" ] ; then
@@ -169,37 +180,17 @@ if test x"$enable_gmx46" == "xyes"; then
 	AC_MSG_RESULT([yes])
 	AC_MSG_NOTICE([g_mmpbsa will be compiled for GROMACS-4.6.x])
 	
-	AC_MSG_NOTICE([checking for fftw3f Libraries in standard location])
-	AC_CHECK_FILE([/usr/local/lib/libfftw3f.a], [a="yes"],[a="no"])
-	if test x"$a" = "xyes"; then
-        	fftw_path="/usr/local/lib"
+	AC_MSG_NOTICE([checking for fftw3f Library])
+
+	AC_CHECK_LIB([fftw3f],main,[a="yes"],[a="no"])
+
+	if test x"$a" = "xno"; then
+		AC_MSG_ERROR([fftw3f library not found in standard location. 
+                Please provide path. e.g. export LDFLAGS=-L/path/to/lib])
 	fi
 
-	if test x"$a" = "xno" ; then
-        	AC_CHECK_FILE([${HOME}/lib/libfftw3f.a], [b="yes"],[b="no"])
-	fi
-
-	if test x"$b" = "xyes"; then
-        	fftw_path="${HOME}/lib"
-	fi
-	
-	if test x"$b" = "xno" ; then
-        	AC_CHECK_FILE([/usr/lib/libfftw3f.a], [c="yes"],[c="no"])
-	fi
-
-	if test x"$c" = "xyes"; then
-        	fftw_path="/usr/lib"
-	fi
-
-	if test [ x"$a" = "xno" ] -a  [ x"$b" = "xno" ] -a [ x"$c" = "xno" ] ; then
-		AC_MSG_ERROR([WARNING: libfftw3f.a not found in standard location. 
-                Please, provide path. e.g. export LDFLAGS=-L/path/to/lib])
-		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
-		LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
-	else
-		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
-		LDFLAGS="$LDFLAGS -L${fftw_path} -L${gmx_lib_path}"
-	fi
+	LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+	LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
 	
 else
 	AC_MSG_NOTICE([g_mmpbsa will be compiled for GROMACS-4.5.x])
