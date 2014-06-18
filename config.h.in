@@ -12,11 +12,20 @@
 /* Define to 1 if you have the file `/usr/local/lib/libgmxana.a'. */
 #undef HAVE__USR_LOCAL_LIB_LIBGMXANA_A
 
+/* Define to 1 if you have the file `/usr/local/lib/libgmxana.so'. */
+#undef HAVE__USR_LOCAL_LIB_LIBGMXANA_SO
+
 /* Define to 1 if you have the file `/usr/local/lib/libgmx.a'. */
 #undef HAVE__USR_LOCAL_LIB_LIBGMX_A
 
+/* Define to 1 if you have the file `/usr/local/lib/libgmx.so'. */
+#undef HAVE__USR_LOCAL_LIB_LIBGMX_SO
+
 /* Define to 1 if you have the file `/usr/local/lib/libmd.a'. */
 #undef HAVE__USR_LOCAL_LIB_LIBMD_A
+
+/* Define to 1 if you have the file `/usr/local/lib/libmd.so'. */
+#undef HAVE__USR_LOCAL_LIB_LIBMD_SO
 
 /* Name of package */
 #undef PACKAGE

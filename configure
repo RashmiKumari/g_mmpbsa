@@ -4269,16 +4269,15 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  a="yes"
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libgmx.a" | $as_tr_cpp` 1
+_ACEOF
+a="yes"
 else
   a=""
 fi
-
-	if test -z "$a"; then
-        	as_fn_error $? "Could not find ${gromacs_lib_path}/libgmx.a library file" "$LINENO" 5
-	fi
-
-	as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmxana.a" | $as_tr_sh`
+as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmxana.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libgmxana.a" >&5
 $as_echo_n "checking for ${gmx_lib_path}/libgmxana.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
@@ -4296,16 +4295,15 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  a="yes"
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libgmxana.a" | $as_tr_cpp` 1
+_ACEOF
+a="yes"
 else
   a=""
 fi
-
-	if test -z "$a"; then
-        	as_fn_error $? "Could not find ${gromacs_lib_path}/libgmxana.a library file" "$LINENO" 5
-	fi
-
-	as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libmd.a" | $as_tr_sh`
+as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libmd.a" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libmd.a" >&5
 $as_echo_n "checking for ${gmx_lib_path}/libmd.a... " >&6; }
 if eval \${$as_ac_File+:} false; then :
@@ -4323,14 +4321,104 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  a="yes"
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libmd.a" | $as_tr_cpp` 1
+_ACEOF
+a="yes"
 else
   a=""
 fi
 
+
 	if test -z "$a"; then
-        	as_fn_error $? "Could not find ${gromacs_lib_path}/libmd.a library file" "$LINENO" 5
+        	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not find one or more of libgmx.a libgmxana.a and libmd.a library files at ${gmx_lib_path}" >&5
+$as_echo "$as_me: WARNING: Could not find one or more of libgmx.a libgmxana.a and libmd.a library files at ${gmx_lib_path}" >&2;}
+		as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmx.so" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libgmx.so" >&5
+$as_echo_n "checking for ${gmx_lib_path}/libgmx.so... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${gmx_lib_path}/libgmx.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libgmx.so" | $as_tr_cpp` 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libgmxana.so" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libgmxana.so" >&5
+$as_echo_n "checking for ${gmx_lib_path}/libgmxana.so... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${gmx_lib_path}/libgmxana.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libgmxana.so" | $as_tr_cpp` 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+as_ac_File=`$as_echo "ac_cv_file_${gmx_lib_path}/libmd.so" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${gmx_lib_path}/libmd.so" >&5
+$as_echo_n "checking for ${gmx_lib_path}/libmd.so... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${gmx_lib_path}/libmd.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_${gmx_lib_path}/libmd.so" | $as_tr_cpp` 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+
+		if test x"$b" = "xno"; then
+			as_fn_error $? "Could not find one or more of libgmx.so libgmxana.so and libmd.so library files at ${gmx_lib_path}" "$LINENO" 5
+		fi
 	fi
+
+
 else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4413,6 +4501,85 @@ fi
 
 	if test x"$a" = "xyes"; then
         	gmx_lib_path="/usr/local/lib"
+
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libgmx.so" >&5
+$as_echo_n "checking for /usr/local/lib/libgmx.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libgmx_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libgmx.so"; then
+  ac_cv_file__usr_local_lib_libgmx_so=yes
+else
+  ac_cv_file__usr_local_lib_libgmx_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libgmx_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libgmx_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libgmx_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBGMX_SO 1
+_ACEOF
+a="yes"
+else
+  a="no"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libgmxana.so" >&5
+$as_echo_n "checking for /usr/local/lib/libgmxana.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libgmxana_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libgmxana.so"; then
+  ac_cv_file__usr_local_lib_libgmxana_so=yes
+else
+  ac_cv_file__usr_local_lib_libgmxana_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libgmxana_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libgmxana_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libgmxana_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBGMXANA_SO 1
+_ACEOF
+a="yes"
+else
+  a="no"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libmd.so" >&5
+$as_echo_n "checking for /usr/local/lib/libmd.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libmd_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libmd.so"; then
+  ac_cv_file__usr_local_lib_libmd_so=yes
+else
+  ac_cv_file__usr_local_lib_libmd_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libmd_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libmd_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libmd_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBMD_SO 1
+_ACEOF
+a="yes"
+else
+  a="no"
+fi
+
+		if test x"$a" = "xyes"; then
+			gmx_lib_path="/usr/local/lib"
+		fi
+
 	fi
 
 	if test x"$a" = "xno" ; then
@@ -4499,6 +4666,81 @@ fi
 
 	if test x"$b" = "xyes"; then
         	gmx_lib_path="${HOME}/lib"
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libgmx.so" >&5
+$as_echo_n "checking for /usr/local/lib/libgmx.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libgmx_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libgmx.so"; then
+  ac_cv_file__usr_local_lib_libgmx_so=yes
+else
+  ac_cv_file__usr_local_lib_libgmx_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libgmx_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libgmx_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libgmx_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBGMX_SO 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libgmxana.so" >&5
+$as_echo_n "checking for /usr/local/lib/libgmxana.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libgmxana_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libgmxana.so"; then
+  ac_cv_file__usr_local_lib_libgmxana_so=yes
+else
+  ac_cv_file__usr_local_lib_libgmxana_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libgmxana_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libgmxana_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libgmxana_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBGMXANA_SO 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libmd.so" >&5
+$as_echo_n "checking for /usr/local/lib/libmd.so... " >&6; }
+if ${ac_cv_file__usr_local_lib_libmd_so+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "/usr/local/lib/libmd.so"; then
+  ac_cv_file__usr_local_lib_libmd_so=yes
+else
+  ac_cv_file__usr_local_lib_libmd_so=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libmd_so" >&5
+$as_echo "$ac_cv_file__usr_local_lib_libmd_so" >&6; }
+if test "x$ac_cv_file__usr_local_lib_libmd_so" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE__USR_LOCAL_LIB_LIBMD_SO 1
+_ACEOF
+b="yes"
+else
+  b="no"
+fi
+
+
 	fi
 
 	if test  x"$a" = "xno"  -a   x"$b" = "xno"  ; then
@@ -4525,100 +4767,53 @@ $as_echo "yes" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: g_mmpbsa will be compiled for GROMACS-4.6.x" >&5
 $as_echo "$as_me: g_mmpbsa will be compiled for GROMACS-4.6.x" >&6;}
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw3f Libraries in standard location" >&5
-$as_echo "$as_me: checking for fftw3f Libraries in standard location" >&6;}
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/local/lib/libfftw3f.a" >&5
-$as_echo_n "checking for /usr/local/lib/libfftw3f.a... " >&6; }
-if ${ac_cv_file__usr_local_lib_libfftw3f_a+:} false; then :
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw3f Library" >&5
+$as_echo "$as_me: checking for fftw3f Library" >&6;}
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lfftw3f" >&5
+$as_echo_n "checking for main in -lfftw3f... " >&6; }
+if ${ac_cv_lib_fftw3f_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "/usr/local/lib/libfftw3f.a"; then
-  ac_cv_file__usr_local_lib_libfftw3f_a=yes
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3f  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3f_main=yes
 else
-  ac_cv_file__usr_local_lib_libfftw3f_a=no
+  ac_cv_lib_fftw3f_main=no
 fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_local_lib_libfftw3f_a" >&5
-$as_echo "$ac_cv_file__usr_local_lib_libfftw3f_a" >&6; }
-if test "x$ac_cv_file__usr_local_lib_libfftw3f_a" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3f_main" >&5
+$as_echo "$ac_cv_lib_fftw3f_main" >&6; }
+if test "x$ac_cv_lib_fftw3f_main" = xyes; then :
   a="yes"
 else
   a="no"
 fi
 
-	if test x"$a" = "xyes"; then
-        	fftw_path="/usr/local/lib"
+
+	if test x"$a" = "xno"; then
+		as_fn_error $? "fftw3f library not found in standard location.
+                Please provide path. e.g. export LDFLAGS=-L/path/to/lib" "$LINENO" 5
 	fi
 
-	if test x"$a" = "xno" ; then
-        	as_ac_File=`$as_echo "ac_cv_file_${HOME}/lib/libfftw3f.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${HOME}/lib/libfftw3f.a" >&5
-$as_echo_n "checking for ${HOME}/lib/libfftw3f.a... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "${HOME}/lib/libfftw3f.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  b="yes"
-else
-  b="no"
-fi
-
-	fi
-
-	if test x"$b" = "xyes"; then
-        	fftw_path="${HOME}/lib"
-	fi
-
-	if test x"$b" = "xno" ; then
-        	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for /usr/lib/libfftw3f.a" >&5
-$as_echo_n "checking for /usr/lib/libfftw3f.a... " >&6; }
-if ${ac_cv_file__usr_lib_libfftw3f_a+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "/usr/lib/libfftw3f.a"; then
-  ac_cv_file__usr_lib_libfftw3f_a=yes
-else
-  ac_cv_file__usr_lib_libfftw3f_a=no
-fi
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__usr_lib_libfftw3f_a" >&5
-$as_echo "$ac_cv_file__usr_lib_libfftw3f_a" >&6; }
-if test "x$ac_cv_file__usr_lib_libfftw3f_a" = xyes; then :
-  c="yes"
-else
-  c="no"
-fi
-
-	fi
-
-	if test x"$c" = "xyes"; then
-        	fftw_path="/usr/lib"
-	fi
-
-	if test  x"$a" = "xno"  -a   x"$b" = "xno"  -a  x"$c" = "xno"  ; then
-		as_fn_error $? "WARNING: libfftw3f.a not found in standard location.
-                Please, provide path. e.g. export LDFLAGS=-L/path/to/lib" "$LINENO" 5
-		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
-		LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
-	else
-		LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
-		LDFLAGS="$LDFLAGS -L${fftw_path} -L${gmx_lib_path}"
-	fi
+	LIBS="$LIBS -pthread -lgmx -lgmxana -lmd -lfftw3f -ldl"
+	LDFLAGS="$LDFLAGS -L${gmx_lib_path}"
 
 else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: g_mmpbsa will be compiled for GROMACS-4.5.x" >&5
