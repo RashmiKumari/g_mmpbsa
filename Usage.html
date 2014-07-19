@@ -1,19 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>g_mmpbsa by RashmiKumari</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    
-        
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>    <![endif]-->
     <script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -23,423 +19,319 @@
   		ga('create', 'UA-48631281-1', 'rashmikumari.github.io');
   		ga('send', 'pageview');
 	</script>
-
-    
   </head>
   <body>
     <div class="wrapper">
-
       <header>
         <h1 class="header">g_mmpbsa</h1>
         <p class="header">MM/PBSA method for GROMACS.</p>
-
         <ul>
-          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/zipball/master">Download
+              ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/RashmiKumari/g_mmpbsa/tarball/master">Download
+              TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/RashmiKumari/g_mmpbsa">View
+              On GitHub</a></li>
         </ul>
-	  	
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/RashmiKumari">RashmiKumari</a></p>
-
-
+        <p class="header">This project is maintained by <a class="header name"
+            href="https://github.com/RashmiKumari">RashmiKumari</a></p>
       </header>
-	  
       <section>
-	  <nav>
-	  	<ul>
-			<li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
-			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
-			<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
-			<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
-			<li class="navigation"><a href="Usage.html">Usage</a></li>
-			<li class="navigation"><a href="Parameters.html">Parameters</a>	</li>
-		</ul>
-		</nav>
-
-<h3 id="top"><a href="#g_mmpbsa">g_mmpbsa</a></h3>
-
-<h3><a href="#mmpbsastatpy">MmPbSaStat.py</a></h3>
-
-<h3><a href="#mmpbsadecomppy">MmPbSaDecomp.py</a></h3>
-
-<h3><a href="#energy2bfac">energy2bfac</a></h3>
-
-<br>
-<br>
-<br>
-<br>
-
-<h1></h1>
-
-<h3 id="g_mmpbsa">g_mmpbsa</h3>
-
-<p>g_mmpbsa calculates binding energy of biomolecular associations like protein-protein, protein-ligand protein-DNA etc using MM-PBSA. It gives the different component of energy term in separate file so that user will have choice to have either MM, PB and SA energy values or all energies according to their objective. The tool also gives residue wise contribution to total binding energy which will provide information about important contributing residues to the molecular association.</p>
-
-<hr>
-
-<p><strong>Only molecular mechanics (vdw and electrostatic) vacuum energy with energy decomposition</strong>
-<pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -n index.ndx -mme -mm energy_MM.xvg -decomp -mmcon contrib_MM.dat </code></pre></p>
-
-<p><strong>Only polar solvation energy with energy decomposition</strong>
-<pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -pol polar.xvg -pcon contrib_pol.dat </code></pre>
-An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/polar_orig/mmpbsa.mdp">mmpbsa.mdp</a> is provided in <code>g_mmpbsa/test/polar_orig</code>.</p>
-
-<p><strong>Only non-polar solvation energy with energy decomposition</strong>
-<pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -apol apolar.xvg -apcon contrib_apol.dat </code></pre></p>
-
-<ul>
-<li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/sasa_orig/mmpbsa.mdp">mmpbsa.mdp</a> for SASA model is provided in <code>g_mmpbsa/test/sasa_orig</code>.</li>
-<li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/sav_orig/mmpbsa.mdp">mmpbsa.mdp</a> for SAV model is provided in <code>g_mmpbsa/test/sav_orig</code>.</li>
-<li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/wca_orig/mmpbsa.mdp">mmpbsa.mdp</a> for WCA model is provided in <code>g_mmpbsa/test/wca_orig</code>.</li>
-</ul>
-
-<p><strong>All energetic term with energy decomposition</strong>
-<pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -pbsa \
+        <nav>
+          <ul>
+            <li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
+            <li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+            <li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
+            <li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
+            <li class="navigation"><a href="Usage.html">Usage</a></li>
+            <li class="navigation"><a href="Parameters.html">Parameters</a> </li>
+          </ul>
+        </nav>
+        <h3 id="top"><a href="#g_mmpbsa">g_mmpbsa</a></h3>
+        <h3><a href="#mmpbsastatpy">MmPbSaStat.py</a></h3>
+        <h3><a href="#mmpbsadecomppy">MmPbSaDecomp.py</a></h3>
+        <h3><a href="#energy2bfac">energy2bfac</a></h3>
+        <br>
+        <br>
+        <br>
+        <br>
+        <h3 id="g_mmpbsa">g_mmpbsa</h3>
+        <p>g_mmpbsa calculates binding energy of biomolecular associations like
+          protein-protein, protein-ligand protein-DNA etc using MM-PBSA. It
+          gives the different component of energy term in separate file so that
+          user will have choice to have either MM, PB and SA energy values or
+          all energies according to their objective. The tool also gives residue
+          wise contribution to total binding energy which will provide
+          information about important contributing residues to the molecular
+          association.</p>
+        <hr>
+        <p><strong>Only molecular mechanics (vdw and electrostatic) vacuum
+            energy with energy decomposition</strong> </p>
+        <pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -n index.ndx -mme -mm energy_MM.xvg -decomp -mmcon contrib_MM.dat </code></pre>
+        <p><strong>Only polar solvation energy with energy decomposition</strong>
+        </p>
+        <pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -pol polar.xvg -pcon contrib_pol.dat </code></pre>
+        An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/polar_orig/mmpbsa.mdp">mmpbsa.mdp</a>
+        is provided in <code>g_mmpbsa/test/polar_orig</code>.
+        <p><strong>Only non-polar solvation energy with energy decomposition</strong>
+        </p>
+        <pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -nomme -pbsa -decomp -apol apolar.xvg -apcon contrib_apol.dat </code></pre>
+        <ul>
+          <li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/sasa_orig/mmpbsa.mdp">mmpbsa.mdp</a>
+            for SASA model is provided in <code>g_mmpbsa/test/sasa_orig</code>.</li>
+          <li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/sav_orig/mmpbsa.mdp">mmpbsa.mdp</a>
+            for SAV model is provided in <code>g_mmpbsa/test/sav_orig</code>.</li>
+          <li>An example <a href="https://github.com/RashmiKumari/g_mmpbsa/blob/master/test/wca_orig/mmpbsa.mdp">mmpbsa.mdp</a>
+            for WCA model is provided in <code>g_mmpbsa/test/wca_orig</code>.</li>
+        </ul>
+        <p><strong>All energetic term with energy decomposition</strong> </p>
+        <pre><code> g_mmpbsa -f traj.xtc -s topol.tpr -i mmpbsa.mdp -n index.ndx -pbsa \
           -mm energy_MM.xvg -pol polar.xvg -apol apolar.xvg -decomp \
           -mmcon contrib_MM.dat -pcon contrib_pol.dat -apcon contrib_apol.dat 
-</code></pre>
-Please keep an eye on RAM usage because combined Molecular-Mechanics and Polar-Solvation energy calculation needs lots of memory.</p>
-
-<hr>
-
-<hr>
-
-<h4>File Options</h4>
-
-<hr>
-
-<pre><code> -s topol.tpr </code></pre>
-
-<p>Input tpr/tpx file of molecule.</p>
-
-<hr>
-
-<pre><code> -f traj.xtc </code></pre>
-
-<p>Input trajectory xtc/trr format file. </p>
-
-<p><strong>WARNING: trajectory should be PBC corrected and molecule should not be PBC broken. To make molecule whole in trajectory, please follow these links: <a href="http://www.gromacs.org/Documentation/Terminology/Periodic_Boundary_Conditions">PBC</a> and <a href="http://manual.gromacs.org/current/online/trjconv.html">trjconv</a>.</strong></p>
-
-<hr>
-
-<pre><code> -n index.ndx </code></pre>
-
-<p>Input atomic index file. User will get choice to select atomic groups.</p>
-
-<hr>
-
-<pre><code> -i grompp.mdp </code></pre>
-
-<p>Input solvation energy parameter file. User may give choice of either <a href="Polar-solvation-input-parameters.html">polar-solvation</a> or <a href="Non-polar-solvation-input-parameters.html">non-polar solvation</a> parameters for both type of calculation.</p>
-
-<hr>
-
-<pre><code> -mm energy_MM.xvg </code></pre>
-
-<p>van der Waal and electrostatic energy of the selected atom group/s.  If the index selected is for one group then the file will have vacuum MM energy value for that group only. On the other side if two group is selected, then file will have vacuum MM energy values for both selected group and for their complexes.</p>
-
-<hr>
-
-<pre><code> -pol polar.xvg </code></pre>
-
-<p>Polar solvation energy of the selected atoms group/s. If the index selected is for one group then the file will have polar energy value for that group only. On the other side if two group is selected, then file will have polar energy values for both selected group and for their complexes.</p>
-
-<hr>
-
-<pre><code> -apol apolar.xvg </code></pre>
-
-<p>Non-polar solvation energy of the selected atoms group/s. If the index selected is for one group then the file will have non-polar energy value for that group only. On the other side if two group is selected from index file then file will have non-polar energy values for both selected group and for their complexes.</p>
-
-<hr>
-
-<pre><code> -mmcon contrib_MM.dat </code></pre>
-
-<p>Vacuum MM van der Waals and electrostatic energy contribution per residue per frame/snaspshot.</p>
-
-<hr>
-
-<pre><code> -pcon contrib_pol.dat </code></pre>
-
-<p>Polar solvation energy contribution per residue frame wise.</p>
-
-<hr>
-
-<pre><code> -apcon contrib_apol.dat </code></pre>
-
-<p>Non-polar solvation energy contribution per residue frame wise.</p>
-
-<hr>
-
-<h4>Other options</h4>
-
-<pre><code> -diff or -nodiff </code></pre>
-
-<p><code>Default: yes</code> If this option is &quot;yes&quot;, selection of two atom groups will be prompted. For example, atom group A and B is selected by user. Then, third combined AB group will be automatically generated. Further, all energy calculation will be performed on these three atom groups A, B and AB.
-If it is switched to &quot;no&quot; by <code>-nodiff</code>, selection of only one atom group will be prompted and all energy calculation will be performed on selected atom group.</p>
-
-<hr>
-
-<pre><code> -mme or -nomme </code></pre>
-
-<p><code>Default: yes</code> If this option is &quot;yes&quot;, van der Waals and electrostatic energy of the selected group/s will be calculated. This option can be changed to &quot;no&quot; by <code>-nomme</code> to prevent this energy calculation.</p>
-
-<hr>
-
-<pre><code> -pdie 1 </code></pre>
-
-<p>Value of solute dielectric constant in the vacuum electrostatic calculation. It should be similar to that of the polar-solvation energy calculation.</p>
-
-<hr>
-
-<pre><code> -pbsa or -nopbsa </code></pre>
-
-<p><code>Default: no</code> : If this option is changed to &quot;yes&quot; by <code>-pbsa</code>, solvation energy will be calculated and solvation energy parameter input file <code>-i</code> is necessary for this calculation.</p>
-
-<hr>
-
-<pre><code> -rad bondi </code></pre>
-
-<p>Three keywords are accepted <code>bondi</code>, <code>mbondi</code> and <code>mbondi2</code> which corresponds to three type of radius discussed in manuscript.</p>
-
-<hr>
-
-<pre><code> -ndots 100 </code></pre>
-
-<p>Number of dots per sphere used in the calculation of solvent accessible surface area and volume. Higher will be the number, more will be the accuracy.</p>
-
-<pre><code> -decomp  or  -nodecomp </code></pre>
-
-<p><code>Default: no</code> If this option is changed to &quot;yes&quot; by <code>-decomp</code>, energetic contribution of each residue to total binding energy will be calculated using energy decomposition scheme.</p>
-
-<hr>
-
-<a href="#top"> &#8593; top &#8593;</a>
-
-<hr>
-
-<h3 id="mmpbsastatpy">MmPbSaStat.py</h3>
-
-<hr>
-
-<p>This script calculates the average binding energy and its standard deviation/error from the output files obtained from g_mmpbsa.</p>
-
-<h4>Usage:</h4>
-
-<pre><code>python MmPbSaStat.py [-h] [-mt] [-mf metafile.dat] [-m energy_MM.xvg]
+</code></pre> Please keep an eye on RAM usage because combined
+        Molecular-Mechanics and Polar-Solvation energy calculation needs lots of
+        memory.
+        <hr>
+        <hr>
+        <h4>File Options</h4>
+        <hr>
+        <pre><code> -s topol.tpr </code></pre>
+        <p>Input tpr/tpx file of molecule.</p>
+        <hr>
+        <pre><code> -f traj.xtc </code></pre>
+        <p>Input trajectory xtc/trr format file. </p>
+        <p><strong>WARNING: trajectory should be PBC corrected and molecule
+            should not be PBC broken. To make molecule whole in trajectory,
+            please follow these links: <a href="http://www.gromacs.org/Documentation/Terminology/Periodic_Boundary_Conditions">PBC</a>
+            and <a href="http://manual.gromacs.org/current/online/trjconv.html">trjconv</a>.</strong></p>
+        <hr>
+        <pre><code> -n index.ndx </code></pre>
+        <p>Input atomic index file. User will get choice to select atomic
+          groups.</p>
+        <hr>
+        <pre><code> -i grompp.mdp </code></pre>
+        <p>Input solvation energy parameter file. User may give choice of either
+          <a href="Polar-solvation-input-parameters.html">polar-solvation</a> or
+          <a href="Non-polar-solvation-input-parameters.html">non-polar
+            solvation</a> parameters for both type of calculation.</p>
+        <hr>
+        <pre><code> -mm energy_MM.xvg </code></pre>
+        <p>van der Waal and electrostatic energy of the selected atom group/s.
+          If the index selected is for one group then the file will have vacuum
+          MM energy value for that group only. On the other side if two group is
+          selected, then file will have vacuum MM energy values for both
+          selected group and for their complexes.</p>
+        <hr>
+        <pre><code> -pol polar.xvg </code></pre>
+        <p>Polar solvation energy of the selected atoms group/s. If the index
+          selected is for one group then the file will have polar energy value
+          for that group only. On the other side if two group is selected, then
+          file will have polar energy values for both selected group and for
+          their complexes.</p>
+        <hr>
+        <pre><code> -apol apolar.xvg </code></pre>
+        <p>Non-polar solvation energy of the selected atoms group/s. If the
+          index selected is for one group then the file will have non-polar
+          energy value for that group only. On the other side if two group is
+          selected from index file then file will have non-polar energy values
+          for both selected group and for their complexes.</p>
+        <hr>
+        <pre><code> -mmcon contrib_MM.dat </code></pre>
+        <p>Vacuum MM van der Waals and electrostatic energy contribution per
+          residue per frame/snaspshot.</p>
+        <hr>
+        <pre><code> -pcon contrib_pol.dat </code></pre>
+        <p>Polar solvation energy contribution per residue frame wise.</p>
+        <hr>
+        <pre><code> -apcon contrib_apol.dat </code></pre>
+        <p>Non-polar solvation energy contribution per residue frame wise.</p>
+        <hr>
+        <h4>Other options</h4>
+        <pre><code> -diff or -nodiff </code></pre>
+        <p><code>Default: yes</code> If this option is "yes", selection of two
+          atom groups will be prompted. For example, atom group A and B is
+          selected by user. Then, third combined AB group will be automatically
+          generated. Further, all energy calculation will be performed on these
+          three atom groups A, B and AB. If it is switched to "no" by <code>-nodiff</code>,
+          selection of only one atom group will be prompted and all energy
+          calculation will be performed on selected atom group.</p>
+        <hr>
+        <pre><code> -mme or -nomme </code></pre>
+        <p><code>Default: yes</code> If this option is "yes", van der Waals and
+          electrostatic energy of the selected group/s will be calculated. This
+          option can be changed to "no" by <code>-nomme</code> to prevent this
+          energy calculation.</p>
+        <hr>
+        <pre><code> -pdie 1 </code></pre>
+        <p>Value of solute dielectric constant in the vacuum electrostatic
+          calculation. It should be similar to that of the polar-solvation
+          energy calculation.</p>
+        <hr>
+        <pre><code> -incl_14 or -noincl_14</code></pre>
+        <p><code>Default: no</code> Include 1-4 atom-pairs, exclude 1-2 and 1-3
+          atom pairs during MM calculation. Should be "yes" when groups are
+          bonded with each other. This option can be changed to "yes" by including 
+          <code>-incl_14</code> with g_mmpbsa command. 
+        </p>
+        <hr>
+        <pre><code> -pbsa or -nopbsa </code></pre>
+        <p><code>Default: no</code> : If this option is changed to "yes" by <code>-pbsa</code>,
+          solvation energy will be calculated and solvation energy parameter
+          input file <code>-i</code> is necessary for this calculation.</p>
+        <hr>
+        <pre><code> -rad bondi </code></pre>
+        <p>Three keywords are accepted <code>bondi</code>, <code>mbondi</code>
+          and <code>mbondi2</code> which corresponds to three type of radius
+          discussed in manuscript.</p>
+        <hr>
+        <pre><code> -ndots 100 </code></pre>
+        <p>Number of dots per sphere used in the calculation of solvent
+          accessible surface area and volume. Higher will be the number, more
+          will be the accuracy.</p>
+        <pre><code> -decomp  or  -nodecomp </code></pre>
+        <p><code>Default: no</code> If this option is changed to "yes" by <code>-decomp</code>,
+          energetic contribution of each residue to total binding energy will be
+          calculated using energy decomposition scheme.</p>
+        <hr> <a href="#top"> ↑ top ↑</a>
+        <hr>
+        <h3 id="mmpbsastatpy">MmPbSaStat.py</h3>
+        <hr>
+        <p>This script calculates the average binding energy and its standard
+          deviation/error from the output files obtained from g_mmpbsa.</p>
+        <h4>Usage:</h4>
+        <pre><code>python MmPbSaStat.py [-h] [-mt] [-mf metafile.dat] [-m energy_MM.xvg]
                      [-p polar.xvg] [-a apolar.xvg] [-bs] [-nbs 500]
                      [-of full_energy.dat] [-os summary_energy.dat]
                      [-om meta_energy.dat]
 </code></pre>
-
-<hr>
-
-<h4>Description</h4>
-
-<pre><code> -h, --help </code></pre>
-
-<p>show this help message and exit</p>
-
-<hr>
-
-<pre><code> -mt, --multiple </code></pre>
-
-<p>If given, calculate for multiple complexes. 
-Need metafile containing path of energy files</p>
-
-<hr>
-
-<pre><code> -mf metafile.dat, --metafile metafile.dat </code></pre>
-
-<p>Metafile containing path to energy files of each
-complex in a row obtained from g_mmpbsa in following
-order: [MM file] [Polar file] [ Non-polar file]</p>
-
-<hr>
-
-<pre><code> -m energy_MM.xvg, --molmech energy_MM.xvg </code></pre>
-
-<p>Vacuum Molecular Mechanics energy file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -p polar.xvg, --polar polar.xvg </code></pre>
-
-<p>Polar solvation energy file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -a apolar.xvg, --apolar apolar.xvg </code></pre>
-
-<p>Non-Polar solvation energy file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -bs, --bootstrap </code></pre>
-
-<p>If given, Enable Boot Strap analysis to calculate standard error.</p>
-
-<hr>
-
-<pre><code> -nbs 500, --nbstep 500 </code></pre>
-
-<p>Number of boot strap steps for average energy and standard error calculation.</p>
-
-<hr>
-
-<pre><code> -of full_energy.dat, --outfr full_energy.dat </code></pre>
-
-<p>Energy File: All energy components in function of time.</p>
-
-<hr>
-
-<pre><code> -os summary_energy.dat, --outsum summary_energy.dat </code></pre>
-
-<p>Final Energy File: Summary of energy components.</p>
-
-<hr>
-
-<pre><code> -om meta_energy.dat, --outmeta meta_energy.dat </code></pre>
-
-<p>Final Energy File for Multiple Complexes: Complex wise net binding energy.</p>
-
-<hr>
-
-<a href="#top"> &#8593; top &#8593;</a>
-
-<hr>
-
-<h3 id="mmpbsadecomppy">MmPbSaDecomp.py</h3>
-
-<hr>
-
-<p>This scripts calculate final contribution energy of each residue from individual energetic terms obtained from the g_mmpbsa</p>
-
-<h4>Usage</h4>
-
-<pre><code> python MmPbSaDecomp.py [-h] [-m contrib_MM.dat] [-p contrib_pol.dat]
+        <hr>
+        <h4>Description</h4>
+        <pre><code> -h, --help </code></pre>
+        <p>show this help message and exit</p>
+        <hr>
+        <pre><code> -mt, --multiple </code></pre>
+        <p>If given, calculate for multiple complexes. Need metafile containing
+          path of energy files</p>
+        <hr>
+        <pre><code> -mf metafile.dat, --metafile metafile.dat </code></pre>
+        <p>Metafile containing path to energy files of each complex in a row
+          obtained from g_mmpbsa in following order: [MM file] [Polar file] [
+          Non-polar file]</p>
+        <hr>
+        <pre><code> -m energy_MM.xvg, --molmech energy_MM.xvg </code></pre>
+        <p>Vacuum Molecular Mechanics energy file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -p polar.xvg, --polar polar.xvg </code></pre>
+        <p>Polar solvation energy file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -a apolar.xvg, --apolar apolar.xvg </code></pre>
+        <p>Non-Polar solvation energy file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -bs, --bootstrap </code></pre>
+        <p>If given, Enable Boot Strap analysis to calculate standard error.</p>
+        <hr>
+        <pre><code> -nbs 500, --nbstep 500 </code></pre>
+        <p>Number of boot strap steps for average energy and standard error
+          calculation.</p>
+        <hr>
+        <pre><code> -of full_energy.dat, --outfr full_energy.dat </code></pre>
+        <p>Energy File: All energy components in function of time.</p>
+        <hr>
+        <pre><code> -os summary_energy.dat, --outsum summary_energy.dat </code></pre>
+        <p>Final Energy File: Summary of energy components.</p>
+        <hr>
+        <pre><code> -om meta_energy.dat, --outmeta meta_energy.dat </code></pre>
+        <p>Final Energy File for Multiple Complexes: Complex wise net binding
+          energy.</p>
+        <hr> <a href="#top"> ↑ top ↑</a>
+        <hr>
+        <h3 id="mmpbsadecomppy">MmPbSaDecomp.py</h3>
+        <hr>
+        <p>This scripts calculate final contribution energy of each residue from
+          individual energetic terms obtained from the g_mmpbsa</p>
+        <h4>Usage</h4>
+        <pre><code> python MmPbSaDecomp.py [-h] [-m contrib_MM.dat] [-p contrib_pol.dat]
                         [-a contrib_apol.dat] [-bs] [-nbs 500] [-ct 999]
                         [-o final_contrib_energy.dat] [-om energyMapIn.dat]
 </code></pre>
-
-<hr>
-
-<h4>Description</h4>
-
-<pre><code> -h, --help </code></pre>
-
-<p>show this help message and exit</p>
-
-<hr>
-
-<pre><code> -m contrib_MM.dat, --molmech contrib_MM.dat </code></pre>
-
-<p>Molecular Mechanics energy contribution file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -p contrib_pol.dat, --polar contrib_pol.dat </code></pre>
-
-<p>Polar solvation energy contribution file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -a contrib_apol.dat, --apolar contrib_apol.dat </code></pre>
-
-<p>Non-Polar solvation energy contribution file obtained from g_mmpbsa.</p>
-
-<hr>
-
-<pre><code> -bs, --bootstrap </code></pre>
-
-<p>If given, Enable Boot Strap analysis to calculate standard error.</p>
-
-<hr>
-
-<pre><code> -nbs 500, --nbstep 500 </code></pre>
-
-<p>Number of boot strap steps for average energy and standard error calculation.</p>
-
-<hr>
-
-<pre><code> -ct 999, --cutoff 999 </code></pre>
-
-<p>Absolute Cutoff in kJ/mol: Energy output above and below this value. If its value is 999, all residues energy will be in output.</p>
-
-<hr>
-
-<pre><code> -o final_contrib_energy.dat, --output final_contrib_energy.dat </code></pre>
-
-<p>Final output file containing binding energy contribution of each residue.</p>
-
-<hr>
-
-<pre><code> -om energyMapIn.dat, --outmap energyMapIn.dat </code></pre>
-
-<p>It is input file for <code>energy2bfac</code>. It can be used with <code>energy2bfac</code> to map energy on structure for visualization.</p>
-
-<hr>
-
-<hr>
-
-<h3 id="energy2bfac">energy2bfac</h3>
-
-<hr>
-
-<p>This tool maps the binding energy contribution of each residue on the structure. The energy will be written in the B-factor field of output PDB file/s. This PDB file can be used with any molecular visualizer and residues can be viewed in color according to the energy of respective residues. The molecular visualizer should support method to color residues by the B-factor values.</p>
-
-<p><strong>WARNING: <code>tpr/tpx</code> file should not contain PBC broken molecule. One may check by generating a PDB file with following command:<code>editconf -f topol.tpr -o check.pdb</code>. Check <code>check.pdb</code> file through visualization.</strong></p>
-
-<h4>Usage</h4>
-
-<pre><code> energy2bfac [-s topol.tpr] [-i decomp_energy.dat] [-n index.ndx] [-c complex.pdb] [-s1 subunit_1.pdb] [-s2 subunit_2.pdb]
+        <hr>
+        <h4>Description</h4>
+        <pre><code> -h, --help </code></pre>
+        <p>show this help message and exit</p>
+        <hr>
+        <pre><code> -m contrib_MM.dat, --molmech contrib_MM.dat </code></pre>
+        <p>Molecular Mechanics energy contribution file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -p contrib_pol.dat, --polar contrib_pol.dat </code></pre>
+        <p>Polar solvation energy contribution file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -a contrib_apol.dat, --apolar contrib_apol.dat </code></pre>
+        <p>Non-Polar solvation energy contribution file obtained from g_mmpbsa.</p>
+        <hr>
+        <pre><code> -bs, --bootstrap </code></pre>
+        <p>If given, Enable Boot Strap analysis to calculate standard error.</p>
+        <hr>
+        <pre><code> -nbs 500, --nbstep 500 </code></pre>
+        <p>Number of boot strap steps for average energy and standard error
+          calculation.</p>
+        <hr>
+        <pre><code> -ct 999, --cutoff 999 </code></pre>
+        <p>Absolute Cutoff in kJ/mol: Energy output above and below this value.
+          If its value is 999, all residues energy will be in output.</p>
+        <hr>
+        <pre><code> -o final_contrib_energy.dat, --output final_contrib_energy.dat </code></pre>
+        <p>Final output file containing binding energy contribution of each
+          residue.</p>
+        <hr>
+        <pre><code> -om energyMapIn.dat, --outmap energyMapIn.dat </code></pre>
+        <p>It is input file for <code>energy2bfac</code>. It can be used with <code>energy2bfac</code>
+          to map energy on structure for visualization.</p>
+        <hr>
+        <hr>
+        <h3 id="energy2bfac">energy2bfac</h3>
+        <hr>
+        <p>This tool maps the binding energy contribution of each residue on the
+          structure. The energy will be written in the B-factor field of output
+          PDB file/s. This PDB file can be used with any molecular visualizer
+          and residues can be viewed in color according to the energy of
+          respective residues. The molecular visualizer should support method to
+          color residues by the B-factor values.</p>
+        <p><strong>WARNING: <code>tpr/tpx</code> file should not contain PBC
+            broken molecule. One may check by generating a PDB file with
+            following command:<code>editconf -f topol.tpr -o check.pdb</code>.
+            Check <code>check.pdb</code> file through visualization.</strong></p>
+        <h4>Usage</h4>
+        <pre><code> energy2bfac [-s topol.tpr] [-i decomp_energy.dat] [-n index.ndx] [-c complex.pdb] [-s1 subunit_1.pdb] [-s2 subunit_2.pdb]
 </code></pre>
-
-<hr>
-
-<h4>Description</h4>
-
-<pre><code> -s topol.tpr </code></pre>
-
-<p>Input tpr/tpx file of molecule</p>
-
-<hr>
-
-<pre><code> -n index.ndx </code></pre>
-
-<p>Input atomic index file. User will get choice to select atomic groups</p>
-
-<hr>
-
-<pre><code> -i decomp_energy.dat </code></pre>
-
-<p>File containing energy contribution of each residue obtained from <code>MmPbSaDecomp.py</code>. One can use <code>-i energyMapIn.dat</code> directly for the input.</p>
-
-<hr>
-
-<pre><code> -c complex.pdb </code></pre>
-
-<p>Output PDB file of molecular complex taken for the calculation, e.g. protein-ligand, protein-DNA or protein-protein.</p>
-
-<hr>
-
-<pre><code> -s1 subunit_1.pdb </code></pre>
-
-<p>Output PDB file of first sub-unit in accordance with first atomic group chosen through index file. </p>
-
-<hr>
-
-<pre><code> -s2 subunit_2.pdb </code></pre>
-
-<p>Output PDB file of second sub-unit in accordance with second atomic group chosen through index file. </p>
-
-<hr>
-<a href="#top"> &#8593; top &#8593;</a>
-      </section>
+        <hr>
+        <h4>Description</h4>
+        <pre><code> -s topol.tpr </code></pre>
+        <p>Input tpr/tpx file of molecule</p>
+        <hr>
+        <pre><code> -n index.ndx </code></pre>
+        <p>Input atomic index file. User will get choice to select atomic groups</p>
+        <hr>
+        <pre><code> -i decomp_energy.dat </code></pre>
+        <p>File containing energy contribution of each residue obtained from <code>MmPbSaDecomp.py</code>.
+          One can use <code>-i energyMapIn.dat</code> directly for the input.</p>
+        <hr>
+        <pre><code> -c complex.pdb </code></pre>
+        <p>Output PDB file of molecular complex taken for the calculation, e.g.
+          protein-ligand, protein-DNA or protein-protein.</p>
+        <hr>
+        <pre><code> -s1 subunit_1.pdb </code></pre>
+        <p>Output PDB file of first sub-unit in accordance with first atomic
+          group chosen through index file. </p>
+        <hr>
+        <pre><code> -s2 subunit_2.pdb </code></pre>
+        <p>Output PDB file of second sub-unit in accordance with second atomic
+          group chosen through index file. </p>
+        <hr> <a href="#top"> ↑ top ↑</a> </section>
       <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a>
+            using the Dinky theme</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
   </body>
 </html>

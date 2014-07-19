@@ -47,7 +47,67 @@
             <li class="navigation"><a href="Parameters.html">Parameters</a> </li>
           </ul>
         </nav>
-        <h4> <a name="Requirement" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Requirement</h4>
+        <h4> Pre-compiled executable program </h4>
+        <p>
+          Pre-compiled program <strong> does not require </strong> any external library or GROMACS and APBS package. These programs are standalone and without any dependency. Download, extract and use it.
+        </p>
+        <p>
+          Presently, these programs are only available for Linux x86_64 (64 bit). 
+        </p>
+        
+        <h5>Download</h5>
+        <table style="width: 100%">
+          <tbody>
+            <tr>
+              <td> <br>
+              </td>
+              <td><strong>GROMACS-4.5.x</strong></td>
+              <td><strong>GROMACS-4.6.x</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Linux x86_64 (64 bit)</strong></td>
+              <td><a href="package/GMX45x/g_mmpbsa.tar.gz"><strong>Download</strong></a></td>
+              <td><a href="package/GMX46x/g_mmpbsa.tar.gz"><strong>Download</strong></a></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h5>Installation</h5>
+        <p>
+          Extract the package. Copy <code>g_mmpbsa</code> and <code>energy2bfac</code> from <code>bin</code> directory to <code>/usr/local/bin</code> or <code>$HOME/bin</code>.
+          <pre><code>tar -zxvf g_mmpbsa.tar.gz
+cd bin
+sudo cp g_mmpbsa /usr/local/bin/.
+sudo cp energy2bfac /usr/local/bin/.
+</code></pre>
+          or
+          <pre><code>tar -zxvf g_mmpbsa.tar.gz
+cd bin
+cp g_mmpbsa $HOME/bin/.
+cp energy2bfac $HOME/bin/.
+</code></pre>
+          or add <code>g_mmpbsa/bin</code> to <code>PATH</code> environment variable by adding following line in <code>.bashrc</code> file:
+          <pre><code>export PATH=${PATH}:/path/to/g_mmpbsa/bin</code>
+</pre>
+        </p>
+        
+        <h5>Parallel support</h5>
+        <p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x
+          or 1.3.x. This parallel support is enabled by default and all
+          processors/core will be used during run-time.</p>
+        <p>To control the usage of processors/cores, number of threads can be
+          changed by defining environment variable. For example in bash, one can
+          write following command: </p>
+        <pre><code> export OMP_NUM_THREADS=X </code></pre>
+        where <code>X</code> is number of core/processors.
+        <hr>
+
+        <p><br>
+        </p>
+
+        <h4> Installation from Source-Code</h4>
+        
+        <h4> Requirement </h4>
         <h5>1. GROMACS 4.5.x/4.6.x</h5>
         <pre><code> Required Libraries : libgmx.a, libgmxana.a and libmd.a<br>or<br></code><code> Required Libraries : libgmx.so, libgmxana.so and libmd.so</code></pre>
         <p><a href="http://www.gromacs.org/">GROMACS</a> should be compiled and
@@ -66,16 +126,6 @@
         <p><a href="http://www.poissonboltzmann.org/apbs">APBS</a> should be
           compiled and installed from the source-code. Downloaded binaries and
           libraries would not work as some required libraries are missing.</p>
-        <h5>Parallel support</h5>
-        <p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x
-          or 1.3.x. This parallel support is enabled by default and all
-          processors/core will be used during run-time.</p>
-        <p>To control the usage of processors/cores, number of threads can be
-          changed by defining environment variable. For example in bash, one can
-          write following command: </p>
-        <pre><code> export OMP_NUM_THREADS=X </code></pre>
-        where <code>X</code> is number of core/processors.
-        <hr>
         <p><strong>Note:</strong> During installation and execution of program,
           errors may appear. Solution of the errors are given below in <a href="#list-of-errors">list</a>
           which will be regularly updated.</p>
@@ -113,7 +163,8 @@ make install</code></pre>
         <h4>3. Configure for g_mmpbsa</h4>
         <p>To get detailed options</p>
         <pre><code>./configure --help </code></pre>
-        <p><strong><em>Defining Path to GROMACS and APBS headers and libraries files</em></strong></p>
+        <p><strong><em>Defining Path to GROMACS and APBS headers and libraries
+              files</em></strong></p>
         <p>Path to GROMACS include directory</p>
         <pre><code> --with-gmx-include=/opt/gromacs/include </code></pre>
         <p>Path to GROMACS Libraries files</p>
