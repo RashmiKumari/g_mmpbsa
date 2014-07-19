@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"         Copyright (C) 2013  Rashmi Kumari and Andrew Lynn              ",
+			"       Copyright (C) 2013, 2014  Rashmi Kumari and Andrew Lynn          ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -187,6 +187,13 @@ void cite(gmx_bool bPolar, gmx_bool bAPolar, t_APolKey APolarKeyWords){
 			fprintf(stderr,"-------- -------- ------------------- -------- --------\n\n");
 		}
 	}
+	fprintf(stderr,"-------- -------- ------------------- -------- --------\n");
+	fprintf(stderr,"g_mmpbsa—A GROMACS Tool for High-Throughput MM-PBSA Calculations.\n");
+	fprintf(stderr,"Kumari R. et al. (2014)\n");
+	fprintf(stderr,"J. Chem. Inf. Model., Article ASAP\n");
+	fprintf(stderr,"URL: http://pubs.acs.org/doi/abs/10.1021/ci500020m \n");
+	fprintf(stderr,"-------- -------- ------------------- -------- --------\n\n");
+
 	fprintf(stderr,"-------- -------- --- Thank You --- -------- --------\n\n");
 }
 
@@ -225,14 +232,14 @@ void decomp_calc_energy (t_topology top, int sizeA, atom_id *indexA, int sizeB, 
 
 int gmx_do_mmpbsa(int argc, char *argv[]) {
   const char *desc[] =
-  {	"g_mmpbsa calculates relative binding free energy of biomolecular associations ",
-	"like protein-protein, protein-ligand protein-DNA etc using MM/PBSA. It gives the",
-	"different component of energy term in separate file so that user will have choice",
-	"to have either MM, PB and SA energy values or all energies according to their ",
-	"objective. The tool also gives residue wise contribution to total binding energy",
-	"which will provide information about important contributing residues to the molecular",
+  {	"g_mmpbsa calculates relative binding free energy using the MM-PBSA method for "
+    "bio-molecular associations such as protein-protein, protein-ligand, protein-DNA etc. "
+    "It calculates three components of the binding energy in separate files, so that",
+    "user will have choice to calculate MM, PB and SA energy values according to their ",
+	"objective. It also calculates contribution of each residue to the net binding energy",
+	"and provides information about important contributing residues to the molecular",
 	"association.\n\n",
-	"For more detail see manual or visit <https://github.com/RashmiKumari/g_mmpbsa/wiki>"
+	"For more detail, see please visit <http://rashmikumari.github.io/g_mmpbsa>"
   };
 
   /* Command-line arguments */

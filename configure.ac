@@ -364,7 +364,7 @@ else
 		gcc_version=`gcc --version`
 		gcc_complete_version=`echo ${gcc_version} | awk '{printf("%s",$3)}' | awk -F'.' '{print $1$2}'`
 		
-		if test ["${gcc_complete_version}" -ge 42]; then
+		if test ["${gcc_complete_version}" -ge 43]; then
 			FFLAGS="${FFLAGS} -fopenmp"
 		else
 		    AC_MSG_RESULT([WARNING])

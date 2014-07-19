@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"         Copyright (C) 2013  Rashmi Kumari and Andrew Lynn              ",
+			"      Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn            ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -119,11 +119,11 @@ int get_energy( char *fnEnergy, int nres, real *energy)	{
 
 int	gmx_energy2bfac (int argc, char *argv[])		{
   const char *desc[] =
-    { "This tool maps the binding energy contribution of each residue on the structure.",
-      "The energy will be written in the B-factor field of output PDB file/s",
+    { "It maps the binding energy contribution of each residue on the structure.",
+      "The energy will be written in the B-factor field of the output PDB file/s",
       "This PDB file can be used with any molecular visualizer and ",
-      "residues can be viewed in color according to the energy of respective residues.",
-      "The molecular visualizer should support method to color residues by the B-factor values."
+      "residues can be viewed in color according to the energy of respective residue.",
+      "The molecular visualizer should support method to color residues by B-factor values."
 	};
 
 
