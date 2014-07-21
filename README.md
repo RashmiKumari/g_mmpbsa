@@ -8,7 +8,7 @@ The development of g_mmpbsa package is initiated under [Open Source Drug Discove
 #### Features
 * It is an open source tool and can be modified under the terms of the GNU public license 
 * It is implemented through open source software [GROMACS](http://www.gromacs.org/) and [APBS](http://www.poissonboltzmann.org/apbs), making it accessible to large number of users. 
-* Easy installation by downloading the compressed file [(zip/tarball)](https://github.com/RashmiKumari/g_mmpbsa/releases) and steps are given in [wiki](https://github.com/RashmiKumari/g_mmpbsa/wiki).
+* Easy installation by downloading the compressed file [(zip/tarball)](https://github.com/RashmiKumari/g_mmpbsa/releases) and steps are given in this <strong>[link](http://rashmikumari.github.io/g_mmpbsa/Download-and-Installation.html)</strong>.
 * It provides user to choose different van der Waal radii for solvation free energy calculation using implicit solvent models.
 * It has options for several non-polar solvation model such as SASA, SAV and Weeks–Chandler–Andersen (WCA).
 * Binding energy decomposition scheme is implemented through MM-PBSA scheme as contrast to other packages, in which scheme is implemented through MM-GBSA only. 
