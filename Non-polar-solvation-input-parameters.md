@@ -67,7 +67,7 @@ Offset or constant `c` in kJ/mol from _E_ = ( <var>p</var> * _SAV_ ) + <var>c</v
 
 ***
 
-#### Continuum/Integral based model (WCA-like)
+#### <a name="wca_like"> </a> Continuum/Integral based model (WCA-like)
 
 ##### WCA
 

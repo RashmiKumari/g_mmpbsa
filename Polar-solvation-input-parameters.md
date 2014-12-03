@@ -99,7 +99,7 @@ The charge of negative ions in bulk solution.
 
 ***
 
-##### rad
+##### nrad
 
     nrad           = 1.81
 
