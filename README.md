@@ -1,13 +1,9 @@
----
-layout: page
----
-
 ### Introduction
 
 
-The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD]{:target="_blank"}, which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc. 
+The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD], which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc. 
 
-g_mmpbsa is developed using two widely used open source software i.e. [GROMACS][GROMACS]{:target="_blank"} and [APBS][APBS]{:target="_blank"} and it has similar user interface like other GROMACS tools. 
+g_mmpbsa is developed using two widely used open source software i.e. [GROMACS][GROMACS] and [APBS][APBS] and it has similar user interface like other GROMACS tools. 
 
 The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme. 
 
@@ -20,9 +16,9 @@ The output from the tool is used further as input in python scripts which is pro
 
 #### Please always cite following two publications:
 
-* Kumari _et al_ (2014) [g_mmpbsa - A GROMACS tool for high-throughput MM-PBSA calculations][g_mmpbsa paper]{:target="_blank"}. _J. Chem. Inf. Model._ 54:1951-1962.
+* Kumari _et al_ (2014) [g_mmpbsa - A GROMACS tool for high-throughput MM-PBSA calculations][g_mmpbsa paper]. _J. Chem. Inf. Model._ 54:1951-1962.
 
-* Baker _et al._ (2001) [Electrostatics of nanosystems: Application to microtubules and the ribosome][apbs paper]{:target="_blank"}. _Proc. Natl. Acad. Sci. USA_  98:10037-10041.
+* Baker _et al._ (2001) [Electrostatics of nanosystems: Application to microtubules and the ribosome][apbs paper]. _Proc. Natl. Acad. Sci. USA_  98:10037-10041.
 
 ***
 
@@ -32,7 +28,7 @@ The output from the tool is used further as input in python scripts which is pro
 
 *   It is an open source tool and can be modified under the terms of the GNU public license
 
-*   It is implemented through open source software [GROMACS][GROMACS]{:target="_blank"} and [APBS][APBS]{:target="_blank"}, making it accessible to large number of users.
+*   It is implemented through open source software [GROMACS][GROMACS] and [APBS][APBS], making it accessible to large number of users.
 
 *   Supports **GROMACS 4.5.x** and **4.6.x** versions.
 
@@ -57,11 +53,11 @@ The output from the tool is used further as input in python scripts which is pro
 
 #### Other Citations:
 
-* Pronk _et al._ (2013) [GROMACS 4.5: a high-throughput and highly parallel open source molecular simulation toolkit][gromacs paper]{:target="_blank"}. _Bioinformatics_ 29:845-854.
+* Pronk _et al._ (2013) [GROMACS 4.5: a high-throughput and highly parallel open source molecular simulation toolkit][gromacs paper]. _Bioinformatics_ 29:845-854.
 
-* Eisenhaber _et al._ (1995) [The double cubic lattice method: Efficient approaches to numerical integration of surface area and volume and to dot surface contouring of molecular assemblies][sasa paper]{:target="_blank"}. _J. Comput. Chem._ 16:273-284.
+* Eisenhaber _et al._ (1995) [The double cubic lattice method: Efficient approaches to numerical integration of surface area and volume and to dot surface contouring of molecular assemblies][sasa paper]. _J. Comput. Chem._ 16:273-284.
 
-* Wagoner _et al._ (2006) [Assessing implicit models for nonpolar mean solvation forces: The importance of dispersion and volume terms][wca paper]{:target="_blank"}. _Proc. Natl. Acad. Sci. USA_  103:8331-8336.
+* Wagoner _et al._ (2006) [Assessing implicit models for nonpolar mean solvation forces: The importance of dispersion and volume terms][wca paper]. _Proc. Natl. Acad. Sci. USA_  103:8331-8336.
 
 * * *
 
