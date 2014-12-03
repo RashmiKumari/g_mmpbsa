@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>g_mmpbsa by RashmiKumari</title>
+    <title>g_mmpbsa</title> <meta name="keywords" content> 
+	<meta name="description" content>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -12,8 +13,8 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-        
-    <script>
+    
+	<script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -22,7 +23,7 @@
   		ga('create', 'UA-48631281-1', 'rashmikumari.github.io');
   		ga('send', 'pageview');
 	</script>
-
+    
   </head>
   <body>
     <div class="wrapper">
@@ -42,38 +43,22 @@
 
       </header>
 	  
-      <section>  
-	  <nav>
-	  	<ul>
-			<li class="navigation"><a href="http://rashmikumari.github.io/g_mmpbsa/">Introduction</a></li>
-			<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
-			<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
-			<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
-			<li class="navigation"><a href="Usage.html">Usage</a></li>
-			<li class="navigation"><a href="Parameters.html">Parameters</a></li>
-		</ul>
-		</nav>
-		
-       <h4> <a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Executing g_mmpbsa</h4>
-
-
-	<p>g_mmpbsa is a console application which is executed from terminal/console by command options similar to other GROMACS module. All the input options should be provided on command line depending on the type of calculation. To calculate for single atomic group (e.g. only protein, only ligand, only specific region of protein etc.) one group is required to choose from index file, whereas for complex (e.g. protein-ligand, protein-protein etc.) two separate group is required to choose from index file. </p>
-
-	<p>To get extensive details of usage with options, please click on <a href="Usage.html">Usage</a>.</p>
-
-	<hr>
-
-	<h4>Parallel support</h4>
-
-	<p>g_mmpbsa inherits OpenMP parallel execution implemented in APBS 1.2.x or 1.3.x. This parallel support is enabled by default and all processors/core will be used during run-time.</p>
-
-	<p>To control the usage of processors/cores, number of threads can be changed by defining environment variable. For example in bash, one can write following command:
-	<pre><code> export OMP_NUM_THREADS=X </code></pre>
-	where <code>X</code> is number of core/processors.</p>
-
-	<hr>
-
-	</section>
+      <section>
+		  <nav>
+			<ul>
+				<li class="navigation"><a href="/">Introduction</a></li>
+				<li class="navigation"><a href="Download-and-Installation.html">Installation</a></li>
+				<li class="navigation"><a href="How-to-Run.html">How to run?</a></li>
+				<li class="navigation"><a href="Tutorial.html">Tutorials</a></li>
+				<li class="navigation"><a href="Usage.html">Usage</a></li>
+				<li class="navigation"><a href="Parameters.html">Parameters</a></li>
+			</ul>
+			</nav>
+			
+	{{ content }}
+      
+	  </section>
+	  
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
