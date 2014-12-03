@@ -67,6 +67,9 @@ int psize (t_topology *top, atom_id *index, int isize, rvec *x, t_PolKey *param,
 		tn[i] = (int) flen[i]/param->gridspace + 0.5;
 		n[i] = 32*((int)((tn[i] - 1) / 32.0 + 0.5)) + 1;
 		nsmall[i] = 32*((int)((tn[i] - 1) / 32.0 + 0.5)) + 1;
+
+		if (nsmall[i] < 33)
+			nsmall[i] = 33;
 	}
 
 	//To Check the available memory
@@ -86,21 +89,21 @@ int psize (t_topology *top, atom_id *index, int isize, rvec *x, t_PolKey *param,
 		}
 	}
 
-
 	// Calculating pdime => np
 	if (gmem >= param->gmemceil)	{
 		zofac = 1 + 2 * param->ofrac;
 		for (i=0;i<DIM;i++)	{
-			np_float = n[i]/nsmall[i];
+			np_float = n[i]/(float)nsmall[i];
 			if (np_float > 1)
 				np[i] = (int)(zofac*n[1]/nsmall[i] + 1.0);
 		}
 	}
 
-	//if(gmem >= param->gmemceil)
-		//param->bParallel = TRUE;
-	//else
-		//param->bParallel = FALSE;
+
+	if(gmem >= param->gmemceil)
+		param->mg_type = mg_para;
+	else
+		param->mg_type = mg_auto;
 
 	if (bCG)	{
 		copy_rvec(clen,param->cglen);
@@ -113,7 +116,8 @@ int psize (t_topology *top, atom_id *index, int isize, rvec *x, t_PolKey *param,
 	}
 	copy_ivec(nsmall,param->dime);
 
-	//if (gmem >= param->gmemceil)
-		//copy_ivec(np,param->pdime);
+	if(param->mg_type == mg_para)
+		copy_ivec(np, param->pdime);
+
 	return 0;
 }

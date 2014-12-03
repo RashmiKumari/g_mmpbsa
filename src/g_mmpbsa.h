@@ -69,6 +69,7 @@ typedef struct {
 	gmx_bool bParallel;
 	gmx_bool bFocus;
 
+	int mg_type;
 	ivec dime;
 	ivec pdime;
 	rvec cglen;
@@ -129,6 +130,9 @@ static const char *chgm_words[] = {"spl2", "spl4", "spl0", NULL};
 
 enum { sacc };
 static const char *APsrfm_words[] = { "sacc", NULL};
+
+enum { mg_auto, mg_para };
+static const char *mg_words[] = { "mg-auto", "mg-para", NULL};
 
 
 // energy_mm.c
@@ -195,7 +199,10 @@ int APolarInAPBS(t_APolKey *APolKey, char *fnPQR, char *fnAPolAPBS, char *fnApbs
 int psize (t_topology *top, atom_id *index, int isize, rvec *x, t_PolKey *param, gmx_bool bCG, gmx_bool bFocus);
 
 // apbs_main.c
+#ifdef INT_APBS
 int apbs( int argc,  char **argv, char *input_path, double *PolarEnergy, double *APolarEnergy, double *AtomEnergy);
-
+#else
+int ext_apbs(int isize, gmx_bool bVerbose, char *fnApbsOut, char *fnPolAPBS, double *PolarEnergy, double *APolarEnergy, double *AtomEnergy);
+#endif
 
 #endif /* G_MMPBSA_H_ */

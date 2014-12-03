@@ -1,2 +1,22 @@
-Version 1.0
+Version 1.1
 
+1. Update for MM calculation. Now this calculation is very fast and does not require large memory.
+
+2. New option "-incl_14" is added for MM calculation. This option enable the exclusion of 1-2 and 1-3 bonded atom-pairs, and the scaling of 1-4 interactions.
+
+3. Minor update and bug-fixes
+
+
+Version 1.5
+
+1. Added support for external APBS program. Now, g_mmpbsa could be used with MPIRUN and external APBS program for parallel computations on HPC.
+
+2. New option "-silent" to supress messages from external APBS program.
+
+3. Added support to install with APBS-1.4.x version.
+
+4. New input kewwords for polar-solvation parameter: mg-type  = mg-auto or mg-para
+
+5. Migrated to cmake build system for installation.
+
+6. Minor bug-fixes.

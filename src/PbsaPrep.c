@@ -371,17 +371,16 @@ int polarInAPBS(t_PolKey *param, char *fnPQR, char *fnPolAPBS, gmx_bool bDECOMP)
 
   fprintf(fIn, "read\n    mol pqr %s\nend\n", fnPQR);
 
-  /*
-  if(param->bParallel)	{
+  if(param->mg_type == mg_para)	{
 	  fprintf(fIn, "\nelec name mol1\n    mg-para\n");
 	  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
 	  fprintf(fIn, "    pdime  %d %d %d\n", param->pdime[XX], param->pdime[YY], param->pdime[ZZ]);
 	  fprintf(fIn, "    ofrac %g\n", param->ofrac);
-  }*/
-
-  fprintf(fIn, "\nelec name mol1\n    mg-auto\n");
-  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
-
+  }
+  else	{
+	  fprintf(fIn, "\nelec name mol1\n    mg-auto\n");
+	  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
+  }
   fprintf(fIn, "    cglen %6.3lf %6.3lf %6.3lf\n", param->cglen[XX], param->cglen[YY], param->cglen[ZZ]);
   fprintf(fIn, "    fglen %6.3lf %6.3lf %6.3lf\n", param->fglen[XX], param->fglen[YY], param->fglen[ZZ]);
   fprintf(fIn, "    cgcent %6.3lf %6.3lf %6.3lf\n", param->cgcent[XX], param->cgcent[YY], param->cgcent[ZZ]);
@@ -404,15 +403,17 @@ int polarInAPBS(t_PolKey *param, char *fnPQR, char *fnPolAPBS, gmx_bool bDECOMP)
   else
 	  fprintf(fIn, "    calcenergy total\n");
   fprintf(fIn, "end\n");
-/*
-  if(param->bParallel)	{
+
+  if(param->mg_type == mg_para)	{
 	  fprintf(fIn, "\nelec name mol2\n    mg-para\n");
 	  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
 	  fprintf(fIn, "    pdime  %d %d %d\n", param->pdime[XX], param->pdime[YY], param->pdime[ZZ]);
 	  fprintf(fIn, "    ofrac %g\n", param->ofrac);
-  }*/
-  fprintf(fIn, "\nelec name mol2\n    mg-auto\n");
-  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
+  }
+  else	{
+	  fprintf(fIn, "\nelec name mol2\n    mg-auto\n");
+	  fprintf(fIn, "    dime  %d %d %d\n", param->dime[XX], param->dime[YY], param->dime[ZZ]);
+  }
 
   fprintf(fIn, "    cglen %6.3lf %6.3lf %6.3lf\n", param->cglen[XX], param->cglen[YY], param->cglen[ZZ]);
   fprintf(fIn, "    fglen %6.3lf %6.3lf %6.3lf\n", param->fglen[XX], param->fglen[YY], param->fglen[ZZ]);

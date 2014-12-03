@@ -246,11 +246,12 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   static real rvdw = 1.0, pdie = 1 ;
   static int ndots = 24;
   static gmx_bool bDIFF = TRUE, bMM = TRUE, bDCOMP = FALSE, bPBSA = FALSE, bFocus = FALSE;
-  gmx_bool bIncl14 = FALSE ;
+  gmx_bool bIncl14 = FALSE, bVerbose=FALSE;
   static const char *rtype[] = { NULL, "bondi", "mbondi", "mbondi2", "amber", NULL };
 
   t_pargs pa[] =
         {
+          { "-silent", FALSE,  etBOOL, {&bVerbose}, "Display messages, output and errors from external APBS program. Only works with external APBS program" },
           { "-rad",    FALSE,  etENUM, { rtype   }, "van der Waal radius type" },
           { "-rvdw",   FALSE,  etREAL, { &rvdw   }, "Default van der Waal radius (in nm) if not found" },
           { "-mme",    TRUE,   etBOOL, { &bMM    }, "To calculate vacuum molecular mechanics energy" },
@@ -318,7 +319,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   char **legVacMM = NULL, **legPolar = NULL, **legAPolar = NULL;
   char inMdp[256];
 
-  char fnPQR[256], fnPolAPBS[256], fnApbsParamAPol[256], fnAPolAPBS[256];
+  char fnPQR[256], fnPolAPBS[256], fnApbsParamAPol[256], fnAPolAPBS[256], fnApbsOut[256];
   t_PolKey PolarKeyWords;
   t_APolKey APolarKeyWords;
 
@@ -332,6 +333,12 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   parse_common_args(&argc, argv,
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT | PCA_BE_NICE, NFILE, fnm,
       asize(pa), pa, asize(desc), desc, 0, NULL, &oenv);
+
+  /* Reverting silent to verbosity for easy use */
+  if (bVerbose==FALSE)
+	  bVerbose = TRUE;
+  else
+	  bVerbose = FALSE;
 
   if(!fn2bTPX(ftp2fn(efTPX, NFILE, fnm)))
 	  gmx_fatal(FARGS, "tpr file is necessary\n");
@@ -357,6 +364,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
       sprintf(fnPolAPBS,"%sA.in" , buf);
       sprintf(fnApbsParamAPol,"%s_param.dat", buf);
       sprintf(fnAPolAPBS,"AP%sA.in" , buf);
+      sprintf(fnApbsOut,"%s.out" , buf);
       remove(buf);
     }
 
@@ -369,7 +377,6 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 	  	  printf("\n\nWARNING: For single group calculations, 1-4 interactions are also included.\n\n");
 	  	  bIncl14 = TRUE;
 	}
-
 
   ////Modify residue name having same name but different structure////
   ////Important for APBS Parameter file prepared for non-polar solvation energy////
@@ -795,9 +802,6 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 	  double *TempAtomPolA=NULL, *TempAtomPolB=NULL, *TempAtomPolAB=NULL;
 	  double *ResEnergyPol=NULL, *ResEnergyAPol=NULL;
 
-	  snew(TempAtomWcaA,isize[0]); snew(TempAtomWcaB,isize[1]); snew(TempAtomWcaAB,isize[2]);
-	  snew(TempAtomPolA,isize[0]); snew(TempAtomPolB,isize[1]); snew(TempAtomPolAB,isize[2]);
-
       gmx_rmpbc(gpbc, natoms, box, x);
 
       if (!bDIFF) //Single calculation start
@@ -820,7 +824,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
               psize(&top, index[0], isize[0], x, &PolarKeyWords,TRUE,bFocus);
               makePQR(&top, index[0], isize[0], ePBC, box, x, modresname, fnPQR);
               polarInAPBS(&PolarKeyWords,fnPQR,fnPolAPBS, bDCOMP);
+#ifdef INT_APBS
               apbs(argc,argv,fnPolAPBS,&tempPolar,NULL,NULL);
+#else
+              ext_apbs(isize[0], bVerbose, fnApbsOut, fnPolAPBS, &tempPolar, NULL, NULL);
+#endif
               fprintf(fPolar,"%15.3lf%15.3lf\n",t, tempPolar);
               remove(fnPQR);remove(fnPolAPBS);
               fflush(fPolar);
@@ -848,7 +856,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
         	  {
                   makePQR(&top, index[0], isize[0], ePBC, box, x, modresname, fnPQR);
                   APolarInAPBS(&APolarKeyWords, fnPQR, fnAPolAPBS,fnApbsParamAPol);
+#ifdef INT_APBS
         		  apbs(argc,argv,fnAPolAPBS,NULL,&TmpApolarEnergy, NULL);
+#else
+        		  ext_apbs(isize[0], bVerbose,fnApbsOut, fnAPolAPBS,NULL,&TmpApolarEnergy, NULL);
+#endif
         		  fprintf(fAPolar, "%15.3lf\n", TmpApolarEnergy);
         	  }
         	  else
@@ -859,6 +871,9 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 
       else //Difference calculation start
         {
+    	  snew(TempAtomWcaA,isize[0]); snew(TempAtomWcaB,isize[1]); snew(TempAtomWcaAB,isize[2]);
+    	  snew(TempAtomPolA,isize[0]); snew(TempAtomPolB,isize[1]); snew(TempAtomPolAB,isize[2]);
+
           if (bMM)
             {
         	  if(bIncl14)
@@ -899,7 +914,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
               psize(&top, index[0], isize[0], x, &PolarKeyWords,FALSE,bFocus);
               makePQR(&top, index[0], isize[0], ePBC, box, x, modresname,fnPQR);
               polarInAPBS(&PolarKeyWords, fnPQR, fnPolAPBS, bDCOMP);
+#ifdef INT_APBS
               apbs(argc, argv, fnPolAPBS, &tempPolar, NULL, TempAtomPolA);
+#else
+              ext_apbs(isize[0], bVerbose, fnApbsOut, fnPolAPBS, &tempPolar, NULL, TempAtomPolA);
+#endif
               fprintf(fPolar, "%15.3lf%15.3lf\t", t, tempPolar);
               remove(fnPQR);
               remove(fnPolAPBS);
@@ -907,7 +926,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
               psize(&top, index[1], isize[1], x, &PolarKeyWords,FALSE,bFocus);
               makePQR(&top, index[1], isize[1], ePBC, box, x, modresname,fnPQR);
               polarInAPBS(&PolarKeyWords, fnPQR, fnPolAPBS, bDCOMP);
+#ifdef INT_APBS
               apbs(argc, argv, fnPolAPBS, &tempPolar, NULL, TempAtomPolB);
+#else
+              ext_apbs(isize[1], bVerbose, fnApbsOut, fnPolAPBS, &tempPolar, NULL, TempAtomPolB);
+#endif
               fprintf(fPolar, "%15.3lf\t", tempPolar);
               remove(fnPQR);
               remove(fnPolAPBS);
@@ -915,7 +938,11 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
               psize(&top, index[2], isize[2], x, &PolarKeyWords,FALSE,bFocus);
               makePQR(&top, index[2], isize[2], ePBC, box, x, modresname,fnPQR);
               polarInAPBS(&PolarKeyWords, fnPQR, fnPolAPBS, bDCOMP);
+#ifdef INT_APBS
               apbs(argc, argv, fnPolAPBS, &tempPolar, NULL, TempAtomPolAB);
+#else
+              ext_apbs(isize[2], bVerbose, fnApbsOut, fnPolAPBS, &tempPolar, NULL, TempAtomPolAB);
+#endif
               fprintf(fPolar, "%15.3lf\n", tempPolar);
               remove(fnPQR);
               remove(fnPolAPBS);
@@ -991,21 +1018,33 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
         	  {
                   makePQR(&top, index[0], isize[0], ePBC, box, x, modresname, fnPQR);
                   APolarInAPBS(&APolarKeyWords, fnPQR, fnAPolAPBS,fnApbsParamAPol);
+#ifdef INT_APBS
                   apbs(argc,argv,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaA);
+#else
+                  ext_apbs(isize[0], bVerbose, fnApbsOut,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaA);
+#endif
            		  fprintf(fAPolar, "%15.3lf",TmpApolarEnergy);
            		  remove(fnPQR);
            		  remove(fnAPolAPBS);
 
                   makePQR(&top, index[1], isize[1], ePBC, box, x, modresname, fnPQR);
                   APolarInAPBS(&APolarKeyWords, fnPQR, fnAPolAPBS,fnApbsParamAPol);
+#ifdef INT_APBS
                   apbs(argc,argv,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaB);
+#else
+                  ext_apbs(isize[1], bVerbose,fnApbsOut,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaB);
+#endif
            		  fprintf(fAPolar, "%15.3lf", TmpApolarEnergy);
           		  remove(fnPQR);
            		  remove(fnAPolAPBS);
 
                   makePQR(&top, index[2], isize[2], ePBC, box, x, modresname, fnPQR);
                   APolarInAPBS(&APolarKeyWords, fnPQR, fnAPolAPBS,fnApbsParamAPol);
+#ifdef INT_APBS
                   apbs(argc,argv,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaAB);
+#else
+                  ext_apbs(isize[2], bVerbose,fnApbsOut,fnAPolAPBS,NULL,&TmpApolarEnergy, TempAtomWcaAB);
+#endif
            		  fprintf(fAPolar, "%15.3lf\n", TmpApolarEnergy);
 
           		  remove(fnPQR);
@@ -1084,6 +1123,13 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 
 int main(int argc, char *argv[])
 {
+
+# ifndef INT_APBS
+#ifdef GMX_NO_SYSTEM
+	  gmx_fatal(FARGS,"No calls to system(3) supported on this platform.");
+#endif
+#endif
+
   gmx_do_mmpbsa(argc, argv);
   return 0;
 }

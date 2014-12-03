@@ -118,6 +118,7 @@ int ReadInput	(char *fnMdp, gmx_bool *bPolar, gmx_bool *bAPolar, t_PolKey *PolKe
 		RTYPE ("ofrac",			PolKey->ofrac, 		0.1);
 
 		//Polar Keywords
+		EETYPE("mg-type",       PolKey->mg_type,    mg_words);
 		RTYPE ("pcharge",       PolKey->pcharge,    	0);
 		RTYPE ("ncharge",   	PolKey->ncharge,    	0);
 		RTYPE ("prad", 	 	 	PolKey->prad,    	0);

@@ -67,7 +67,7 @@
 #include "apbs/femparm.h"  
 
 
-#include "routines.h"
+#include "apbs13_routines.h"
 
 //VEMBED(rcsid="$Id: routines.c 1615 2010-10-20 19:16:35Z sobolevnrm $")
 

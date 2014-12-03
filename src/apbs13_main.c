@@ -68,7 +68,7 @@
 #include "apbs/pbeparm.h"
 #include "apbs/femparm.h"
 
-#include "routines.h"
+#include "apbs13_routines.h"
 
 ////Added for the g_mmpbsa/////////////
 #include "smalloc.h"
@@ -681,7 +681,7 @@ int apbs( int argc,  char **argv, char *input_path, double *PolarEnergy, double 
 		pbeparm = nosh->calc[1]->pbeparm;
 		convert = 0.5*Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na;
 		for (kk=0; kk<nenergy[1]; kk++)
-			AtomEnergyOut[kk] = convert*atomEnergy[1][kk] - convert*atomEnergy[3][kk];
+			AtomEnergyOut[kk] = convert*atomEnergy[nosh->elec2calc[0]][kk] - convert*atomEnergy[nosh->elec2calc[1]][kk];
 		//*AtomEnergyOut = LocalAtomEnergyOut;
 	}
 

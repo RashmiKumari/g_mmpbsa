@@ -55,8 +55,8 @@
  *
  */
 
-#ifndef _APBSROUTINES_H_
-#define _APBSROUTINES_H_
+#ifndef _APBS13_ROUTINES_H_
+#define _APBS13_ROUTINES_H_
 
 #include "apbs/apbs.h"  
 #include "apbs/nosh.h"  
