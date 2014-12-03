@@ -34,9 +34,9 @@ The output from the tool is used further as input in python scripts which is pro
 
 *   Supports **APBS 1.2.x**, **1.3.x** and **1.4.x** versions
 
-*   Inherits APBS capability of parallel computation using **OpenMP**. See details [here](How-to-Run.html#openmp).
+*   Inherits APBS capability of parallel computation using **OpenMP**. See details [here](http://rashmikumari.github.io/g_mmpbsa/How-to-Run.html#openmp).
 
-*   Supports **external APBS** execuatble with **mpirun** for parallel computation on HPC. See details [here](How-to-Run.html#mpirun).
+*   Supports **external APBS** execuatble with **mpirun** for parallel computation on HPC. See details [here](http://rashmikumari.github.io/g_mmpbsa/How-to-Run.html#mpirun).
 
 *   Options for van der Waal radii that are used for solvation free energy calculation using implicit solvent models.
 
