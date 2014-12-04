@@ -204,8 +204,6 @@ Follow these steps to download and install APBS-1.4.1 version:
 
 #### <a name="install-without-apbs"> </a>Installation without APBS (to use with external APBS)
 
-**Warning:**{: style="color: red"} Compiler for GROMACS, APBS and g_mmpbsa should be same.
-
 **Required Library from GROMACS:** `libgmx`
 
 ##### A. Install GROMACS 4.5.x/4.6.x
