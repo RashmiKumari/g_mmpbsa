@@ -9,6 +9,8 @@ layout: page
 *   [fadd](Polar-solvation-input-parameters.html#fadd)
 *   [gridspace](Polar-solvation-input-parameters.html#gridspace)
 *   [gmemceil](Polar-solvation-input-parameters.html#gmemceil)
+*   [PBsolver](Polar-solvation-input-parameters.html#pbsolver)
+*   [mg-type](Polar-solvation-input-parameters.html#mg-type)
 *   [pcharge](Polar-solvation-input-parameters.html#pcharge)
 *   [prad](Polar-solvation-input-parameters.html#prad)
 *   [pconc](Polar-solvation-input-parameters.html#pconc)
@@ -25,7 +27,7 @@ layout: page
 *   [temp](Polar-solvation-input-parameters.html#temp)
 *   [chgm](Polar-solvation-input-parameters.html#chgm)
 *   [bcfl](Polar-solvation-input-parameters.html#bcfl)
-*   [PBsolver](Polar-solvation-input-parameters.html#pbsolver)
+
 
 
 ### [Input Keywords for Non-polar Solvation energy](Non-polar-solvation-input-parameters.html) 
