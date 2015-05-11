@@ -4,7 +4,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 #
 # This file is part of g_mmpbsa.
 #
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,16 +36,14 @@
 #
 
 import re
+import sys
 import numpy as np
-from scipy import stats
 import argparse
 import os
 import math
-import scipy.stats as spstat
 
 def main():
 	args = ParseOptions()
-	CheckInput(args)
 	#File => Frame wise component energy
 	frame_wise = open(args.outfr, 'w')
 	frame_wise.write('#Time E_VdW_mm(Protein)\tE_Elec_mm(Protein)\tE_Pol(Protein)\tE_Apol(Protein)\tE_VdW_mm(Ligand)\tE_Elec_mm(Ligand)\tE_Pol(Ligand)\tE_Apol(Ligand)\tE_VdW_mm(Complex)\tE_Elec_mm(Complex)\tE_Pol(Complex)\tE_Apol(Complex)\tDelta_E_mm\tDelta_E_Pol\tDelta_E_Apol\tDelta_E_binding\n')
@@ -197,22 +195,6 @@ def CheckEnData(mmEn,polEn,apolEn):
 			print "Number of row is not same for all column"
 			exit(1)
 
-def CheckInput(args):
-	if args.multiple:
-		if not os.path.exists(args.metafile):
-			print '\n{0} not found....\n' .format(args.metafile)
-			exit(1)
-	else:
-		if not os.path.exists(args.molmech):
-			print '\n{0} not found....\n' .format(args.molmech)
-			exit(1)
-		if not os.path.exists(args.polar):
-			print '\n{0} not found....\n' .format(args.polar)
-			exit(1)
-		if not os.path.exists(args.apolar):
-			print '\n{0} not found....\n' .format(args.polar)
-			exit(1)
-	
 def ParseOptions():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-mt", "--multiple", help='If given, calculate for multiple complexes. Need Metafile containing path of energy files', action="store_true")
@@ -226,7 +208,32 @@ def ParseOptions():
 	parser.add_argument("-of", "--outfr", help='Energy File: All energy components frame wise',action="store",default='full_energy.dat', metavar='full_energy.dat')
 	parser.add_argument("-os", "--outsum", help='Final Energy File: Full Summary of energy components',action="store",default='summary_energy.dat', metavar='summary_energy.dat')
 	parser.add_argument("-om", "--outmeta", help='Final Energy File for Multiple Complexes: Complex wise final binding nergy',action="store",default='meta_energy.dat',metavar='meta_energy.dat')
+	
+	if len(sys.argv) < 2:
+		parser.print_help()
+		exit(1)
+	
 	args = parser.parse_args()
+	
+	if args.multiple:
+		if not os.path.exists(args.metafile):
+			print '\nERROR: {0} not found....\n' .format(args.metafile)
+			parser.print_help()
+			exit(1)
+	else:
+		if not os.path.exists(args.molmech):
+			print '\nERROR: {0} not found....\n' .format(args.molmech)
+			parser.print_help()
+			exit(1)
+		if not os.path.exists(args.polar):
+			print '\nERROR: {0} not found....\n' .format(args.polar)
+			parser.print_help()
+			exit(1)
+		if not os.path.exists(args.apolar):
+			print '\nERROR: {0} not found....\n' .format(args.apolar)
+			parser.print_help()
+			exit(1)
+	
 	return args
 
 def ReadData(FileName,n=2):

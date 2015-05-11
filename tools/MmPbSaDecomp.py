@@ -5,7 +5,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -129,7 +129,23 @@ def ParseOptions():
 	parser.add_argument("-ct", "--cutoff", help='Absolute Cutoff: energy output above and below this value',action="store",type=float,default=999, metavar=999)
         parser.add_argument("-o", "--output", help='Final Decomposed Energy File',action="store",default='final_contrib_energy.dat', metavar='final_contrib_energy.dat')
 	parser.add_argument("-om", "--outmap", help='energy2bfac input file: to map energy on structure for visualization',action="store",default='energyMapIn.dat', metavar='energyMapIn.dat')
-        return parser.parse_args()
+        
+		args = parser.parse_args()
+
+		if not os.path.exists(args.molmech):
+			print '\n{0} not found....\n' .format(args.molmech)
+			parser.print_help()
+			exit(1)
+		if not os.path.exists(args.polar):
+			print '\n{0} not found....\n' .format(args.polar)
+			parser.print_help()
+			exit(1)
+		if not os.path.exists(args.apolar):
+			print '\n{0} not found....\n' .format(args.apolar)
+			parser.print_help()
+			exit(1)
+
+		return parser.parse_args()
 
 def CheckResname(resA,resB,resC):
 	if(len(resA) != len(resB)):
@@ -163,7 +179,7 @@ def CheckInput(args):
 		print '\n{0} not found....\n' .format(args.polar)
 		exit(1)
 	if not os.path.exists(args.apolar):
-		print '\n{0} not found....\n' .format(args.polar)
+		print '\n{0} not found....\n' .format(args.apolar)
 		exit(1)
 
 
