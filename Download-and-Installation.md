@@ -29,8 +29,8 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
 ##### <a name="download-binary"></a> Download
 
 
-|                         |    GROMACS-4.5.x     |     GROMACS-4.6.x    |     GROMACS-5.0.x    |
-|:------------------------|:--------------------:|:--------------------:|:--------------------:|
+|                         |    Gromacs-4.5.x     |     Gromacs-4.6.x    |     Gromacs-5.0.x    |
+|:------------------|:--------------------:|:--------------------:|:--------------------:|
 |  Linux x86_64 (64 bit)  |   [Download][1]      |    [Download][5]     |    [Download][9]     |
 |  Linux x86 (32 bit)     |   [Download][2]      |    [Download][6]     |    [Download][10]    |
 |                      **To use with external APBS program**                                   |
