@@ -29,16 +29,16 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
 ##### <a name="download-binary"></a> Download
 
 
-|                         |    GROMACS-4.5.x     |     GROMACS-4.6.x    |
-|:------------------------|:--------------------:|:--------------------:|
-|  Linux x86_64 (64 bit)  |   [Download][1]      |    [Download][2]     |
-|  Linux x86 (32 bit)     |   [Download][3]      |    [Download][4]     |
-|                      **To use with external APBS program**            |
-|  Linux x86_64 (64 bit)  |   [Download][5]      |    [Download][6]     |
-|  Linux x86 (32 bit)     |   [Download][7]      |    [Download][8]     |
+|                         |    GROMACS-4.5.x     |     GROMACS-4.6.x    |     GROMACS-5.0.x    |
+|:------------------------|:--------------------:|:--------------------:|:--------------------:|
+|  Linux x86_64 (64 bit)  |   [Download][1]      |    [Download][5]     |    [Download][9]     |
+|  Linux x86 (32 bit)     |   [Download][2]      |    [Download][6]     |    [Download][10]    |
+|                      **To use with external APBS program**                                   |
+|  Linux x86_64 (64 bit)  |   [Download][3]      |    [Download][7]     |    [Download][11]    |
+|  Linux x86 (32 bit)     |   [Download][4]      |    [Download][8]     |    [Download][12]    |
 
 
-[**Download Python Scripts**][9]
+[**Download Python Scripts**][13]
 
 ##### <a name="install-binary"></a> Installation
 
@@ -231,11 +231,15 @@ Install as described [above](#install-gromacs).
 
 ---
 [1]: package/GMX45x/g_mmpbsa.tar.gz
-[2]: package/GMX46x/g_mmpbsa.tar.gz
-[3]: package/GMX45x_32bit/g_mmpbsa.tar.gz
-[4]: package/GMX46x_32bit/g_mmpbsa.tar.gz
-[5]: package/GMX45x_extrn_APBS/g_mmpbsa.tar.gz
-[6]: package/GMX46x_extrn_APBS/g_mmpbsa.tar.gz
-[7]: package/GMX45x_extrn_APBS_32bit/g_mmpbsa.tar.gz
+[2]: package/GMX45x_32bit/g_mmpbsa.tar.gz 
+[3]: package/GMX45x_extrn_APBS/g_mmpbsa.tar.gz
+[4]: package/GMX45x_extrn_APBS_32bit/g_mmpbsa.tar.gz 
+[5]: package/GMX46x/g_mmpbsa.tar.gz
+[6]: package/GMX46x_32bit/g_mmpbsa.tar.gz
+[7]: package/GMX46x_extrn_APBS/g_mmpbsa.tar.gz
 [8]: package/GMX46x_extrn_APBS_32bit/g_mmpbsa.tar.gz
-[9]: package/scripts.tar.gz
+[9]: package/GMX50x/g_mmpbsa.tar.gz
+[10]: package/GMX50x_32bit/g_mmpbsa.tar.gz
+[11]: package/GMX50x_extrn_APBS/g_mmpbsa.tar.gz
+[12]: package/GMX50x_extrn_APBS_32bit/g_mmpbsa.tar.gz
+[13]: package/scripts.tar.gz
