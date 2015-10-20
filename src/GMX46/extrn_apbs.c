@@ -1,9 +1,10 @@
 /*
  * This file is part of g_mmpbsa.
  *
- * Authors: Rashmi Kumari and Rajendra Kumar
+ * Authors: Rashmi Kumari and Andrew Lynn
+ * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,9 +38,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "smalloc.h"
-#include "gmx_fatal.h"
-#include "ExtractData.h"
+#include "gromacs/smalloc.h"
+#include "gromacs/gmx_fatal.h"
+#include "../ExtractData.h"
 
 double get_totEnergy(char *line)	{
 	double energy;
@@ -102,7 +103,7 @@ int have_mpirun(const char *line)	{
 	};
 	bool bMPI=FALSE;
 
-	for(i=0; i<3; i++)	{
+	for(i=0; i<4; i++)	{
 		if (strstr(line, mpi_dict[i]) != NULL)	{
 			bMPI = TRUE;
 			break;

@@ -4,7 +4,7 @@
 #
 # Author: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ def main():
 	parser = ParseOptions()
 	args = CheckInput(parser)
 	residues2mutate = get_residue_list_for_scan(args)
-		
+
 	wildtype_path = os.path.abspath(args.dirWildType)
 	mutation_path = os.path.abspath(args.dirMutations)
 	file_list = [ os.path.join(wildtype_path, f) for f in os.listdir(wildtype_path) if os.path.isfile(os.path.join(wildtype_path, f)) ]
@@ -60,14 +60,14 @@ def main():
 		sys.stdout.write("\nMutating residue no. %s of chain %s to %s " % (residue.pos, residue.chain, residue.name))
 		sys.stdout.write("\n----------------------------------------------------\n")
 		sys.stdout.flush()
-		
+
 		# Add residue into object
 		mt.add_mutation(residue)
 
 		# Mutate all frames using modeller
 		mt.mutate_frames(mutation_path, args)
 
-		# Generate trajectory, topology and tpr file of mutated protein complex	
+		# Generate trajectory, topology and tpr file of mutated protein complex
 		mt.generate_traj(mutation_path, args)
 
 		# Remove residue from mutations
@@ -87,7 +87,7 @@ class Mutations:
 	def __init__(self, file_list):
 		self.file_list = file_list
 		self.residues=[]
-	
+
 	def add_mutation(self, residues):
 		self.residues.append(residues)
 
@@ -108,7 +108,7 @@ class Mutations:
 			if not os.path.isdir(mutation_path):
 				raise
 
-		dest_path = os.path.join(mutation_path, self.dirname())	
+		dest_path = os.path.join(mutation_path, self.dirname())
 		try:
 			os.makedirs(dest_path)
 		except OSError:
@@ -120,13 +120,13 @@ class Mutations:
 		for a_file in self.file_list:
 			sys.stdout.write("\r    ...Mutating Frame: %d/%d" % (n, len(self.file_list)))
 			sys.stdout.flush()
-		
+
 			# Change of atomname CD to CD1 of ILE, modeller does not detect CD atomname
 			CD_2_CD1_for_ILE(a_file, "modeller_in.pdb")
-			
+
 			# Mutations of selected residue by modeller
 			mutate_a_frame("modeller_in.pdb", os.path.basename(a_file), self.residues)
-							
+
 			os.remove("modeller_in.pdb")
 			n=n+1
 		sys.stdout.write("\n    ...Finished\n")
@@ -141,7 +141,7 @@ class Mutations:
 			if os.path.isdir(mutation_path):
 				raise
 
-		dest_path = os.path.join(mutation_path, self.dirname())	
+		dest_path = os.path.join(mutation_path, self.dirname())
 		try:
 			os.path.exists(dest_path)
 		except OSError:
@@ -149,10 +149,10 @@ class Mutations:
 				raise
 
 		cd = ChDir(dest_path)
-		
+
 		#Generate gro and toplogy file for alanine scanning
-		gen_top_gro_for_alascan(args, self.residues, self.file_list)	
-	
+		gen_top_gro_for_alascan(args, self.residues, self.file_list)
+
 		#Energy minimization
 		n = 1
 		for a_file in self.file_list:
@@ -160,26 +160,26 @@ class Mutations:
 			sys.stdout.flush()
 			energy_minimization(args, a_file)
 			n=n+1
-		
+
 		sys.stdout.write("\n    ...Finished\n")
 		sys.stdout.flush()
-		
+
 		sys.stdout.write("\r    ...Generating trajectory and tpr file")
 		sys.stdout.flush()
 
 		# Generate trajectory and tpr from energy minimized mutated frames
 		gen_traj_tpr(args)
-		
+
 		sys.stdout.write("\n    ...Finished\n")
 		sys.stdout.flush()
 
 		del cd
-	
+
 def gen_traj_tpr(args):
 	files = os.listdir(os.getcwd())
 
 	frames = []
-	
+
 	# Deleting top and itp files
 	for a_file in files:
 		if a_file.endswith("em.gro"):
@@ -199,7 +199,7 @@ def gen_traj_tpr(args):
 
 	# Generating tpr file
 	gen_tpr(args, files[0])
-	
+
 	# Running trjconv to set time in trajectory
 	command = 'trjcat -f '
 	for frame in frames:
@@ -214,7 +214,7 @@ def gen_traj_tpr(args):
 	for i in range(1, len(frames)):
 		os.remove(frames[i])
 	os.remove('traj_temp.xtc')
-	
+
 def gen_top_gro_for_alascan(args, residues, file_list):
 
 	# Update protonation states of the selected residues
@@ -225,7 +225,7 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 		sys.stdout.flush()
 		InFile = os.path.basename(aFile)
 		update_prot_state(args, InFile)
-	
+
 	sys.stdout.write("\n    ...Finished\n")
 	sys.stdout.flush()
 
@@ -238,8 +238,8 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 		InFile = os.path.basename(aFile)
 		OutFile1 = '{0}_nobox.pdb' .format(os.path.splitext(InFile)[0])
 		OutFile2 = '{0}.gro' .format(os.path.splitext(InFile)[0])
-	
-		# Running pdb2gmx	
+
+		# Running pdb2gmx
 		command = 'pdb2gmx -f {0} -water tip3p -o {1}' .format(InFile, OutFile1)
 		p = Popen(shlex.split(command), stdin=PIPE, stdout=PIPE, stderr=PIPE)
 		p.stdin.write('{0}\n' .format(args.force_field))
@@ -251,7 +251,7 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 		# Recover coordinates of hydrogen atoms
 		if(not args.no_orig_h_pos):
 			recover_hydrogen_coords(residues, aFile, OutFile1)
-	
+
 		# Generating dodecahedron box
 		command = 'editconf -f {0} -bt dodecahedron -d 1 -c -o {1}' .format(OutFile1, OutFile2)
 		p = Popen(shlex.split(command), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -260,7 +260,7 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 		if p.returncode != 0:
 			print stdout, stderr
 			sys.exit(1)
-	
+
 		files = os.listdir(os.getcwd())
 
 		#Deleting top and itp files
@@ -268,16 +268,16 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 			if top.endswith(".top") or top.endswith(".itp"):
 				os.remove(top)
 		os.remove(OutFile1)
-		
+
 	sys.stdout.write("\n    ...Finished\n")
 	sys.stdout.flush()
 
-	#Generate topolgy using pdb2gmx	
+	#Generate topolgy using pdb2gmx
 	sys.stdout.write("\r    ...Generating topology files using pdb2gmx...")
 	sys.stdout.flush()
 
 	InFile = os.path.basename(file_list[0])
-	
+
 	command = ['pdb2gmx', '-f', InFile, '-water', 'tip3p', '-o', 'temp.gro']
 	p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 	p.stdin.write('{0}\n' .format(args.force_field))
@@ -285,13 +285,13 @@ def gen_top_gro_for_alascan(args, residues, file_list):
 	if p.returncode != 0:
 		print stdout, stderr
 		sys.exit(1)
-		 
+
 	os.remove('temp.gro')
 
 	for aFile in file_list:
 		InFile = os.path.basename(aFile)
 		os.remove(InFile)
-	
+
 	sys.stdout.write("\n    ...Finished")
 	sys.stdout.flush()
 
@@ -301,7 +301,7 @@ def energy_minimization(args, filename):
 	OutFile = '{0}_em.gro' .format(os.path.splitext(pdbfile)[0])
 
 	# Generating tpr file
-	gen_tpr(args, InFile)	
+	gen_tpr(args, InFile)
 
 	# Running mdrun for minimization
 	command = 'mdrun -s topol.tpr -c {0}' .format(OutFile)
@@ -310,7 +310,7 @@ def energy_minimization(args, filename):
 	if p.returncode != 0:
 		print stdout, stderr
 		sys.exit(1)
-	
+
 	#Deleting files generated during minimization
 	files = os.listdir(os.getcwd())
 	for tfile in files:
@@ -341,9 +341,9 @@ def gen_tpr(args, infile):
 	fmdp.write("Tcoupl              =  no\n")
 	fmdp.write("Pcoupl              =  no\n")
 	fmdp.write("gen_vel             =  no\n")
-	fmdp.close()	
+	fmdp.close()
 
-	command = 'grompp -f em.mdp -c {0} -p topol.top -o topol.tpr' .format(infile) 
+	command = 'grompp -f em.mdp -c {0} -p topol.top -o topol.tpr' .format(infile)
 	p = Popen(shlex.split(command), stdin=PIPE, stdout=PIPE, stderr=PIPE)
 	stdout, stderr = p.communicate()
 	if p.returncode != 0:
@@ -358,7 +358,7 @@ def CD_2_CD1_for_ILE(infile, outfile):
 	except IOError:
 		print '\nCould not open File: {0}\n' .format(infile)
 		raise
-	
+
 	PDB = []
 	for line in finPDB:
 		PDB.append(line)
@@ -369,8 +369,8 @@ def CD_2_CD1_for_ILE(infile, outfile):
 		tmp = re.split('\s+', PDB[i])
 		if (tmp[0]=='ATOM') and (tmp[3]=='ILE') and (tmp[2] == 'CD'):
 			PDB[i] = PDB[i].replace('CD ', 'CD1')
-	
-	#Writing output PDB file	
+
+	#Writing output PDB file
 	try:
 		fout = open(outfile, 'w')
 	except IOError:
@@ -387,7 +387,7 @@ def recover_hydrogen_coords(residues, infile, outfile):
 	except IOError:
 		print '\nCould not open File: {0}\n' .format(infile)
 		raise
-	
+
 	inPDB = []
 	for line in finPDB:
 		inPDB.append(line)
@@ -400,7 +400,7 @@ def recover_hydrogen_coords(residues, infile, outfile):
 	except IOError:
 		print '\nCould not open File: {0}\n' .format(outfile)
 		raise
-	
+
 	outPDB = []
 	for line in foutPDB:
 		outPDB.append(line)
@@ -434,7 +434,7 @@ def recover_hydrogen_coords(residues, infile, outfile):
 			tmpOUT = re.split('\s+', outPDB[j])
 			if (tmpOUT[0] !='ATOM'):
 				continue
-			
+
 			#Checking for mutated residues
 			for residue in residues:
 				if (residue.pos == tmpOUT[5]) and (residue.chain == tmpOUT[4]):
@@ -443,13 +443,13 @@ def recover_hydrogen_coords(residues, infile, outfile):
 			if mutateOUT:
 				mutateOUT = False
 				continue
-		
+
 			#Replacing coordinates of hydrogen atoms
 			if ( (re.search(r"^H", tmpOUT[2]) != None) or (re.search(r"^\dH", tmpOUT[2]) != None)) and (tmpOUT[2] == tmpIN[2]) and (tmpOUT[4] == tmpIN[4]) and (tmpOUT[5] == tmpIN[5]):
 				outPDB[j] = inPDB[i]
 				break
-	
-	#Writing output PDB file	
+
+	#Writing output PDB file
 	try:
 		fout = open(outfile, 'w')
 	except IOError:
@@ -483,7 +483,7 @@ def get_residue_list_for_scan(args):
 				rlist.append(resid)
 		for i in range(len(rlist)):
 			residues2mutate.append(resid2mutate(args.residue_name, str(rlist[i]), chain))
-	#for i in range(len(residues2mutate)):	
+	#for i in range(len(residues2mutate)):
 		#print residues2mutate[i].name, residues2mutate[i].pos, residues2mutate[i].chain
 	#sys.exit(0)
 	return residues2mutate
@@ -500,7 +500,7 @@ def update_prot_state(args, filename):
 				chain.append(ch)
 				resid.append(rlist[i])
 		return resid, chain
-	
+
 	#Replace specific residue
 	def replace_residue(PDB, resid, chain, old, new):
 		for r in range(len(resid)):
@@ -509,7 +509,7 @@ def update_prot_state(args, filename):
 				if (tmp[0]=='ATOM') and (resid[r]==tmp[5]) and (chain[r]==tmp[4]):
 					PDB[i] = PDB[i].replace(old, new)
 		return PDB
-	
+
 	#Replace HIS with HIE
 	def replace_HIS_to_HIE(PDB):
 		for i in range(len(PDB)):
@@ -517,26 +517,26 @@ def update_prot_state(args, filename):
 			if (tmp[0]=='ATOM') and (tmp[3]=='HIS'):
 				PDB[i] = PDB[i].replace('HIS', 'HIE')
 		return PDB
-		
+
 	#Opening input pdb file
 	try:
 		finPDB = open(filename, 'r')
 	except IOError:
 		print '\nCould not open File: {0}\n' .format(infile)
 		raise
-	
+
 	PDB = []
 	for line in finPDB:
 		PDB.append(line)
 
 	finPDB.close()
 	os.remove(filename)
-	
+
 	#Replacing HIS with HIP
 	if (args.hip != None):
 		resid, chain = get_resid_list(args.hip)
-		PDB = replace_residue(PDB, resid, chain, 'HIS', 'HIP')	
-			
+		PDB = replace_residue(PDB, resid, chain, 'HIS', 'HIP')
+
 	#Replacing HIS with HID
 	if (args.hid != None):
 		resid, chain = get_resid_list(args.hid)
@@ -544,28 +544,28 @@ def update_prot_state(args, filename):
 
 	#Replacing HIS with HIE
 	replace_HIS_to_HIE(PDB)
-	
+
 	#Replacing GLU with GLH
 	if (args.glh != None):
 		resid, chain = get_resid_list(args.glh)
 		PDB = replace_residue(PDB, resid, chain, 'GLU', 'GLH')
-	
+
 	#Replacing ASP with ASH
 	if (args.ash != None):
 		resid, chain = get_resid_list(args.ash)
 		PDB = replace_residue(PDB, resid, chain, 'ASP', 'ASH')
-	
+
 	#Replacing LYS with LYN
 	if (args.lyn != None):
 		resid, chain = get_resid_list(args.lyn)
 		PDB = replace_residue(PDB, resid, chain, 'LYS', 'LYN')
-	
+
 	#Replacing CYS with CYM
 	if (args.cym != None):
 		resid, chain = get_resid_list(args.cym)
 		PDB = replace_residue(PDB, resid, chain, 'CYS', 'CYM')
 
-	#Writing output PDB file	
+	#Writing output PDB file
 	try:
 		fout = open(filename, 'w')
 	except IOError:
@@ -578,7 +578,7 @@ def update_prot_state(args, filename):
 
 def ParseOptions():
 	parser = argparse.ArgumentParser()
-	
+
 	parser.add_argument("-drWT", "--dirWildType", help='Directory containing wild-type frames from MD trajectory', action="store", default='wildtype', metavar='wildtype')
 	parser.add_argument("-drMT", "--dirMutations", help='Directory containing mutated frames from MD trajectory', action="store", default='mutations', metavar='mutations')
 	parser.add_argument("-ff", "--force_field", help='Force-field number to choose in pdb2gmx. Default value is 6, which corrosponds to AMBER99SB-ILDN force-field in standard GROMACS package', action="store", default='6', metavar='6')
@@ -598,9 +598,9 @@ def ParseOptions():
 	parser.add_argument("-emnstyp", "--em_ns_type", help='Cut-off scheme during energy minimization', action="store", default="grid", metavar="grid")
 	parser.add_argument("-t0", "--time0", help='Starting time (ps) of mutated trajectory', action="store", default=0, type=float, metavar=0)
 	parser.add_argument("-tstep", "--timestep", help='Time step (ps) between frames of mutated trajectory', action="store", default=500, type=float, metavar=500)
-	
+
 	return parser
-	
+
 
 #def mutate(modelname, respos, restyp, chain):
 def mutate_a_frame(modelname, outfile, residues):
@@ -637,7 +637,7 @@ def mutate_a_frame(modelname, outfile, residues):
 		for typ in ('omega', 'chi1', 'chi2', 'chi3', 'chi4'):
 			rsr.make(s, restraint_type=typ+'_dihedral', spline_range=4.0,spline_dx=0.3, spline_min_points = 5, aln=aln, spline_on_site=True)
 
-	log.level(output=0, warnings=0, errors=1)	
+	log.level(output=0, warnings=0, errors=1)
 	#log.verbose()
 	# Set a different value for rand_seed to get a different final model
 	env = environ(rand_seed=-49837)
@@ -670,7 +670,7 @@ def mutate_a_frame(modelname, outfile, residues):
 		#perform the mutate residue operation
 		#s.mutate(residue_type=restyp)
 		s.mutate(residue_type=residue.name)
-	
+
 	#get two copies of the sequence.  A modeller trick to get things set up
 	ali.append_model(mdl1, align_codes=modelname)
 

@@ -1,10 +1,17 @@
-/*
+/**
+ * @file GMX50/PbsaPrep.c
+ * @brief Definition of routines to setup PBSA calculations
+ * @ingroup PBSA_PREP
+ * @author Rashmi Kumari, Rajendra Kumar and Andrew Lynn
+ * @attention
+ * @verbatim
+ *
  * This file is part of g_mmpbsa.
  *
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,18 +39,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
+ * @endverbatim
+ *
  */
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
-#include "statutil.h"
-#include "typedefs.h"
-#include "smalloc.h"
-#include "vec.h"
-#include "tpxio.h"
-#include "rmpbc.h"
-#include "xvgr.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/rmpbc.h"
+#include "gromacs/legacyheaders/xvgr.h"
+#include "gromacs/fileio/tpxio.h"
+#include "gromacs/fileio/futil.h"
+#include "gromacs/utility/smalloc.h"
 
 #include "g_mmpbsa.h"
 
@@ -259,7 +268,7 @@ int makePQR(t_topology *top, atom_id *index, int isize, int ePBC, matrix box, rv
   real q, r;
   static const char *pdb = "%-6s%5u  %-5.4s%4.4s  %4d    %8.3f%8.3f%8.3f";
   //set_pdb_wide_format(TRUE);
-  fPQR = ffopen(fnPQR, "w");
+  fPQR = gmx_ffopen(fnPQR, "w");
   //write_pdbfile_indexed(fPQR,NULL,&(top->atoms),x,ePBC,box,' ',-1,isize,index,NULL,TRUE);
   for (i = 0; i < isize; i++)
     {
@@ -272,7 +281,7 @@ int makePQR(t_topology *top, atom_id *index, int isize, int ePBC, matrix box, rv
       fprintf(fPQR, pdb, "ATOM", i + 1, atomname, modresname[index[i]], resnmr, 10 * x[index[i]][XX], 10 * x[index[i]][YY], 10 * x[index[i]][ZZ]);
       fprintf(fPQR, "%8.3f%8.3f\n", q, r);
     }
-  ffclose(fPQR);
+  gmx_ffclose(fPQR);
   return 0;
 }
 
@@ -319,7 +328,7 @@ void ApbsParamAPol(t_topology *top, atom_id *index, int isize, char **modresname
   real sig6, vdw, sigma, epsilon;
   double c6, c12;
   FILE *fOut;
-  fOut = ffopen(fnApbsParamAPol, "w");
+  fOut = gmx_ffopen(fnApbsParamAPol, "w");
 
   for (n = 0; n < isize; n++)
     {
@@ -360,14 +369,14 @@ void ApbsParamAPol(t_topology *top, atom_id *index, int isize, char **modresname
   fprintf(fOut, "WAT     OW      -0.834        1.575305  6.36386e-01\n");
   fprintf(fOut, "WAT     HW1      0.417        0.000000  0.000000000\n");
   fprintf(fOut, "WAT     HW2      0.417        0.000000  0.000000000");
-  ffclose(fOut);
+  gmx_ffclose(fOut);
 
 }
 
 int polarInAPBS(t_PolKey *param, char *fnPQR, char *fnPolAPBS, gmx_bool bDECOMP)	{
 
   FILE *fIn;
-  fIn = ffopen(fnPolAPBS, "w");
+  fIn = gmx_ffopen(fnPolAPBS, "w");
 
   fprintf(fIn, "read\n    mol pqr %s\nend\n", fnPQR);
 
@@ -439,14 +448,14 @@ int polarInAPBS(t_PolKey *param, char *fnPQR, char *fnPolAPBS, gmx_bool bDECOMP)
   fprintf(fIn, "end\n");
   fprintf(fIn, "print elecEnergy mol1 - mol2 end\n");
   fprintf(fIn, "quit\n");
-  ffclose(fIn);
+  gmx_ffclose(fIn);
 
   return 0;
 }
 
 int APolarInAPBS(t_APolKey *APolKey, char *fnPQR, char *fnAPolAPBS, char *fnApbsParamAPol)	{
   FILE *fIn;
-  fIn = ffopen(fnAPolAPBS, "w");
+  fIn = gmx_ffopen(fnAPolAPBS, "w");
 
   fprintf(fIn, "read\n    mol pqr %s\n    parm flat %s\nend\n", fnPQR, fnApbsParamAPol);
   fprintf(fIn, "\nAPOLAR name mol1\n");
@@ -465,8 +474,7 @@ int APolarInAPBS(t_APolKey *APolKey, char *fnPQR, char *fnAPolAPBS, char *fnApbs
   fprintf(fIn, "end\n");
   fprintf(fIn, "\nprint apolEnergy mol1 end\n");
   fprintf(fIn, "quit\n");
-  ffclose(fIn);
+  gmx_ffclose(fIn);
 
   return 0;
 }
-

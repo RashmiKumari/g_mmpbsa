@@ -1,10 +1,18 @@
-/*
+/**
+ * @file GMX50/radius.c
+ * @brief Definition of routines for radius types
+ * @ingroup RADIUS
+ * @author Rashmi Kumari, Rajendra Kumar and Andrew Lynn
+ * @attention
+ * @verbatim
+ *
+ *
  * This file is part of g_mmpbsa.
  *
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +40,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
+ * @endverbatim
+ *
  */
 
-#include "stdio.h"
-#include "string.h"
-#include "stdlib.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "g_mmpbsa.h"
 

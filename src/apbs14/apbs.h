@@ -6,7 +6,7 @@
  *  @file    apbs.h
  *  @author  Nathan Baker
  *  @brief   Header file for header dependencies
- *  @ingroup  Frontend
+ *  @ingroup  Frontend_APBS14
  *  @version $Id$
  *  @attention
  *  @verbatim

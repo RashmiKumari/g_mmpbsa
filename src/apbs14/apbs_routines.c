@@ -1,7 +1,8 @@
 /**
-*  @file    routines.c
+ *  @file    apbs14/apbs_routines.c
+ *  @ingroup  Frontend_APBS
  *  @author  Nathan Baker
- *  @brief   Supporting routines for APBS front end
+ *  @brief   APBS 1.4 Supporting routines for front end
  *  @version $Id$
  *  @attention
  *  @verbatim
@@ -49,14 +50,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  * @endverbatim
- * 
+ *
  * ----------------------------------------------------------
  * Modified by Rashmi Kumari and Rajendra Kumar for g_mmpbsa
  * ----------------------------------------------------------
  *
  */
 
-#include "apbs14_routines.h"
+#include "apbs_routines.h"
 #include "geoflow/cpbconcz2.h"
 /*
 VEMBED(rcsid="$Id$")
@@ -2714,8 +2715,8 @@ VPUBLIC int printEnergy(Vcom *com,
 VPUBLIC int printElecEnergy(Vcom *com,
                             NOsh *nosh,
                             double totEnergy[NOSH_MAXCALC],
-                            int iprint, 
-							double *PolarEnergy /* Added for g_mmpbsa */
+                            int iprint,
+							              double *PolarEnergy
                            ) {
 
     int iarg,
@@ -4346,7 +4347,7 @@ VPUBLIC int initAPOL(NOsh *nosh, /**< Input parameter object */
                      int *nforce, /**< Number of force calculations */
                      AtomForce **atomForce, /**< Atom force storage object */
                      Valist *alist, /**< Atom list */
-					 double *AtomEnergyOut  /** Added for g_mmpbsa */
+					 double *AtomEnergyOut  /**< Return array of atomic energy for g_mmpbsa */
                     ) {
     int i,          /**< @todo document */
         natoms,     /**< Number of atoms */
@@ -4831,7 +4832,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
  * Initialize a boundary element calculation.
  */
 VPUBLIC int initBEM(int icalc,
-                   NOsh *nosh, 
+                   NOsh *nosh,
                    BEMparm *bemparm,
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
@@ -4990,7 +4991,7 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
  * Initialize a geometric flow calculation.
  */
 VPUBLIC int initGEOFLOW(int icalc,
-                   NOsh *nosh, 
+                   NOsh *nosh,
                    GEOFLOWparm *bemparm,
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
@@ -5031,7 +5032,7 @@ VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pb
     }
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
-    
+
     natm = 0;
     for (m=0; m < nosh->nmol; ++m){
         natm += Valist_getNumberAtoms(molecules[m]);
@@ -5178,4 +5179,3 @@ VPUBLIC int writematGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm) {
     if (nosh->bogus) return 1;
     return 1;
 }
-

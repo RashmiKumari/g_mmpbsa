@@ -1,7 +1,8 @@
 /**
-*  @file    routines.c
+ *  @file    apbs13/apbs_routines.c
+ *  @ingroup  Frontend_APBS13
  *  @author  Nathan Baker
- *  @brief   Supporting routines for APBS front end
+ *  @brief   APBS-1.3 Supporting routines for front end
  *  @version $Id: routines.c 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @attention
  *  @verbatim
@@ -14,21 +15,21 @@
  *
  * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * -  Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.  
- * 
+ * list of conditions and the following disclaimer.
+ *
  * - Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation
  * and/or other materials provided with the distribution.
- * 
+ *
  * - Neither the name of Washington University in St. Louis nor the names of its
  * contributors may be used to endorse or promote products derived from this
  * software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -49,41 +50,41 @@
  */
 
 #include "apbscfg.h"
-#include "maloc/maloc.h"  
+#include "maloc/maloc.h"
 #ifdef HAVE_MC_H
-#include "mc/mc.h"  
+#include "mc/mc.h"
 #include "apbs/vfetk.h"
 #endif
 #ifdef HAVE_MCX_H
-#  include "mcx/mcx.h"  
+#  include "mcx/mcx.h"
 #endif
 
-#include "apbs/apbs.h"  
-#include "apbs/vhal.h"  
-#include "apbs/nosh.h"  
-#include "apbs/vgrid.h"  
-#include "apbs/mgparm.h"  
-#include "apbs/pbeparm.h"  
-#include "apbs/femparm.h"  
+#include "apbs/apbs.h"
+#include "apbs/vhal.h"
+#include "apbs/nosh.h"
+#include "apbs/vgrid.h"
+#include "apbs/mgparm.h"
+#include "apbs/pbeparm.h"
+#include "apbs/femparm.h"
 
 
-#include "apbs13_routines.h"
+#include "apbs_routines.h"
 
 //VEMBED(rcsid="$Id: routines.c 1615 2010-10-20 19:16:35Z sobolevnrm $")
 
 VPUBLIC void startVio() { Vio_start(); }
 
 VPUBLIC Vparam* loadParameter(NOsh *nosh) {
-	
+
 	Vparam *param = VNULL;
-	
+
 	if (nosh->gotparm) {
 		param = Vparam_ctor();
 		switch (nosh->parmfmt) {
 			case NPF_FLAT:
 				Vnm_tprint( 1, "Reading parameter data from %s.\n",
 							nosh->parmpath);
-				if (Vparam_readFlatFile(param, "FILE", "ASC", VNULL, 
+				if (Vparam_readFlatFile(param, "FILE", "ASC", VNULL,
 										nosh->parmpath) != 1) {
 					Vnm_tprint(2, "Error reading parameter file (%s)!\n", nosh->parmpath);
 					return VNULL;
@@ -92,7 +93,7 @@ VPUBLIC Vparam* loadParameter(NOsh *nosh) {
 			case NPF_XML:
 				Vnm_tprint( 1, "Reading parameter data from %s.\n",
 							nosh->parmpath);
-				if (Vparam_readXMLFile(param, "FILE", "ASC", VNULL, 
+				if (Vparam_readXMLFile(param, "FILE", "ASC", VNULL,
 									   nosh->parmpath) != 1) {
 					Vnm_tprint(2, "Error reading parameter file (%s)!\n", nosh->parmpath);
 					return VNULL;
@@ -109,20 +110,20 @@ VPUBLIC Vparam* loadParameter(NOsh *nosh) {
 
 
 VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL]) {
-	
+
 	int i;
 	int use_params = 0;
 	Vrc_Codes rc;
-	
+
 	Vio *sock = VNULL;
-	
+
 	Vnm_tprint( 1, "Got paths for %d molecules\n", nosh->nmol);
 	if (nosh->nmol <= 0) {
 		Vnm_tprint(2, "You didn't specify any molecules (correctly)!\n");
 		Vnm_tprint(2, "Bailing out!\n");
 		return 0;
 	}
-	
+
 	if (nosh->gotparm) {
 		if (param == VNULL) {
 			Vnm_tprint(2, "Error!  You don't have a valid parameter object!\n");
@@ -138,7 +139,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 			alist[i] = VNULL;
 			alist[i] = Valist_ctor();
 		}
-		
+
 		switch (nosh->molfmt[i]) {
 			case NMF_PQR:
 					/* Print out a warning to the user letting them know that we are overriding PQR
@@ -151,7 +152,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 							nosh->molpath[i]);
 					sock = Vio_ctor("FILE", "ASC", VNULL, nosh->molpath[i], "r");
 					if (sock == VNULL) {
-						Vnm_print(2, "Problem opening virtual socket %s!\n", 
+						Vnm_print(2, "Problem opening virtual socket %s!\n",
 							  nosh->molpath[i]);
 						return 0;
 					}
@@ -166,7 +167,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 						rc = Valist_readPQR(alist[i], VNULL, sock);
 					}
 					if(rc == 0) return 0;
-					
+
 					Vio_acceptFree(sock);
 					Vio_dtor(&sock);
 					break;
@@ -180,7 +181,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 							nosh->molpath[i]);
 					sock = Vio_ctor("FILE", "ASC", VNULL, nosh->molpath[i], "r");
 					if (sock == VNULL) {
-						Vnm_print(2, "Problem opening virtual socket %s!\n", 
+						Vnm_print(2, "Problem opening virtual socket %s!\n",
 							  nosh->molpath[i]);
 						return 0;
 					}
@@ -192,7 +193,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 					/* If we are looking for an atom/residue that does not exist
 					 * then abort and return 0 */
 					if(rc == 0) return 0;
-					
+
 					Vio_acceptFree(sock);
 					Vio_dtor(&sock);
 					break;
@@ -201,7 +202,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 							nosh->molpath[i]);
 				sock = Vio_ctor("FILE", "ASC", VNULL, nosh->molpath[i], "r");
 				if (sock == VNULL) {
-					Vnm_print(2, "Problem opening virtual socket %s!\n", 
+					Vnm_print(2, "Problem opening virtual socket %s!\n",
 							  nosh->molpath[i]);
 					return 0;
 				}
@@ -216,7 +217,7 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 						rc = Valist_readXML(alist[i], VNULL, sock);
 					}
 					if(rc == 0) return 0;
-					
+
 				Vio_acceptFree(sock);
 				Vio_dtor(&sock);
 				break;
@@ -234,9 +235,9 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 
 		Vnm_tprint( 1, "  %d atoms\n", Valist_getNumberAtoms(alist[i]));
 		Vnm_tprint( 1, "  Centered at (%4.3e, %4.3e, %4.3e)\n",
-					alist[i]->center[0], alist[i]->center[1], 
+					alist[i]->center[0], alist[i]->center[1],
 					alist[i]->center[2]);
-		Vnm_tprint( 1, "  Net charge %3.2e e\n", alist[i]->charge);        
+		Vnm_tprint( 1, "  Net charge %3.2e e\n", alist[i]->charge);
 
 	}
 
@@ -245,37 +246,37 @@ VPUBLIC int loadMolecules(NOsh *nosh, Vparam *param, Valist *alist[NOSH_MAXMOL])
 }
 
 VPUBLIC void killMolecules(NOsh *nosh, Valist *alist[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint( 1, "Destroying %d molecules\n", nosh->nmol);
 #endif
-	
+
 	for (i=0; i<nosh->nmol; i++) Valist_dtor(&(alist[i]));
-	
+
 }
 
-VPUBLIC int loadDielMaps(NOsh *nosh, 
-						 Vgrid *dielXMap[NOSH_MAXMOL], 
+VPUBLIC int loadDielMaps(NOsh *nosh,
+						 Vgrid *dielXMap[NOSH_MAXMOL],
 						 Vgrid *dielYMap[NOSH_MAXMOL],
 						 Vgrid *dielZMap[NOSH_MAXMOL]) {
-	
+
 	int i, ii, nx, ny, nz;
 	double sum, hx, hy, hzed, xmin, ymin, zmin;
-	
-	if (nosh->ndiel > 0) 
-		Vnm_tprint( 1, "Got paths for %d dielectric map sets\n", 
+
+	if (nosh->ndiel > 0)
+		Vnm_tprint( 1, "Got paths for %d dielectric map sets\n",
 					nosh->ndiel);
 	else return 1;
-	
+
 	for (i=0; i<nosh->ndiel; i++) {
 		Vnm_tprint( 1, "Reading x-shifted dielectric map data from \
 %s:\n", nosh->dielXpath[i]);
 		dielXMap[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 		switch (nosh->dielfmt[i]) {
 			case VDF_DX:
-				if (Vgrid_readDX(dielXMap[i], "FILE", "ASC", VNULL, 
+				if (Vgrid_readDX(dielXMap[i], "FILE", "ASC", VNULL,
 								 nosh->dielXpath[i]) != 1) {
 					Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								nosh->dielXpath[i]);
@@ -292,7 +293,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 				zmin = dielXMap[i]->zmin;
 				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
 				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   xmin, ymin, zmin);
 				sum = 0;
 				for (ii=0; ii<(nx*ny*nz); ii++)
@@ -317,7 +318,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 				zmin = dielXMap[i]->zmin;
 				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
 				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   xmin, ymin, zmin);
 				sum = 0;
 				for (ii=0; ii<(nx*ny*nz); ii++)
@@ -335,7 +336,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 				Vnm_tprint( 2, "MCSF input not supported yet!\n");
 				return 0;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 							nosh->dielfmt[i]);
 				return 0;
 		}
@@ -344,7 +345,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 		dielYMap[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 		switch (nosh->dielfmt[i]) {
 			case VDF_DX:
-				if (Vgrid_readDX(dielYMap[i], "FILE", "ASC", VNULL, 
+				if (Vgrid_readDX(dielYMap[i], "FILE", "ASC", VNULL,
 								 nosh->dielYpath[i]) != 1) {
 					Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								nosh->dielYpath[i]);
@@ -404,7 +405,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 				Vnm_tprint( 2, "MCSF input not supported yet!\n");
 				return 0;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 							nosh->dielfmt[i]);
 				return 0;
 		}
@@ -413,7 +414,7 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 		dielZMap[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 		switch (nosh->dielfmt[i]) {
 			case VDF_DX:
-				if (Vgrid_readDX(dielZMap[i], "FILE", "ASC", VNULL, 
+				if (Vgrid_readDX(dielZMap[i], "FILE", "ASC", VNULL,
 								 nosh->dielZpath[i]) != 1) {
 					Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								nosh->dielZpath[i]);
@@ -475,26 +476,26 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
 				Vnm_tprint( 2, "MCSF input not supported yet!\n");
 				return 0;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 							nosh->dielfmt[i]);
 				return 0;
 		}
 	}
-	
+
 	return 1;
-	
+
 }
 
-VPUBLIC void killDielMaps(NOsh *nosh, 
-						  Vgrid *dielXMap[NOSH_MAXMOL], 
+VPUBLIC void killDielMaps(NOsh *nosh,
+						  Vgrid *dielXMap[NOSH_MAXMOL],
 						  Vgrid *dielYMap[NOSH_MAXMOL],
 						  Vgrid *dielZMap[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 	if (nosh->ndiel > 0) {
 #ifndef VAPBSQUIET
-		Vnm_tprint( 1, "Destroying %d dielectric map sets\n", 
+		Vnm_tprint( 1, "Destroying %d dielectric map sets\n",
 					nosh->ndiel);
 #endif
 		for (i=0; i<nosh->ndiel; i++) {
@@ -504,35 +505,35 @@ VPUBLIC void killDielMaps(NOsh *nosh,
 		}
 	}
 	else return;
-	
+
 }
 
 VPUBLIC int loadKappaMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i, ii;
 	double sum;
-	
-	if (nosh->nkappa > 0) 
+
+	if (nosh->nkappa > 0)
 		Vnm_tprint( 1, "Got paths for %d kappa maps\n", nosh->nkappa);
 	else return 1;
-	
+
 	for (i=0; i<nosh->nkappa; i++) {
 		Vnm_tprint( 1, "Reading kappa map data from %s:\n",
 					nosh->kappapath[i]);
 		map[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 		switch (nosh->kappafmt[i]) {
 			case VDF_DX:
-				if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL, 
+				if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL,
 								 nosh->kappapath[i]) != 1) {
 					Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								nosh->kappapath[i]);
 					return 0;
 				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n", 
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
 						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
 						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
 				sum = 0;
 				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++)
@@ -550,20 +551,20 @@ VPUBLIC int loadKappaMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 				Vnm_tprint( 2, "AVS input not supported yet!\n");
 				return 0;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 							nosh->kappafmt[i]);
 				return 0;
 		}
 	}
-	
+
 	return 1;
-	
+
 }
 
 VPUBLIC void killKappaMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 	if (nosh->nkappa > 0) {
 #ifndef VAPBSQUIET
 		Vnm_tprint( 1, "Destroying %d kappa maps\n", nosh->nkappa);
@@ -571,18 +572,18 @@ VPUBLIC void killKappaMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 		for (i=0; i<nosh->nkappa; i++) Vgrid_dtor(&(map[i]));
 	}
 	else return;
-	
+
 }
 
 VPUBLIC int loadPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i, ii;
 	double sum;
-	
-	if (nosh->npot > 0) 
+
+	if (nosh->npot > 0)
 		Vnm_tprint( 1, "Got paths for %d potential maps\n", nosh->npot);
 	else return 1;
-	
+
 	for (i=0; i<nosh->npot; i++) {
 		Vnm_tprint( 1, "Reading potential map data from %s:\n",
 				   nosh->potpath[i]);
@@ -591,7 +592,7 @@ VPUBLIC int loadPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 			case VDF_DX:
 			case VDF_GZ:
 				if (nosh->potfmt[i] == VDF_DX) {
-					if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL, 
+					if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL,
 									 nosh->potpath[i]) != 1) {
 						Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								   nosh->potpath[i]);
@@ -604,11 +605,11 @@ VPUBLIC int loadPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 						return 0;
 					}
 				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n", 
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
 						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
 						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
 				sum = 0;
 				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++)
@@ -626,20 +627,20 @@ VPUBLIC int loadPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 				Vnm_tprint( 2, "AVS input not supported yet!\n");
 				return 0;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 						   nosh->potfmt[i]);
 				return 0;
 		}
 	}
-	
+
 	return 1;
-	
+
 }
 
 VPUBLIC void killPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 	if (nosh->npot > 0) {
 #ifndef VAPBSQUIET
 		Vnm_tprint( 1, "Destroying %d potential maps\n", nosh->npot);
@@ -647,38 +648,38 @@ VPUBLIC void killPotMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 		for (i=0; i<nosh->npot; i++) Vgrid_dtor(&(map[i]));
 	}
 	else return;
-	
+
 }
 
 VPUBLIC int loadChargeMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i, ii;
 	double sum;
-	
+
 	if (nosh->ncharge > 0)
 		Vnm_tprint( 1, "Got paths for %d charge maps\n", nosh->ncharge);
 	else return 1;
-	
+
 	for (i=0; i<nosh->ncharge; i++) {
 		Vnm_tprint( 1, "Reading charge map data from %s:\n",
 					nosh->chargepath[i]);
 		map[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 		switch (nosh->chargefmt[i]) {
 			case VDF_DX:
-				if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL, 
+				if (Vgrid_readDX(map[i], "FILE", "ASC", VNULL,
 								 nosh->chargepath[i]) != 1) {
 					Vnm_tprint( 2, "Fatal error while reading from %s\n",
 								nosh->chargepath[i]);
 					return 0;
 				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n", 
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
 						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
 						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
 				sum = 0;
-				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++) 
+				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++)
 					sum += (map[i]->data[ii]);
 					sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
 				Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
@@ -698,53 +699,53 @@ VPUBLIC int loadChargeMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
 							   nosh->chargepath[i]);
 					return 0;
 				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n", 
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
 						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
 						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n", 
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
 						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
 				sum = 0;
-				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++) 
+				for (ii=0; ii<(map[i]->nx*map[i]->ny*map[i]->nz); ii++)
 					sum += (map[i]->data[ii]);
 				sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
 				Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
 				break;
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 							nosh->kappafmt[i]);
 				return 0;
 		}
 	}
-	
+
 	return 1;
-	
+
 }
 
 VPUBLIC void killChargeMaps(NOsh *nosh, Vgrid *map[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 	if (nosh->ncharge > 0) {
 #ifndef VAPBSQUIET
 		Vnm_tprint( 1, "Destroying %d charge maps\n", nosh->ncharge);
 #endif
-		
+
 		for (i=0; i<nosh->ncharge; i++) Vgrid_dtor(&(map[i]));
 	}
-	
+
 	else return;
-	
+
 }
 
 VPUBLIC void printPBEPARM(PBEparm *pbeparm) {
-	
+
 	int i;
 	double ionstr = 0.0;
-	
+
 	for (i=0; i<pbeparm->nion; i++)
 		ionstr += 0.5*(VSQR(pbeparm->ionq[i])*pbeparm->ionc[i]);
-	
+
 	Vnm_tprint( 1, "  Molecule ID: %d\n", pbeparm->molid);
 	switch (pbeparm->pbetype) {
 		case PBE_NPBE:
@@ -788,15 +789,15 @@ conditions\n");
 				pbeparm->nion, ionstr);
 	for (i=0; i<pbeparm->nion; i++) {
 		Vnm_tprint( 1, "    %4.3f A-radius, %4.3f e-charge, \
-%4.3f M concentration\n", 
-					pbeparm->ionr[i], pbeparm->ionq[i], pbeparm->ionc[i]);            
+%4.3f M concentration\n",
+					pbeparm->ionr[i], pbeparm->ionq[i], pbeparm->ionc[i]);
 	}
-	
+
 	if(pbeparm->pbetype == PBE_SMPBE){ /* SMPBE Added */
 		Vnm_tprint( 1, "  Lattice spacing: %4.3f A (SMPBE) \n", pbeparm->smvolume);
 		Vnm_tprint( 1, "  Relative size parameter: %4.3f  (SMPBE) \n", pbeparm->smsize);
 	}
-	
+
 	Vnm_tprint( 1, "  Solute dielectric: %4.3f\n", pbeparm->pdie);
 	Vnm_tprint( 1, "  Solvent dielectric: %4.3f\n", pbeparm->sdie);
 	switch (pbeparm->srfm) {
@@ -879,7 +880,7 @@ to ");
 			case VDT_ATOMPOT:
 				Vnm_tprint(1, "  Atom potentials to be written to ");
 				break;
-			default: 
+			default:
 				Vnm_tprint(2, "  Invalid data type for writing!\n");
 				break;
 		}
@@ -898,21 +899,21 @@ to ");
 				break;
 			case VDF_MCSF:
 				Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "mcsf");
-				break;				
+				break;
 			case VDF_FLAT:
 				Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "txt");
-				break;				
-			default: 
+				break;
+			default:
 				Vnm_tprint(2, "  Invalid format for writing!\n");
 				break;
 		}
-		
+
 	}
-	
+
 }
 
 VPUBLIC void printMGPARM(MGparm *mgparm, double realCenter[3]) {
-	
+
 	switch (mgparm->chgm) {
 		case 0:
 			Vnm_tprint(1, "  Using linear spline charge discretization.\n");
@@ -924,9 +925,9 @@ VPUBLIC void printMGPARM(MGparm *mgparm, double realCenter[3]) {
 			break;
 	}
 	if (mgparm->type == MCT_PARALLEL) {
-		Vnm_tprint( 1, "  Partition overlap fraction = %g\n", 
+		Vnm_tprint( 1, "  Partition overlap fraction = %g\n",
 					mgparm->ofrac);
-		Vnm_tprint( 1, "  Processor array = %d x %d x %d\n", 
+		Vnm_tprint( 1, "  Processor array = %d x %d x %d\n",
 					mgparm->pdime[0], mgparm->pdime[1], mgparm->pdime[2]);
 	}
 	Vnm_tprint( 1, "  Grid dimensions: %d x %d x %d\n",
@@ -938,15 +939,15 @@ VPUBLIC void printMGPARM(MGparm *mgparm, double realCenter[3]) {
 	Vnm_tprint( 1, "  Grid center: (%4.3f, %4.3f, %4.3f)\n",
 				realCenter[0], realCenter[1], realCenter[2]);
 	Vnm_tprint( 1, "  Multigrid levels: %d\n", mgparm->nlev);
-	
+
 }
 
-VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm, 
-				   PBEparm *pbeparm, double realCenter[3], Vpbe *pbe[NOSH_MAXCALC], 
-				   Valist *alist[NOSH_MAXMOL], Vgrid *dielXMap[NOSH_MAXMOL], 
+VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
+				   PBEparm *pbeparm, double realCenter[3], Vpbe *pbe[NOSH_MAXCALC],
+				   Valist *alist[NOSH_MAXMOL], Vgrid *dielXMap[NOSH_MAXMOL],
 				   Vgrid *dielYMap[NOSH_MAXMOL], Vgrid *dielZMap[NOSH_MAXMOL],
-				   Vgrid *kappaMap[NOSH_MAXMOL],  
-				   Vgrid *chargeMap[NOSH_MAXMOL], Vpmgp *pmgp[NOSH_MAXCALC], 
+				   Vgrid *kappaMap[NOSH_MAXMOL],
+				   Vgrid *chargeMap[NOSH_MAXMOL], Vpmgp *pmgp[NOSH_MAXCALC],
 				   Vpmg *pmg[NOSH_MAXCALC], Vgrid *potMap[NOSH_MAXMOL]) {
 
 	int j,  focusFlag, iatom;
@@ -956,12 +957,12 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 	Vgrid *theDielXMap, *theDielYMap, *theDielZMap;
 	Vgrid *theKappaMap, *thePotMap, *theChargeMap;
 	Valist *myalist = VNULL;
-	
+
 	Vnm_tstart(APBS_TIMER_SETUP, "Setup timer");
-	
+
 	/* Update the grid center */
 	for (j=0; j<3; j++) realCenter[j] = mgparm->center[j];
-	
+
 	/* Check for completely-neutral molecule */
 	q = 0;
 	myalist = alist[pbeparm->molid-1];
@@ -969,14 +970,14 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 		atom = Valist_getAtom(myalist, iatom);
 		q += VSQR(Vatom_getCharge(atom));
 	}
-	/*  D. Gohara 10/22/09 - disabled 
+	/*  D. Gohara 10/22/09 - disabled
 	if (q < (1e-6)) {
 		Vnm_tprint(2, "Molecule #%d is uncharged!\n", pbeparm->molid);
 		Vnm_tprint(2, "Sum square charge = %g!\n", q);
 		return 0;
 	}
 	*/
-	
+
 	/* Set up PBE object */
 	Vnm_tprint(0, "Setting up PBE object...\n");
 	if (pbeparm->srfm == VSM_SPLINE) sparm = pbeparm->swin;
@@ -990,14 +991,14 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 		}
 		focusFlag = 1;
 	} else focusFlag = 0;
-	
+
 	pbe[icalc] = Vpbe_ctor(myalist, pbeparm->nion,
-						   pbeparm->ionc, pbeparm->ionr, pbeparm->ionq, 
-						   pbeparm->temp, pbeparm->pdie, 
-						   pbeparm->sdie, sparm, focusFlag, pbeparm->sdens, 
-						   pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie, 
+						   pbeparm->ionc, pbeparm->ionr, pbeparm->ionq,
+						   pbeparm->temp, pbeparm->pdie,
+						   pbeparm->sdie, sparm, focusFlag, pbeparm->sdens,
+						   pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie,
 						   pbeparm->memv);
-	
+
 	/* Set up PDE object */
 	Vnm_tprint(0, "Setting up PDE object...\n");
 	switch (pbeparm->pbetype) {
@@ -1024,12 +1025,12 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 		case PBE_SMPBE: /* SMPBE Added */
 			mgparm->nonlintype = NONLIN_SMPBE;
 			pmgp[icalc] = Vpmgp_ctor(mgparm);
-			
+
 			/* Copy Code */
 			pbe[icalc]->smsize = pbeparm->smsize;
 			pbe[icalc]->smvolume = pbeparm->smvolume;
 			pbe[icalc]->ipkey = pmgp[icalc]->ipkey;
-			
+
 			break;
 		default:
 			Vnm_tprint(2, "Error!  Unknown PBE type (%d)!\n", pbeparm->pbetype);
@@ -1040,17 +1041,17 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 	pmgp[icalc]->xcent = realCenter[0];
 	pmgp[icalc]->ycent = realCenter[1];
 	pmgp[icalc]->zcent = realCenter[2];
-	
+
 	if (pbeparm->bcfl == BCFL_FOCUS) {
         if (icalc == 0) {
             Vnm_tprint( 2, "Can't focus first calculation!\n");
             return 0;
         }
-        /* Focusing requires the previous calculation in order to setup the 
+        /* Focusing requires the previous calculation in order to setup the
         current run... */
         pmg[icalc] = Vpmg_ctor(pmgp[icalc], pbe[icalc], 1, pmg[icalc-1],
-							   mgparm, pbeparm->calcenergy);   
-        /* ...however, it should be done with the previous calculation now, so 
+							   mgparm, pbeparm->calcenergy);
+        /* ...however, it should be done with the previous calculation now, so
         we should be able to destroy it here. */
         /* Vpmg_dtor(&(pmg[icalc-1])); */
 	} else {
@@ -1065,7 +1066,7 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 		if ((pbeparm->dielMapID-1) < nosh->ndiel) {
 			theDielXMap = dielXMap[pbeparm->dielMapID-1];
 		} else {
-			Vnm_print(2, "Error!  %d is not a valid dielectric map ID!\n", 
+			Vnm_print(2, "Error!  %d is not a valid dielectric map ID!\n",
 					  pbeparm->dielMapID);
 			return 0;
 		}
@@ -1123,7 +1124,7 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 		return 0;
 	}
 
-	if (!Vpmg_fillco(pmg[icalc], 
+	if (!Vpmg_fillco(pmg[icalc],
 					 pbeparm->srfm, pbeparm->swin, mgparm->chgm,
 					 pbeparm->useDielMap, theDielXMap,
 					 pbeparm->useDielMap, theDielYMap,
@@ -1139,62 +1140,62 @@ VPUBLIC int initMG(int icalc, NOsh *nosh, MGparm *mgparm,
 #ifndef VAPBSQUIET
 	Vnm_tprint(1, "  Debye length:  %g A\n", Vpbe_getDeblen(pbe[icalc]));
 #endif
-	
+
 	/* Setup time statistics */
 	Vnm_tstop(APBS_TIMER_SETUP, "Setup timer");
-	
+
 	/* Memory statistics */
 	bytesTotal = Vmem_bytesTotal();
 	highWater = Vmem_highWaterTotal();
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint( 1, "  Current memory usage:  %4.3f MB total, \
 %4.3f MB high water\n", (double)(bytesTotal)/(1024.*1024.),
 				(double)(highWater)/(1024.*1024.));
 #endif
-	
+
 	return 1;
-	
+
 }
 
-VPUBLIC void killMG(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC], 
+VPUBLIC void killMG(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC],
 					Vpmgp *pmgp[NOSH_MAXCALC], Vpmg *pmg[NOSH_MAXCALC]) {
-	
+
         int i;
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint(1, "Destroying multigrid structures.\n");
 #endif
-	
-	/* 
+
+	/*
 	   There appears to be a relationship (or this is a bug in Linux, can't tell
-	   at the moment, since Linux is the only OS that seems to be affected) 
-	   between one of the three object types: Vpbe, Vpmg or Vpmgp that requires 
-	   deallocations to be performed in a specific order. This results in a  
-	   bug some of the time when freeing Vpmg objects below. Therefore it 
+	   at the moment, since Linux is the only OS that seems to be affected)
+	   between one of the three object types: Vpbe, Vpmg or Vpmgp that requires
+	   deallocations to be performed in a specific order. This results in a
+	   bug some of the time when freeing Vpmg objects below. Therefore it
 	   appears to be important to release the Vpmg structs BEFORE the Vpmgp structs .
 	*/
 	Vpmg_dtor(&(pmg[nosh->ncalc-1]));
-	
+
 	for(i=0;i<nosh->ncalc;i++){
 		Vpbe_dtor(&(pbe[i]));
 		Vpmgp_dtor(&(pmgp[i]));
 	}
-	
+
 }
 
 VPUBLIC int solveMG(NOsh *nosh, Vpmg *pmg, MGparm_CalcType type) {
-	
+
 	int nx, ny, nz, i;
-	
-	
+
+
 	if (nosh != VNULL) {
 		if (nosh->bogus) return 1;
 	}
-	
+
 	Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
-	
-	
+
+
 	if (type != MCT_DUMMY) {
 #ifndef VAPBSQUIET
 		Vnm_tprint( 1,"  Solving PDE (see io.mc* for details)...\n");
@@ -1212,18 +1213,18 @@ solution array\n");
 		for (i=0; i<nx*ny*nz; i++) pmg->u[i] = 0.0;
 	}
 	Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
-	
+
 	return 1;
-	
+
 }
 
 VPUBLIC int setPartMG(NOsh *nosh, MGparm *mgparm, Vpmg *pmg) {
-	
+
 	int j;
 	double partMin[3], partMax[3];
-	
+
 	if (nosh->bogus) return 1;
-	
+
 	if (mgparm->type == MCT_PARALLEL) {
 		for (j=0; j<3; j++) {
 			partMin[j] = mgparm->partDisjCenter[j] - 0.5*mgparm->partDisjLength[j];
@@ -1253,40 +1254,40 @@ VPUBLIC int setPartMG(NOsh *nosh, MGparm *mgparm, Vpmg *pmg) {
 			  partMin[0], partMin[1], partMin[2],
 			  partMax[0], partMax[1], partMax[2]); */
 	Vpmg_setPart(pmg, partMin, partMax, mgparm->partDisjOwnSide);
-	
-	
+
+
 	return 1;
-	
+
 }
 
-VPUBLIC int energyMG(NOsh *nosh, int icalc, Vpmg *pmg, 
+VPUBLIC int energyMG(NOsh *nosh, int icalc, Vpmg *pmg,
 					 int *nenergy, double *totEnergy, double *qfEnergy, double *qmEnergy,
 					 double *dielEnergy) {
-	
+
 	Valist *alist;
 	Vatom *atom;
 	int i;
 	double tenergy;
 	MGparm *mgparm;
 	PBEparm *pbeparm;
-	int extEnergy;              
-	
+	int extEnergy;
+
 	mgparm = nosh->calc[icalc]->mgparm;
 	pbeparm = nosh->calc[icalc]->pbeparm;
-	
+
 	Vnm_tstart(APBS_TIMER_ENERGY, "Energy timer");
 #ifndef VAPBSQUIET
 	Vnm_tprint( 1,"  Calculating energy (see io.mc* for details)...\n");
 #endif
 	extEnergy = 1;
-	
+
 	if (pbeparm->calcenergy == PCE_TOTAL) {
 		*nenergy = 1;
 		/* Some processors don't count */
 		if (nosh->bogus == 0) {
 			*totEnergy = Vpmg_energy(pmg, extEnergy);
 #ifndef VAPBSQUIET
-			Vnm_tprint( 1, "  Total electrostatic energy = %1.12E kJ/mol\n", 
+			Vnm_tprint( 1, "  Total electrostatic energy = %1.12E kJ/mol\n",
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na*(*totEnergy));
 #endif
 		} else *totEnergy = 0;
@@ -1309,7 +1310,7 @@ kJ/mol\n", Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na*(*totEnergy));
 #endif
 		alist = pmg->pbe->alist;
 		for (i=0; i<Valist_getNumberAtoms(alist); i++) {
-			atom = Valist_getAtom(alist, i); 
+			atom = Valist_getAtom(alist, i);
 			tenergy = Vpmg_qfAtomEnergy(pmg, atom);
 //#ifndef VAPBSQUIET
 //			Vnm_tprint( 1, "      Atom %d:  %1.12E kJ/mol\n", i,
@@ -1317,19 +1318,19 @@ kJ/mol\n", Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na*(*totEnergy));
 //#endif
 		}
 	} else *nenergy = 0;
-	
+
 	Vnm_tstop(APBS_TIMER_ENERGY, "Energy timer");
-	
+
 	return 1;
 }
 
 VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
-					Vpmg *pmg, int *nforce, AtomForce **atomForce, 
+					Vpmg *pmg, int *nforce, AtomForce **atomForce,
 					Valist *alist[NOSH_MAXMOL]) {
-	
+
 	int j, k;
 	double qfForce[3], dbForce[3], ibForce[3];
-	
+
 	Vnm_tstart(APBS_TIMER_FORCE, "Force timer");
 
 #ifndef VAPBSQUIET
@@ -1345,16 +1346,16 @@ VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
 			(*atomForce)[0].ibForce[j] = 0;
 			(*atomForce)[0].dbForce[j] = 0;
 		}
-		for (j=0;j<Valist_getNumberAtoms(alist[pbeparm->molid-1]);j++) { 
+		for (j=0;j<Valist_getNumberAtoms(alist[pbeparm->molid-1]);j++) {
 			if (nosh->bogus == 0) {
 				VASSERT(Vpmg_qfForce(pmg, qfForce, j, mgparm->chgm));
 				VASSERT(Vpmg_ibForce(pmg, ibForce, j, pbeparm->srfm));
 				VASSERT(Vpmg_dbForce(pmg, dbForce, j, pbeparm->srfm));
 			} else {
 				for (k=0; k<3; k++) {
-					qfForce[k] = 0; 
-					ibForce[k] = 0; 
-					dbForce[k] = 0; 
+					qfForce[k] = 0;
+					ibForce[k] = 0;
+					dbForce[k] = 0;
 				}
 			}
 			for (k=0; k<3; k++) {
@@ -1398,11 +1399,11 @@ VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
 #endif
 		for (j=0;j<Valist_getNumberAtoms(alist[pbeparm->molid-1]);j++) {
 			if (nosh->bogus == 0) {
-				VASSERT(Vpmg_qfForce(pmg, (*atomForce)[j].qfForce, j, 
+				VASSERT(Vpmg_qfForce(pmg, (*atomForce)[j].qfForce, j,
 									 mgparm->chgm));
-				VASSERT(Vpmg_ibForce(pmg, (*atomForce)[j].ibForce, j, 
+				VASSERT(Vpmg_ibForce(pmg, (*atomForce)[j].ibForce, j,
 									 pbeparm->srfm));
-				VASSERT(Vpmg_dbForce(pmg, (*atomForce)[j].dbForce, j, 
+				VASSERT(Vpmg_dbForce(pmg, (*atomForce)[j].dbForce, j,
 									 pbeparm->srfm));
 			} else {
 				for (k=0; k<3; k++) {
@@ -1412,7 +1413,7 @@ VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
 				}
 			}
 #ifndef VAPBSQUIET
-			Vnm_tprint( 1, "mgF  tot %d  %4.3e  %4.3e  %4.3e\n", j, 
+			Vnm_tprint( 1, "mgF  tot %d  %4.3e  %4.3e  %4.3e\n", j,
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*((*atomForce)[j].qfForce[0]+(*atomForce)[j].ibForce[0]+
 						  (*atomForce)[j].dbForce[0]),
@@ -1422,21 +1423,21 @@ VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*((*atomForce)[j].qfForce[2]+(*atomForce)[j].ibForce[2]+
 						  (*atomForce)[j].dbForce[2]));
-			Vnm_tprint( 1, "mgF  qf  %d  %4.3e  %4.3e  %4.3e\n", j, 
+			Vnm_tprint( 1, "mgF  qf  %d  %4.3e  %4.3e  %4.3e\n", j,
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].qfForce[0],
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].qfForce[1],
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].qfForce[2]);
-			Vnm_tprint( 1, "mgF  ib  %d  %4.3e  %4.3e  %4.3e\n", j, 
+			Vnm_tprint( 1, "mgF  ib  %d  %4.3e  %4.3e  %4.3e\n", j,
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].ibForce[0],
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].ibForce[1],
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].ibForce[2]);
-			Vnm_tprint( 1, "mgF  db  %d  %4.3e  %4.3e  %4.3e\n", j, 
+			Vnm_tprint( 1, "mgF  db  %d  %4.3e  %4.3e  %4.3e\n", j,
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
 						*(*atomForce)[j].dbForce[0],
 						Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na \
@@ -1446,46 +1447,46 @@ VPUBLIC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
 #endif
 		}
 	} else *nforce = 0;
-	
+
 	Vnm_tstop(APBS_TIMER_FORCE, "Force timer");
-	
+
 	return 1;
 }
 
-VPUBLIC void killEnergy() { 
-	
+VPUBLIC void killEnergy() {
+
 #ifndef VAPBSQUIET
-	Vnm_tprint(1, "No energy arrays to destroy.\n"); 
+	Vnm_tprint(1, "No energy arrays to destroy.\n");
 #endif
-	
+
 }
 
-VPUBLIC void killForce(Vmem *mem, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+VPUBLIC void killForce(Vmem *mem, NOsh *nosh, int nforce[NOSH_MAXCALC],
 					   AtomForce *atomForce[NOSH_MAXCALC]) {
-	
+
 	int i;
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint(1, "Destroying force arrays.\n");
 #endif
-	
+
 	for (i=0; i<nosh->ncalc; i++) {
-		
+
 		if (nforce[i] > 0) Vmem_free(mem, nforce[i], sizeof(AtomForce),
 									 (void **)&(atomForce[i]));
-		
+
 	}
 }
 
 VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
-	
+
 	char writematstem[VMAX_ARGLEN];
 	char outpath[VMAX_ARGLEN];
 	char mxtype[3];
 	int strlenmax;
-	
+
 	if (nosh->bogus) return 1;
-	
+
 #ifdef HAVE_MPI_H
 	strlenmax = VMAX_ARGLEN-14;
 	if (strlen(pbeparm->writematstem) > strlenmax) {
@@ -1509,7 +1510,7 @@ VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 		sprintf(writematstem, "%s", pbeparm->writematstem);
 	}
 #endif
-	
+
 	if (pbeparm->writemat == 1) {
 		strlenmax = VMAX_ARGLEN-5;
 		if ((int)strlen(pbeparm->writematstem) > strlenmax) {
@@ -1526,58 +1527,58 @@ VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 		if (pbeparm->writematflag == 0) {
 			Vnm_tprint( 1, "  Writing Poisson operator matrix \
 to %s...\n", outpath);
-			
+
 			/* Linearization of Poisson-Boltzmann operator around solution */
 		} else if (pbeparm->writematflag == 1) {
 			Vnm_tprint( 1, "  Writing linearization of full \
 Poisson-Boltzmann operator matrix to %s...\n", outpath);
-			
+
 		} else {
 			Vnm_tprint( 2, "  Bogus matrix specification\
 (%d)!\n", pbeparm->writematflag);
 			return 0;
 		}
-		
+
 		Vnm_tprint(0, "  Printing operator...\n");
-		//Vpmg_printColComp(pmg, outpath, outpath, mxtype, 
+		//Vpmg_printColComp(pmg, outpath, outpath, mxtype,
 		//				  pbeparm->writematflag);
 		return 0;
-		
+
 	}
-	
+
 	return 1;
 }
 
-VPUBLIC void storeAtomEnergy(Vpmg *pmg, int icalc, double **atomEnergy, 
+VPUBLIC void storeAtomEnergy(Vpmg *pmg, int icalc, double **atomEnergy,
 							 int *nenergy){
-	
+
 	Vatom *atom;
 	Valist *alist;
 	int i;
-	
+
 	alist = pmg->pbe->alist;
 	*nenergy = Valist_getNumberAtoms(alist);
 	*atomEnergy = (double *)Vmem_malloc(pmg->vmem, *nenergy, sizeof(double));
-	
+
 	for (i=0; i<*nenergy; i++) {
-		atom = Valist_getAtom(alist, i); 
+		atom = Valist_getAtom(alist, i);
 		(*atomEnergy)[i] = Vpmg_qfAtomEnergy(pmg, atom);
 	}
 }
 
 VPUBLIC int writedataFlat(
-						  NOsh *nosh, 
-						  Vcom *com, 
-						  const char *fname, 
-						  double totEnergy[NOSH_MAXCALC], 
-						  double qfEnergy[NOSH_MAXCALC], 
-						  double qmEnergy[NOSH_MAXCALC], 
+						  NOsh *nosh,
+						  Vcom *com,
+						  const char *fname,
+						  double totEnergy[NOSH_MAXCALC],
+						  double qfEnergy[NOSH_MAXCALC],
+						  double qmEnergy[NOSH_MAXCALC],
 						  double dielEnergy[NOSH_MAXCALC],
-						  int nenergy[NOSH_MAXCALC], 
+						  int nenergy[NOSH_MAXCALC],
 						  double *atomEnergy[NOSH_MAXCALC],
-						  int nforce[NOSH_MAXCALC], 
+						  int nforce[NOSH_MAXCALC],
 						  AtomForce *atomForce[NOSH_MAXCALC]) {
-	
+
 	FILE *file;
 	time_t now;
 	int ielec, icalc, i, j;
@@ -1587,39 +1588,39 @@ VPUBLIC int writedataFlat(
 	double conversion, ltenergy, gtenergy, scalar;
 
 	if (nosh->bogus) return 1;
-	
+
 	/* Initialize some variables */
-	
+
 	icalc = 0;
-	
+
 	file = fopen(fname, "w");
 	if (file == VNULL) {
 		Vnm_print(2, "writedataFlat: Problem opening virtual socket %s\n",
 				  fname);
 		return 0;
 	}
-	
+
 	/* Strip the newline character from the date */
-	
+
 	now = time(VNULL);
 	timestring = ctime(&now);
 	fprintf(file,"%s\n", timestring);
-	
+
 	for (ielec=0; ielec<nosh->nelec;ielec++) { /* elec loop */
-		
+
 		/* Initialize per-elec pointers */
-		
+
 		mgparm = nosh->calc[icalc]->mgparm;
 		pbeparm = nosh->calc[icalc]->pbeparm;
-		
+
 		/* Convert from kT/e to kJ/mol */
 		conversion =  Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na;
-		
+
 		fprintf(file,"elec");
 		if (Vstring_strcasecmp(nosh->elecname[ielec], "") != 0) {
 			fprintf(file," name %s\n", nosh->elecname[ielec]);
 		} else fprintf(file, "\n");
-		
+
 		switch (mgparm->type) {
 			case MCT_DUMMY:
 				fprintf(file,"    mg-dummy\n");
@@ -1636,11 +1637,11 @@ VPUBLIC int writedataFlat(
 			default:
 				break;
 		}
-		
+
 		fprintf(file,"    mol %d\n", pbeparm->molid);
 		fprintf(file,"    dime %d %d %d\n", mgparm->dime[0], mgparm->dime[1],\
 				mgparm->dime[2]);
-		
+
 		switch (pbeparm->pbetype) {
 			case PBE_NPBE:
 				fprintf(file,"    npbe\n");
@@ -1651,17 +1652,17 @@ VPUBLIC int writedataFlat(
 			default:
 				break;
 		}
-		
+
 		if (pbeparm->nion > 0) {
 			for (i=0; i<pbeparm->nion; i++) {
 				fprintf(file,"    ion %4.3f %4.3f %4.3f\n",
 						pbeparm->ionr[i], pbeparm->ionq[i], pbeparm->ionc[i]);
 			}
 		}
-		
+
 		fprintf(file,"    pdie %4.3f\n", pbeparm->pdie);
 		fprintf(file,"    sdie %4.3f\n", pbeparm->sdie);
-		
+
 		switch (pbeparm->srfm) {
 			case 0:
 				fprintf(file,"    srfm mol\n");
@@ -1678,7 +1679,7 @@ VPUBLIC int writedataFlat(
 			default:
 				break;
 		}
-		
+
 		switch (pbeparm->bcfl) {
 			case BCFL_ZERO:
 				fprintf(file,"    bcfl zero\n");
@@ -1701,52 +1702,52 @@ VPUBLIC int writedataFlat(
 			default:
 				break;
 		}
-		
+
 		fprintf(file,"    temp %4.3f\n", pbeparm->temp);
-		
+
 		for (;icalc<=nosh->elec2calc[ielec];icalc++){ /* calc loop */
-			
+
 			/* Reinitialize per-calc pointers */
 			mgparm = nosh->calc[icalc]->mgparm;
 			pbeparm = nosh->calc[icalc]->pbeparm;
-			
+
 			fprintf(file,"    calc\n");
 			fprintf(file,"        id %i\n", (icalc+1));
-			fprintf(file,"        grid %4.3f %4.3f %4.3f\n", 
+			fprintf(file,"        grid %4.3f %4.3f %4.3f\n",
 					mgparm->grid[0], mgparm->grid[1], mgparm->grid[2]);
-			fprintf(file,"        glen %4.3f %4.3f %4.3f\n", 
+			fprintf(file,"        glen %4.3f %4.3f %4.3f\n",
 					mgparm->glen[0], mgparm->glen[1], mgparm->glen[2]);
-			
+
 			if (pbeparm->calcenergy == PCE_TOTAL) {
-				fprintf(file,"        totEnergy %1.12E kJ/mol\n", 
+				fprintf(file,"        totEnergy %1.12E kJ/mol\n",
 						(totEnergy[icalc]*conversion));
 			} if (pbeparm->calcenergy == PCE_COMPS) {
-			        fprintf(file,"        totEnergy %1.12E kJ/mol\n", 
+			        fprintf(file,"        totEnergy %1.12E kJ/mol\n",
 						(totEnergy[icalc]*conversion));
-				fprintf(file,"        qfEnergy %1.12E kJ/mol\n", 
-						(0.5*qfEnergy[icalc]*conversion)); 
-				fprintf(file,"        qmEnergy %1.12E kJ/mol\n", 
-						(qmEnergy[icalc]*conversion)); 
-				fprintf(file,"        dielEnergy %1.12E kJ/mol\n", 
+				fprintf(file,"        qfEnergy %1.12E kJ/mol\n",
+						(0.5*qfEnergy[icalc]*conversion));
+				fprintf(file,"        qmEnergy %1.12E kJ/mol\n",
+						(qmEnergy[icalc]*conversion));
+				fprintf(file,"        dielEnergy %1.12E kJ/mol\n",
 						(dielEnergy[icalc]*conversion));
 				for (i=0; i<nenergy[icalc]; i++){
 					fprintf(file,"        atom %i %1.12E kJ/mol\n", i,
 							(0.5*atomEnergy[icalc][i]*conversion));
-					
-				}
-			} 
 
-			if (pbeparm->calcforce == PCF_TOTAL) { 
-				fprintf(file,"        qfForce %1.12E %1.12E %1.12E kJ/mol/A\n", 
-						(atomForce[icalc][0].qfForce[0]*conversion), 
+				}
+			}
+
+			if (pbeparm->calcforce == PCF_TOTAL) {
+				fprintf(file,"        qfForce %1.12E %1.12E %1.12E kJ/mol/A\n",
+						(atomForce[icalc][0].qfForce[0]*conversion),
 					        (atomForce[icalc][0].qfForce[1]*conversion),
 					        (atomForce[icalc][0].qfForce[2]*conversion));
-				fprintf(file,"        ibForce %1.12E %1.12E %1.12E kJ/mol/A\n", 
-						(atomForce[icalc][0].ibForce[0]*conversion), 
+				fprintf(file,"        ibForce %1.12E %1.12E %1.12E kJ/mol/A\n",
+						(atomForce[icalc][0].ibForce[0]*conversion),
 					        (atomForce[icalc][0].ibForce[1]*conversion),
 					        (atomForce[icalc][0].ibForce[2]*conversion));
-				fprintf(file,"        dbForce %1.12E %1.12E %1.12E kJ/mol/A\n", 
-						(atomForce[icalc][0].dbForce[0]*conversion), 
+				fprintf(file,"        dbForce %1.12E %1.12E %1.12E kJ/mol/A\n",
+						(atomForce[icalc][0].dbForce[0]*conversion),
 					        (atomForce[icalc][0].dbForce[1]*conversion),
 					        (atomForce[icalc][0].dbForce[2]*conversion));
 			}
@@ -1759,24 +1760,24 @@ VPUBLIC int writedataFlat(
 /* Handle print energy statements */
 
 for (i=0; i<nosh->nprint; i++) {
-	
+
 	if (nosh->printwhat[i] == NPT_ENERGY) {
-		
+
 		fprintf(file,"print energy");
-		fprintf(file," %d", nosh->printcalc[i][0]+1); 
-		
+		fprintf(file," %d", nosh->printcalc[i][0]+1);
+
 		for (j=1; j<nosh->printnarg[i]; j++) {
 			if (nosh->printop[i][j-1] == 0) fprintf(file," +");
 			else if (nosh->printop[i][j-1] == 1) fprintf(file, " -");
 			fprintf(file, " %d", nosh->printcalc[i][j]+1);
 		}
-		
+
 		fprintf(file, "\n");
 		icalc = nosh->elec2calc[nosh->printcalc[i][0]];
-		
+
 		ltenergy = Vunit_kb * (1e-3) * Vunit_Na * \
 			nosh->calc[icalc]->pbeparm->temp * totEnergy[icalc];
-		
+
 		for (j=1; j<nosh->printnarg[i]; j++) {
 			icalc = nosh->elec2calc[nosh->printcalc[i][j]];
 			/* Add or subtract? */
@@ -1785,15 +1786,15 @@ for (i=0; i<nosh->nprint; i++) {
 			/* Accumulate */
 			ltenergy += (scalar * Vunit_kb * (1e-3) * Vunit_Na *
 						 nosh->calc[icalc]->pbeparm->temp * totEnergy[icalc]);
-			
+
 			Vcom_reduce(com, &ltenergy, &gtenergy, 1, 2, 0);
-			
+
 		}
 		fprintf(file,"    localEnergy %1.12E kJ/mol\n", \
 				ltenergy);
 		fprintf(file,"    globalEnergy %1.12E kJ/mol\nend\n", \
-				gtenergy); 
-	} 
+				gtenergy);
+	}
 }
 
 fclose(file);
@@ -1801,16 +1802,16 @@ fclose(file);
 return 1;
 }
 
-VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname, 
-						 double totEnergy[NOSH_MAXCALC], 
-						 double qfEnergy[NOSH_MAXCALC], 
-						 double qmEnergy[NOSH_MAXCALC], 
+VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
+						 double totEnergy[NOSH_MAXCALC],
+						 double qfEnergy[NOSH_MAXCALC],
+						 double qmEnergy[NOSH_MAXCALC],
 						 double dielEnergy[NOSH_MAXCALC],
-						 int nenergy[NOSH_MAXCALC], 
+						 int nenergy[NOSH_MAXCALC],
 						 double *atomEnergy[NOSH_MAXCALC],
-			                         int nforce[NOSH_MAXCALC], 
+			                         int nforce[NOSH_MAXCALC],
 						 AtomForce *atomForce[NOSH_MAXCALC]) {
-	
+
 	FILE *file;
 	time_t now;
 	int ielec, icalc, i, j;
@@ -1819,46 +1820,46 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 	PBEparm *pbeparm = VNULL;
 	MGparm *mgparm = VNULL;
 	double conversion, ltenergy, gtenergy, scalar;
-	
+
 	if (nosh->bogus) return 1;
-	
+
 	/* Initialize some variables */
-	
+
 	icalc = 0;
-	
+
 	file = fopen(fname, "w");
 	if (file == VNULL) {
 		Vnm_print(2, "writedataXML: Problem opening virtual socket %s\n",
 				  fname);
 		return 0;
 	}
-	
+
 	fprintf(file,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(file,"<APBS>\n");
-	
+
 	/* Strip the newline character from the date */
-	
+
 	now = time(VNULL);
 	timestring = ctime(&now);
 	for(c = timestring; *c != '\n'; c++);
 	*c = '\0';
 	fprintf(file,"    <date>%s</date>\n", timestring);
-	
+
 	for (ielec=0; ielec<nosh->nelec;ielec++){ /* elec loop */
-		
+
 		/* Initialize per-elec pointers */
-		
+
 		mgparm = nosh->calc[icalc]->mgparm;
 		pbeparm = nosh->calc[icalc]->pbeparm;
-		
+
 		/* Convert from kT/e to kJ/mol */
 		conversion =  Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na;
-		
+
 		fprintf(file,"    <elec>\n");
 		if (Vstring_strcasecmp(nosh->elecname[ielec], "") != 0) {
 			fprintf(file,"      <name>%s</name>\n", nosh->elecname[ielec]);
-		} 
-		
+		}
+
 		switch (mgparm->type) {
 			case MCT_DUMMY:
 				fprintf(file,"      <type>mg-dummy</type>\n");
@@ -1875,12 +1876,12 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 			default:
 				break;
 		}
-		
+
 		fprintf(file,"      <molid>%d</molid>\n", pbeparm->molid);
 		fprintf(file,"      <nx>%d</nx>\n", mgparm->dime[0]);
 		fprintf(file,"      <ny>%d</ny>\n", mgparm->dime[1]);
 		fprintf(file,"      <nz>%d</nz>\n", mgparm->dime[2]);
-		
+
 		switch (pbeparm->pbetype) {
 			case PBE_NPBE:
 				fprintf(file,"      <pbe>npbe</pbe>\n");
@@ -1891,7 +1892,7 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 			default:
 				break;
 		}
-		
+
 		if (pbeparm->nion > 0) {
 			for (i=0; i<pbeparm->nion; i++) {
 				fprintf(file, "      <ion>\n");
@@ -1899,16 +1900,16 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 						pbeparm->ionr[i]);
 				fprintf(file,"          <charge>%4.3f A</charge>\n",
 						pbeparm->ionq[i]);
-				fprintf(file,"          <concentration>%4.3f M</concentration>\n", 
+				fprintf(file,"          <concentration>%4.3f M</concentration>\n",
 						pbeparm->ionc[i]);
 				fprintf(file, "      </ion>\n");
-				
+
 			}
 		}
-		
+
 		fprintf(file,"      <pdie>%4.3f</pdie>\n", pbeparm->pdie);
 		fprintf(file,"      <sdie>%4.3f</sdie>\n", pbeparm->sdie);
-		
+
 		switch (pbeparm->srfm) {
 			case 0:
 				fprintf(file,"      <srfm>mol</srfm>\n");
@@ -1924,7 +1925,7 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 			default:
 				break;
 		}
-		
+
 		switch (pbeparm->bcfl) {
 			case BCFL_ZERO:
 				fprintf(file,"      <bcfl>zero</bcfl>\n");
@@ -1947,15 +1948,15 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 			default:
 				break;
 		}
-		
+
 		fprintf(file,"      <temp>%4.3f K</temp>\n", pbeparm->temp);
-		
+
 		for (;icalc<=nosh->elec2calc[ielec];icalc++){ /* calc loop */
-			
+
 			/* Reinitialize per-calc pointers */
 			mgparm = nosh->calc[icalc]->mgparm;
 			pbeparm = nosh->calc[icalc]->pbeparm;
-			
+
 			fprintf(file,"      <calc>\n");
 			fprintf(file,"          <id>%i</id>\n", (icalc+1));
 			fprintf(file,"          <hx>%4.3f A</hx>\n", mgparm->grid[0]);
@@ -1964,48 +1965,48 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 			fprintf(file,"          <xlen>%4.3f A</xlen>\n", mgparm->glen[0]);
 			fprintf(file,"          <ylen>%4.3f A</ylen>\n", mgparm->glen[1]);
 			fprintf(file,"          <zlen>%4.3f A</zlen>\n", mgparm->glen[2]);
-			
+
 			if (pbeparm->calcenergy == PCE_TOTAL) {
-				fprintf(file,"          <totEnergy>%1.12E kJ/mol</totEnergy>\n", 
+				fprintf(file,"          <totEnergy>%1.12E kJ/mol</totEnergy>\n",
 						(totEnergy[icalc]*conversion));
 			} else if (pbeparm->calcenergy == PCE_COMPS) {
-	                        fprintf(file,"          <totEnergy>%1.12E kJ/mol</totEnergy>\n", 
+	                        fprintf(file,"          <totEnergy>%1.12E kJ/mol</totEnergy>\n",
 						(totEnergy[icalc]*conversion));
-				fprintf(file,"          <qfEnergy>%1.12E kJ/mol</qfEnergy>\n", 
-						(0.5*qfEnergy[icalc]*conversion)); 
-				fprintf(file,"          <qmEnergy>%1.12E kJ/mol</qmEnergy>\n", 
-						(qmEnergy[icalc]*conversion)); 
-				fprintf(file,"          <dielEnergy>%1.12E kJ/mol</dielEnergy>\n", 
+				fprintf(file,"          <qfEnergy>%1.12E kJ/mol</qfEnergy>\n",
+						(0.5*qfEnergy[icalc]*conversion));
+				fprintf(file,"          <qmEnergy>%1.12E kJ/mol</qmEnergy>\n",
+						(qmEnergy[icalc]*conversion));
+				fprintf(file,"          <dielEnergy>%1.12E kJ/mol</dielEnergy>\n",
 						(dielEnergy[icalc]*conversion));
 				for (i=0; i<nenergy[icalc]; i++){
 					fprintf(file,"          <atom>\n");
 					fprintf(file,"              <id>%i</id>\n", i+1);
-					fprintf(file,"              <energy>%1.12E kJ/mol</energy>\n", 
+					fprintf(file,"              <energy>%1.12E kJ/mol</energy>\n",
 							(0.5*atomEnergy[icalc][i]*conversion));
 					fprintf(file,"          </atom>\n");
 				}
-			} 
+			}
 
 
-			if (pbeparm->calcforce == PCF_TOTAL) { 
-			        fprintf(file,"          <qfforce_x>%1.12E</qfforce_x>\n", 
-					atomForce[icalc][0].qfForce[0]*conversion); 
-				fprintf(file,"          <qfforce_y>%1.12E</qfforce_y>\n", 
-					atomForce[icalc][0].qfForce[1]*conversion); 
-				fprintf(file,"          <qfforce_z>%1.12E</qfforce_z>\n", 
-					atomForce[icalc][0].qfForce[2]*conversion); 
-				fprintf(file,"          <ibforce_x>%1.12E</ibforce_x>\n", 
-					atomForce[icalc][0].ibForce[0]*conversion); 
-				fprintf(file,"          <ibforce_y>%1.12E</ibforce_y>\n", 
-					atomForce[icalc][0].ibForce[1]*conversion); 
-				fprintf(file,"          <ibforce_z>%1.12E</ibforce_z>\n", 
-					atomForce[icalc][0].ibForce[2]*conversion); 
-				fprintf(file,"          <dbforce_x>%1.12E</dbforce_x>\n", 
-					atomForce[icalc][0].dbForce[0]*conversion); 
-				fprintf(file,"          <dbforce_y>%1.12E</dbforce_y>\n", 
-					atomForce[icalc][0].dbForce[1]*conversion); 
-				fprintf(file,"          <dbforce_z>%1.12E</dbforce_z>\n", 
-					atomForce[icalc][0].dbForce[2]*conversion); 
+			if (pbeparm->calcforce == PCF_TOTAL) {
+			        fprintf(file,"          <qfforce_x>%1.12E</qfforce_x>\n",
+					atomForce[icalc][0].qfForce[0]*conversion);
+				fprintf(file,"          <qfforce_y>%1.12E</qfforce_y>\n",
+					atomForce[icalc][0].qfForce[1]*conversion);
+				fprintf(file,"          <qfforce_z>%1.12E</qfforce_z>\n",
+					atomForce[icalc][0].qfForce[2]*conversion);
+				fprintf(file,"          <ibforce_x>%1.12E</ibforce_x>\n",
+					atomForce[icalc][0].ibForce[0]*conversion);
+				fprintf(file,"          <ibforce_y>%1.12E</ibforce_y>\n",
+					atomForce[icalc][0].ibForce[1]*conversion);
+				fprintf(file,"          <ibforce_z>%1.12E</ibforce_z>\n",
+					atomForce[icalc][0].ibForce[2]*conversion);
+				fprintf(file,"          <dbforce_x>%1.12E</dbforce_x>\n",
+					atomForce[icalc][0].dbForce[0]*conversion);
+				fprintf(file,"          <dbforce_y>%1.12E</dbforce_y>\n",
+					atomForce[icalc][0].dbForce[1]*conversion);
+				fprintf(file,"          <dbforce_z>%1.12E</dbforce_z>\n",
+					atomForce[icalc][0].dbForce[2]*conversion);
 			}
 
 			fprintf(file,"      </calc>\n");
@@ -2017,24 +2018,24 @@ VPUBLIC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
 /* Handle print energy statements */
 
 for (i=0; i<nosh->nprint; i++) {
-	
+
 	if (nosh->printwhat[i] == NPT_ENERGY) {
-		
+
 		fprintf(file,"    <printEnergy>\n");
-		fprintf(file,"        <equation>%d", nosh->printcalc[i][0]+1); 
-		
+		fprintf(file,"        <equation>%d", nosh->printcalc[i][0]+1);
+
 		for (j=1; j<nosh->printnarg[i]; j++) {
 			if (nosh->printop[i][j-1] == 0) fprintf(file," +");
 			else if (nosh->printop[i][j-1] == 1) fprintf(file, " -");
 			fprintf(file, " %d", nosh->printcalc[i][j] +1);
 		}
-		
+
 		fprintf(file, "</equation>\n");
 		icalc = nosh->elec2calc[nosh->printcalc[i][0]];
-		
+
 		ltenergy = Vunit_kb * (1e-3) * Vunit_Na * \
 			nosh->calc[icalc]->pbeparm->temp * totEnergy[icalc];
-		
+
 		for (j=1; j<nosh->printnarg[i]; j++) {
 			icalc = nosh->elec2calc[nosh->printcalc[i][j]];
 			/* Add or subtract? */
@@ -2048,8 +2049,8 @@ for (i=0; i<nosh->nprint; i++) {
 		fprintf(file,"        <localEnergy>%1.12E kJ/mol</localEnergy>\n", \
 				ltenergy);
 		fprintf(file,"        <globalEnergy>%1.12E kJ/mol</globalEnergy>\n", \
-				gtenergy); 
-		
+				gtenergy);
+
 		fprintf(file,"    </printEnergy>\n");
 	}
 }
@@ -2059,34 +2060,34 @@ fprintf(file,"</APBS>\n");
 fclose(file);
 
 return 1;
-}   
+}
 
 VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
-	
+
 	char writestem[VMAX_ARGLEN];
 	char outpath[VMAX_ARGLEN];
 	char title[72];
 	int i, nx, ny, nz, natoms;
 	double hx, hy, hzed, xcent, ycent, zcent, xmin, ymin, zmin;
-	
-	Vgrid *grid; 
+
+	Vgrid *grid;
 	Vio *sock;
-	
+
 	if (nosh->bogus) return 1;
-	
-	for (i=0; i<pbeparm->numwrite; i++) { 
-		
+
+	for (i=0; i<pbeparm->numwrite; i++) {
+
 		nx = pmg->pmgp->nx;
 		ny = pmg->pmgp->ny;
 		nz = pmg->pmgp->nz;
 		hx = pmg->pmgp->hx;
 		hy = pmg->pmgp->hy;
 		hzed = pmg->pmgp->hzed;
-		
+
 		switch (pbeparm->writetype[i]) {
-			
+
 			case VDT_CHARGE:
-				
+
 				Vnm_tprint(1, "  Writing charge distribution to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2094,13 +2095,13 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_CHARGE, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_CHARGE, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title, "CHARGE DISTRIBUTION (e)");
 				break;
-				
+
 			case VDT_POT:
-				
+
 				Vnm_tprint(1, "  Writing potential to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2108,13 +2109,13 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_POT, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_POT, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title, "POTENTIAL (kT/e)");
 				break;
-				
+
 			case VDT_SMOL:
-				
+
 				Vnm_tprint(1, "  Writing molecular accessibility to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2122,15 +2123,15 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_SMOL, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_SMOL,
 									   pbeparm->srad, pbeparm->pbetype, pbeparm));
-				sprintf(title, 
-						"SOLVENT ACCESSIBILITY -- MOLECULAR (%4.3f PROBE)", 
+				sprintf(title,
+						"SOLVENT ACCESSIBILITY -- MOLECULAR (%4.3f PROBE)",
 						pbeparm->srad);
 				break;
-				
+
 			case VDT_SSPL:
-				
+
 				Vnm_tprint(1, "  Writing spline-based accessibility to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2140,13 +2141,13 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				zmin = zcent - 0.5*(nz-1)*hzed;
 				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_SSPL,
 									   pbeparm->swin, pbeparm->pbetype, pbeparm));
-				sprintf(title, 
+				sprintf(title,
 						"SOLVENT ACCESSIBILITY -- SPLINE (%4.3f WINDOW)",
 						pbeparm->swin);
 				break;
-				
+
 			case VDT_VDW:
-				
+
 				Vnm_tprint(1, "  Writing van der Waals accessibility to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2154,13 +2155,13 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_VDW, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_VDW, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title, "SOLVENT ACCESSIBILITY -- VAN DER WAALS");
 				break;
-				
+
 			case VDT_IVDW:
-				
+
 				Vnm_tprint(1, "  Writing ion accessibility to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2168,15 +2169,15 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_IVDW, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_IVDW,
 									   pmg->pbe->maxIonRadius, pbeparm->pbetype, pbeparm));
-				sprintf(title, 
+				sprintf(title,
 						"ION ACCESSIBILITY -- SPLINE (%4.3f RADIUS)",
 						pmg->pbe->maxIonRadius);
 				break;
-				
+
 			case VDT_LAP:
-				
+
 				Vnm_tprint(1, "  Writing potential Laplacian to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2184,14 +2185,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_LAP, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_LAP, 0.0,
 									   pbeparm->pbetype, pbeparm));
-				sprintf(title, 
+				sprintf(title,
 						"POTENTIAL LAPLACIAN (kT/e/A^2)");
 				break;
-				
+
 			case VDT_EDENS:
-				
+
 				Vnm_tprint(1, "  Writing energy density to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2199,13 +2200,13 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_EDENS, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_EDENS, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title, "ENERGY DENSITY (kT/e/A)^2");
 				break;
-				
+
 			case VDT_NDENS:
-				
+
 				Vnm_tprint(1, "  Writing number density to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2213,14 +2214,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_NDENS, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_NDENS, 0.0,
 									   pbeparm->pbetype, pbeparm));
-				sprintf(title, 
+				sprintf(title,
 						"ION NUMBER DENSITY (M)");
 				break;
-				
+
 			case VDT_QDENS:
-				
+
 				Vnm_tprint(1, "  Writing charge density to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2228,14 +2229,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_QDENS, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_QDENS, 0.0,
 									   pbeparm->pbetype, pbeparm));
-				sprintf(title, 
+				sprintf(title,
 						"ION CHARGE DENSITY (e_c * M)");
 				break;
-				
+
 			case VDT_DIELX:
-				
+
 				Vnm_tprint(1, "  Writing x-shifted dielectric map to ");
 				xcent = pmg->pmgp->xcent + 0.5*hx;
 				ycent = pmg->pmgp->ycent;
@@ -2243,14 +2244,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELX, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELX, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title,
 						"X-SHIFTED DIELECTRIC MAP");
 				break;
-				
+
 			case VDT_DIELY:
-				
+
 				Vnm_tprint(1, "  Writing y-shifted dielectric map to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent + 0.5*hy;
@@ -2258,14 +2259,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELY, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELY, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title,
 						"Y-SHIFTED DIELECTRIC MAP");
 				break;
-				
+
 			case VDT_DIELZ:
-				
+
 				Vnm_tprint(1, "  Writing z-shifted dielectric map to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2273,14 +2274,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELZ, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_DIELZ, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title,
 						"Z-SHIFTED DIELECTRIC MAP");
 				break;
-				
+
 			case VDT_KAPPA:
-				
+
 				Vnm_tprint(1, "  Writing kappa map to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2288,14 +2289,14 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_KAPPA, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_KAPPA, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title,
 						"KAPPA MAP");
 				break;
-				
+
 			case VDT_ATOMPOT:
-				
+
 				Vnm_tprint(1, "  Writing atom potentials to ");
 				xcent = pmg->pmgp->xcent;
 				ycent = pmg->pmgp->ycent;
@@ -2303,18 +2304,18 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 				xmin = xcent - 0.5*(nx-1)*hx;
 				ymin = ycent - 0.5*(ny-1)*hy;
 				zmin = zcent - 0.5*(nz-1)*hzed;
-				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_ATOMPOT, 0.0, 
+				VASSERT(Vpmg_fillArray(pmg, pmg->rwork, VDT_ATOMPOT, 0.0,
 									   pbeparm->pbetype, pbeparm));
 				sprintf(title,
 						"ATOM POTENTIALS");
-				break;	
+				break;
 			default:
-				
+
 				Vnm_tprint(2, "Invalid data type for writing!\n");
 				return 0;
 		}
-		
-		
+
+
 #ifdef HAVE_MPI_H
 		sprintf(writestem, "%s-PE%d", pbeparm->writestem[i], rank);
 #else
@@ -2324,9 +2325,9 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 			sprintf(writestem, "%s", pbeparm->writestem[i]);
 		}
 #endif
-		
+
 		switch (pbeparm->writefmt[i]) {
-			
+
 			case VDF_DX:
 				sprintf(outpath, "%s.%s", writestem, "dx");
 				Vnm_tprint(1, "%s\n", outpath);
@@ -2336,7 +2337,7 @@ VPUBLIC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg) {
 							  pmg->pvec);
 				Vgrid_dtor(&grid);
 				break;
-				
+
 			case VDF_AVS:
 				sprintf(outpath, "%s.%s", writestem, "ucd");
 				Vnm_tprint(1, "%s\n", outpath);
@@ -2350,7 +2351,7 @@ uniform meshes yet!\n");
 				Vnm_tprint(2, "Sorry, MCSF format isn't supported for \
 						   uniform meshes yet!\n");
 				break;
-				
+
 			case VDF_UHBD:
 				sprintf(outpath, "%s.%s", writestem, "grd");
 				Vnm_tprint(1, "%s\n", outpath);
@@ -2360,7 +2361,7 @@ uniform meshes yet!\n");
 								pmg->pvec);
 				Vgrid_dtor(&grid);
 				break;
-				
+
 			case VDF_GZ:
 				sprintf(outpath, "%s.%s", writestem, "dx.gz");
 				Vnm_tprint(1, "%s\n", outpath);
@@ -2370,7 +2371,7 @@ uniform meshes yet!\n");
 							  pmg->pvec);
 				Vgrid_dtor(&grid);
 				break;
-			case VDF_FLAT: 
+			case VDF_FLAT:
 				sprintf(outpath, "%s.%s", writestem, "txt");
 				Vnm_tprint(1, "%s\n", outpath);
 				Vnm_print(0, "routines:  Opening virtual socket...\n");
@@ -2383,7 +2384,7 @@ uniform meshes yet!\n");
 				if (Vio_connect(sock, 0) < 0) {
 					Vnm_print(2, "routines: Problem connecting virtual socket %s\n",
 							  outpath);
-					return 0; 
+					return 0;
 				}
 				Vio_printf(sock, "# Data from %s\n", PACKAGE_STRING);
 				Vio_printf(sock, "# \n");
@@ -2394,24 +2395,24 @@ uniform meshes yet!\n");
 					Vio_printf(sock, "%12.6e\n", pmg->rwork[i]);
 				break;
 			default:
-				Vnm_tprint(2, "Bogus data format (%d)!\n", 
+				Vnm_tprint(2, "Bogus data format (%d)!\n",
 						   pbeparm->writefmt[i]);
 				break;
 		}
-		
+
 	}
-	
+
 	return 1;
 }
 
 VPUBLIC double returnEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], int iprint){
-	
+
 	int iarg, calcid;
 	double ltenergy, scalar;
-	
+
 	calcid = nosh->elec2calc[nosh->printcalc[iprint][0]];
 	if (nosh->calc[calcid]->pbeparm->calcenergy != PCE_NO) {
-		ltenergy = Vunit_kb * (1e-3) * Vunit_Na * 
+		ltenergy = Vunit_kb * (1e-3) * Vunit_Na *
 		nosh->calc[calcid]->pbeparm->temp * totEnergy[calcid];
 	} else {
 		Vnm_tprint( 2, " No energy available in Calculation %d\n", calcid+1);
@@ -2426,23 +2427,23 @@ VPUBLIC double returnEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC
 		ltenergy += (scalar * Vunit_kb * (1e-3) * Vunit_Na *
 					 nosh->calc[calcid]->pbeparm->temp * totEnergy[calcid]);
 	}
-	
+
 	return ltenergy;
 }
 
-VPUBLIC int printEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], 
+VPUBLIC int printEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
 						int iprint) {
-	
+
 	int iarg, calcid;
 	double ltenergy, gtenergy, scalar;
-	
+
 	Vnm_tprint( 2, "Warning: The 'energy' print keyword is deprecated.\n" \
 				   "         Use elecEnergy for electrostatics energy calcs.\n\n");
-	
+
 	if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "print energy %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "print energy %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "print energy %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->elecname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -2454,11 +2455,11 @@ VPUBLIC int printEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->elecname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
@@ -2481,29 +2482,29 @@ VPUBLIC int printEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
 		ltenergy += (scalar * Vunit_kb * (1e-3) * Vunit_Na *
 					 nosh->calc[calcid]->pbeparm->temp * totEnergy[calcid]);
 	}
-	
-	Vnm_tprint( 1, "  Local net energy (PE %d) = %1.12E kJ/mol\n", 
+
+	Vnm_tprint( 1, "  Local net energy (PE %d) = %1.12E kJ/mol\n",
 				Vcom_rank(com), ltenergy);
 	Vnm_tprint( 0, "printEnergy:  Performing global reduction (sum)\n");
 	Vcom_reduce(com, &ltenergy, &gtenergy, 1, 2, 0);
 	Vnm_tprint( 1, "  Global net ELEC energy = %1.12E kJ/mol\n", gtenergy);
-	
+
 	return 1;
-	
+
 }
 ///////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// Modified for g_mmpbsa //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-VPUBLIC int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], 
+VPUBLIC int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
 						int iprint, double *PolarEnergy) {
-	
+
 	int iarg, calcid;
 	double ltenergy, gtenergy, scalar;
-	
+
 	if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "\nprint energy %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "\nprint energy %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "\nprint energy %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->elecname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -2515,11 +2516,11 @@ VPUBLIC int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->elecname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
@@ -2542,8 +2543,8 @@ VPUBLIC int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC
 		ltenergy += (scalar * Vunit_kb * (1e-3) * Vunit_Na *
 					 nosh->calc[calcid]->pbeparm->temp * totEnergy[calcid]);
 	}
-	
-	Vnm_tprint( 1, "  Local net energy (PE %d) = %1.12E kJ/mol\n", 
+
+	Vnm_tprint( 1, "  Local net energy (PE %d) = %1.12E kJ/mol\n",
 				Vcom_rank(com), ltenergy);
 	Vnm_tprint( 0, "printEnergy:  Performing global reduction (sum)\n");
 	Vcom_reduce(com, &ltenergy, &gtenergy, 1, 2, 0);
@@ -2552,20 +2553,20 @@ VPUBLIC int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC
 	*PolarEnergy = gtenergy;
 /////////////////////////////////////////////////////////////////////////////////////////
 	return 1;
-	
+
 }
 
 VPUBLIC int printApolEnergy(NOsh *nosh, int iprint, double *APolarEnergy) {
-	
+
 	int iarg, calcid;
 	double gtenergy, scalar;
-	
+
 	APOLparm *apolparm = VNULL;
-	
+
 	if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "\nprint APOL energy %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "\nprint APOL energy %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "\nprint APOL energy %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->apolname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -2577,19 +2578,19 @@ VPUBLIC int printApolEnergy(NOsh *nosh, int iprint, double *APolarEnergy) {
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->apolname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
 	Vnm_tprint(1, "end\n");
-	
+
 	calcid = nosh->apol2calc[nosh->printcalc[iprint][0]];
 	apolparm = nosh->calc[calcid]->apolparm;
-	
+
 	if (apolparm->calcenergy == ACE_TOTAL) {
 		gtenergy = ((apolparm->gamma*apolparm->sasa) + (apolparm->press*apolparm->sav) + (apolparm->wcaEnergy));
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2602,17 +2603,17 @@ VPUBLIC int printApolEnergy(NOsh *nosh, int iprint, double *APolarEnergy) {
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
 		calcid = nosh->apol2calc[nosh->printcalc[iprint][iarg]];
 		apolparm = nosh->calc[calcid]->apolparm;
-		
+
 		/* Add or subtract? */
 		if (nosh->printop[iprint][iarg-1] == 0) scalar = 1.0;
 		else if (nosh->printop[iprint][iarg-1] == 1) scalar = -1.0;
 		/* Accumulate */
 		gtenergy += (scalar * ((apolparm->gamma*apolparm->sasa) +
-							   (apolparm->press*apolparm->sav) + 
+							   (apolparm->press*apolparm->sav) +
 							   (apolparm->wcaEnergy)));
 
 	}
-	
+
 	Vnm_tprint( 1, "  Global net APOL energy = %1.12E kJ/mol\n", gtenergy);
 	return 1;
 }
@@ -2623,21 +2624,21 @@ VPUBLIC int printApolEnergy(NOsh *nosh, int iprint, double *APolarEnergy) {
 
 
 
-VPUBLIC int printForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+VPUBLIC int printForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 					   AtomForce *atomForce[NOSH_MAXCALC], int iprint) {
-	
+
 	int iarg, ifr, ivc, calcid, refnforce, refcalcforce;
 	double temp, scalar;
 	double totforce[3];
 	AtomForce *lforce, *gforce, *aforce;
-	
+
 	Vnm_tprint( 2, "Warning: The 'force' print keyword is deprecated.\n" \
 				   "         Use elecForce for electrostatics force calcs.\n\n");
-	
+
 	if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "print force %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "print force %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "print force %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->elecname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -2649,16 +2650,16 @@ VPUBLIC int printForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->elecname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
 	Vnm_tprint(1, "end\n");
-	
+
 	/* First, go through and make sure we did the same type of force
 		* evaluation in each of the requested calculations */
 	calcid = nosh->elec2calc[nosh->printcalc[iprint][0]];
@@ -2684,40 +2685,40 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 			return 0;
 		}
 	}
-	
+
 	/* Now, allocate space to accumulate the forces */
 	lforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
 	gforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
-	
+
 	/* Now, accumulate the forces */
 	calcid = nosh->elec2calc[nosh->printcalc[iprint][0]];
 	aforce = atomForce[calcid];
 	temp = nosh->calc[calcid]->pbeparm->temp;
-	
+
 	/* Load up the first calculation */
 	if (refcalcforce == PCF_TOTAL) {
 		/* Set to total force */
 		for (ivc=0; ivc<3; ivc++) {
-			lforce[0].qfForce[ivc] = 
+			lforce[0].qfForce[ivc] =
 			Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].qfForce[ivc];
-			lforce[0].ibForce[ivc] = 
+			lforce[0].ibForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].ibForce[ivc];
-			lforce[0].dbForce[ivc] = 
+			lforce[0].dbForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].dbForce[ivc];
 		}
-	} else if (refcalcforce == PCF_COMPS) { 
+	} else if (refcalcforce == PCF_COMPS) {
 		for (ifr=0; ifr<refnforce; ifr++) {
 			for (ivc=0; ivc<3; ivc++) {
-				lforce[ifr].qfForce[ivc] = 
+				lforce[ifr].qfForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].qfForce[ivc];
-				lforce[ifr].ibForce[ivc] = 
+				lforce[ifr].ibForce[ivc] =
 					Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].ibForce[ivc];
-				lforce[ifr].dbForce[ivc] = 
+				lforce[ifr].dbForce[ivc] =
 					Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].dbForce[ivc];
 			}
 		}
 	}
-	
+
 	/* Load up the rest of the calculations */
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
 		calcid = nosh->elec2calc[nosh->printcalc[iprint][iarg]];
@@ -2731,34 +2732,34 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		if (refcalcforce == PCF_TOTAL) {
 			/* Set to total force */
 			for (ivc=0; ivc<3; ivc++) {
-				lforce[0].qfForce[ivc] += 
+				lforce[0].qfForce[ivc] +=
 				(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].qfForce[ivc]);
-				lforce[0].ibForce[ivc] += 
+				lforce[0].ibForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].ibForce[ivc]);
-				lforce[0].dbForce[ivc] += 
+				lforce[0].dbForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].dbForce[ivc]);
 			}
 		} else if (refcalcforce == PCF_COMPS) {
 			for (ifr=0; ifr<refnforce; ifr++) {
 				for (ivc=0; ivc<3; ivc++) {
-					lforce[ifr].qfForce[ivc] += 
+					lforce[ifr].qfForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].qfForce[ivc]);
-					lforce[ifr].ibForce[ivc] += 
+					lforce[ifr].ibForce[ivc] +=
 						(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].ibForce[ivc]);
-					lforce[ifr].dbForce[ivc] += 
+					lforce[ifr].dbForce[ivc] +=
 						(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].dbForce[ivc]);
 				}
 			}
 		}
 	}
-	
+
 	Vnm_tprint( 0, "printEnergy:  Performing global reduction (sum)\n");
 	for (ifr=0; ifr<refnforce; ifr++) {
 		Vcom_reduce(com, lforce[ifr].qfForce, gforce[ifr].qfForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].ibForce, gforce[ifr].ibForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].dbForce, gforce[ifr].dbForce, 3, 2, 0);
 	}
-	
+
 #if 0
 	if (refcalcforce == PCF_TOTAL) {
 		Vnm_tprint( 1, "  Local net fixed charge force = \
@@ -2784,7 +2785,7 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		}
 	}
 #endif
-	
+
 	if (refcalcforce == PCF_TOTAL) {
 		Vnm_tprint( 1, "  Printing net forces (kJ/mol/A).\n");
 		Vnm_tprint( 1, "  Legend:\n");
@@ -2792,24 +2793,24 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    qf  -- Fixed charge force\n");
 		Vnm_tprint( 1, "    db  -- Dielectric boundary force\n");
 		Vnm_tprint( 1, "    ib  -- Ionic boundary force\n");
-		
+
 		for (ivc=0; ivc<3; ivc++) {
-			totforce[ivc] = 
+			totforce[ivc] =
 			gforce[0].qfForce[ivc] + gforce[0].ibForce[ivc] \
 			+ gforce[0].dbForce[ivc];
 		}
-		
-		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0], 
+
+		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
-		Vnm_tprint( 1, "  qf  %1.12E  %1.12E  %1.12E\n", gforce[0].qfForce[0], 
+		Vnm_tprint( 1, "  qf  %1.12E  %1.12E  %1.12E\n", gforce[0].qfForce[0],
 					gforce[0].qfForce[1], gforce[0].qfForce[2]);
-		Vnm_tprint( 1, "  ib  %1.12E  %1.12E  %1.12E\n", gforce[0].ibForce[0], 
+		Vnm_tprint( 1, "  ib  %1.12E  %1.12E  %1.12E\n", gforce[0].ibForce[0],
 					gforce[0].ibForce[1], gforce[0].ibForce[2]);
-		Vnm_tprint( 1, "  db  %1.12E  %1.12E  %1.12E\n", gforce[0].dbForce[0], 
+		Vnm_tprint( 1, "  db  %1.12E  %1.12E  %1.12E\n", gforce[0].dbForce[0],
 					gforce[0].dbForce[1], gforce[0].dbForce[2]);
-		
+
 	} else if (refcalcforce == PCF_COMPS) {
-		
+
 		Vnm_tprint( 1, "  Printing per-atom forces (kJ/mol/A).\n");
 		Vnm_tprint( 1, "  Legend:\n");
 		Vnm_tprint( 1, "    tot n -- Total force for atom n\n");
@@ -2817,22 +2818,22 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    db  n -- Dielectric boundary force for atom n\n");
 		Vnm_tprint( 1, "    ib  n -- Ionic boundary force for atom n\n");
 		Vnm_tprint( 1, "    tot all -- Total force for system\n");
-		
+
 		totforce[0] = 0.0;
 		totforce[1] = 0.0;
 		totforce[2] = 0.0;
-		
+
 		for (ifr=0; ifr<refnforce; ifr++) {
-			Vnm_tprint( 1, "  qf  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].qfForce[0], gforce[ifr].qfForce[1], 
+			Vnm_tprint( 1, "  qf  %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].qfForce[0], gforce[ifr].qfForce[1],
 						gforce[ifr].qfForce[2]);
-			Vnm_tprint( 1, "  ib  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  ib  %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						gforce[ifr].ibForce[0], gforce[ifr].ibForce[1],
 						gforce[ifr].ibForce[2]);
-			Vnm_tprint( 1, "  db  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].dbForce[0], gforce[ifr].dbForce[1], 
+			Vnm_tprint( 1, "  db  %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].dbForce[0], gforce[ifr].dbForce[1],
 						gforce[ifr].dbForce[2]);
-			Vnm_tprint( 1, "  tot %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  tot %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						(gforce[ifr].dbForce[0] \
 						 + gforce[ifr].ibForce[0] +
 						 gforce[ifr].qfForce[0]),
@@ -2851,26 +2852,26 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "  tot all %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
 	}
-	
+
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&lforce));
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&gforce));
-	
+
 	return 1;
-	
+
 }
 
-VPUBLIC int printElecForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+VPUBLIC int printElecForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 					   AtomForce *atomForce[NOSH_MAXCALC], int iprint) {
-	
+
 	int iarg, ifr, ivc, calcid, refnforce, refcalcforce;
 	double temp, scalar;
 	double totforce[3];
 	AtomForce *lforce, *gforce, *aforce;
-	
+
 	if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "print force %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "print force %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "print force %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->elecname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -2882,16 +2883,16 @@ VPUBLIC int printElecForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->elecname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->elecname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
 	Vnm_tprint(1, "end\n");
-	
+
 	/* First, go through and make sure we did the same type of force
 		* evaluation in each of the requested calculations */
 	calcid = nosh->elec2calc[nosh->printcalc[iprint][0]];
@@ -2917,40 +2918,40 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 			return 0;
 		}
 	}
-	
+
 	/* Now, allocate space to accumulate the forces */
 	lforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
 	gforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
-	
+
 	/* Now, accumulate the forces */
 	calcid = nosh->elec2calc[nosh->printcalc[iprint][0]];
 	aforce = atomForce[calcid];
 	temp = nosh->calc[calcid]->pbeparm->temp;
-	
+
 	/* Load up the first calculation */
 	if (refcalcforce == PCF_TOTAL) {
 		/* Set to total force */
 		for (ivc=0; ivc<3; ivc++) {
-			lforce[0].qfForce[ivc] = 
+			lforce[0].qfForce[ivc] =
 			Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].qfForce[ivc];
-			lforce[0].ibForce[ivc] = 
+			lforce[0].ibForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].ibForce[ivc];
-			lforce[0].dbForce[ivc] = 
+			lforce[0].dbForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].dbForce[ivc];
 		}
-	} else if (refcalcforce == PCF_COMPS) { 
+	} else if (refcalcforce == PCF_COMPS) {
 		for (ifr=0; ifr<refnforce; ifr++) {
 			for (ivc=0; ivc<3; ivc++) {
-				lforce[ifr].qfForce[ivc] = 
+				lforce[ifr].qfForce[ivc] =
 				Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].qfForce[ivc];
-				lforce[ifr].ibForce[ivc] = 
+				lforce[ifr].ibForce[ivc] =
 					Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].ibForce[ivc];
-				lforce[ifr].dbForce[ivc] = 
+				lforce[ifr].dbForce[ivc] =
 					Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].dbForce[ivc];
 			}
 		}
 	}
-	
+
 	/* Load up the rest of the calculations */
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
 		calcid = nosh->elec2calc[nosh->printcalc[iprint][iarg]];
@@ -2964,34 +2965,34 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		if (refcalcforce == PCF_TOTAL) {
 			/* Set to total force */
 			for (ivc=0; ivc<3; ivc++) {
-				lforce[0].qfForce[ivc] += 
+				lforce[0].qfForce[ivc] +=
 				(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].qfForce[ivc]);
-				lforce[0].ibForce[ivc] += 
+				lforce[0].ibForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].ibForce[ivc]);
-				lforce[0].dbForce[ivc] += 
+				lforce[0].dbForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[0].dbForce[ivc]);
 			}
 		} else if (refcalcforce == PCF_COMPS) {
 			for (ifr=0; ifr<refnforce; ifr++) {
 				for (ivc=0; ivc<3; ivc++) {
-					lforce[ifr].qfForce[ivc] += 
+					lforce[ifr].qfForce[ivc] +=
 					(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].qfForce[ivc]);
-					lforce[ifr].ibForce[ivc] += 
+					lforce[ifr].ibForce[ivc] +=
 						(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].ibForce[ivc]);
-					lforce[ifr].dbForce[ivc] += 
+					lforce[ifr].dbForce[ivc] +=
 						(scalar*Vunit_kb*(1e-3)*Vunit_Na*temp*aforce[ifr].dbForce[ivc]);
 				}
 			}
 		}
 	}
-	
+
 	Vnm_tprint( 0, "printEnergy:  Performing global reduction (sum)\n");
 	for (ifr=0; ifr<refnforce; ifr++) {
 		Vcom_reduce(com, lforce[ifr].qfForce, gforce[ifr].qfForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].ibForce, gforce[ifr].ibForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].dbForce, gforce[ifr].dbForce, 3, 2, 0);
 	}
-	
+
 #if 0
 	if (refcalcforce == PCF_TOTAL) {
 		Vnm_tprint( 1, "  Local net fixed charge force = \
@@ -3017,7 +3018,7 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		}
 	}
 #endif
-	
+
 	if (refcalcforce == PCF_TOTAL) {
 		Vnm_tprint( 1, "  Printing net forces (kJ/mol/A).\n");
 		Vnm_tprint( 1, "  Legend:\n");
@@ -3025,24 +3026,24 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    qf  -- Fixed charge force\n");
 		Vnm_tprint( 1, "    db  -- Dielectric boundary force\n");
 		Vnm_tprint( 1, "    ib  -- Ionic boundary force\n");
-		
+
 		for (ivc=0; ivc<3; ivc++) {
-			totforce[ivc] = 
+			totforce[ivc] =
 			gforce[0].qfForce[ivc] + gforce[0].ibForce[ivc] \
 			+ gforce[0].dbForce[ivc];
 		}
-		
-		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0], 
+
+		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
-		Vnm_tprint( 1, "  qf  %1.12E  %1.12E  %1.12E\n", gforce[0].qfForce[0], 
+		Vnm_tprint( 1, "  qf  %1.12E  %1.12E  %1.12E\n", gforce[0].qfForce[0],
 					gforce[0].qfForce[1], gforce[0].qfForce[2]);
-		Vnm_tprint( 1, "  ib  %1.12E  %1.12E  %1.12E\n", gforce[0].ibForce[0], 
+		Vnm_tprint( 1, "  ib  %1.12E  %1.12E  %1.12E\n", gforce[0].ibForce[0],
 					gforce[0].ibForce[1], gforce[0].ibForce[2]);
-		Vnm_tprint( 1, "  db  %1.12E  %1.12E  %1.12E\n", gforce[0].dbForce[0], 
+		Vnm_tprint( 1, "  db  %1.12E  %1.12E  %1.12E\n", gforce[0].dbForce[0],
 					gforce[0].dbForce[1], gforce[0].dbForce[2]);
-		
+
 	} else if (refcalcforce == PCF_COMPS) {
-		
+
 		Vnm_tprint( 1, "  Printing per-atom forces (kJ/mol/A).\n");
 		Vnm_tprint( 1, "  Legend:\n");
 		Vnm_tprint( 1, "    tot n -- Total force for atom n\n");
@@ -3050,22 +3051,22 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    db  n -- Dielectric boundary force for atom n\n");
 		Vnm_tprint( 1, "    ib  n -- Ionic boundary force for atom n\n");
 		Vnm_tprint( 1, "    tot all -- Total force for system\n");
-		
+
 		totforce[0] = 0.0;
 		totforce[1] = 0.0;
 		totforce[2] = 0.0;
-		
+
 		for (ifr=0; ifr<refnforce; ifr++) {
-			Vnm_tprint( 1, "  qf  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].qfForce[0], gforce[ifr].qfForce[1], 
+			Vnm_tprint( 1, "  qf  %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].qfForce[0], gforce[ifr].qfForce[1],
 						gforce[ifr].qfForce[2]);
-			Vnm_tprint( 1, "  ib  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  ib  %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						gforce[ifr].ibForce[0], gforce[ifr].ibForce[1],
 						gforce[ifr].ibForce[2]);
-			Vnm_tprint( 1, "  db  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].dbForce[0], gforce[ifr].dbForce[1], 
+			Vnm_tprint( 1, "  db  %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].dbForce[0], gforce[ifr].dbForce[1],
 						gforce[ifr].dbForce[2]);
-			Vnm_tprint( 1, "  tot %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  tot %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						(gforce[ifr].dbForce[0] \
 						 + gforce[ifr].ibForce[0] +
 						 gforce[ifr].qfForce[0]),
@@ -3084,26 +3085,26 @@ calculations %d and %d\n", nosh->elec2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "  tot all %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
 	}
-	
+
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&lforce));
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&gforce));
-	
+
 	return 1;
-	
+
 }
 
-VPUBLIC int printApolForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+VPUBLIC int printApolForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 						   AtomForce *atomForce[NOSH_MAXCALC], int iprint) {
-	
+
 	int iarg, ifr, ivc, calcid, refnforce, refcalcforce;
 	double temp, scalar;
 	double totforce[3];
 	AtomForce *lforce, *gforce, *aforce;
-	
+
 	if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][0]], "") == 0){
 		Vnm_tprint( 1, "\nprint APOL force %d ", nosh->printcalc[iprint][0]+1);
 	} else {
-		Vnm_tprint( 1, "\nprint APOL force %d (%s) ", nosh->printcalc[iprint][0]+1, 
+		Vnm_tprint( 1, "\nprint APOL force %d (%s) ", nosh->printcalc[iprint][0]+1,
 					nosh->apolname[nosh->printcalc[iprint][0]]);
 	}
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
@@ -3115,16 +3116,16 @@ VPUBLIC int printApolForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
 			Vnm_tprint( 2, "Undefined PRINT operation!\n");
 			return 0;
 		}
-		if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][iarg]], 
+		if (Vstring_strcasecmp(nosh->apolname[nosh->printcalc[iprint][iarg]],
 							   "") == 0) {
 			Vnm_tprint( 1, "%d ", nosh->printcalc[iprint][iarg]+1);
 		} else {
-			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1, 
+			Vnm_tprint( 1, "%d (%s) ", nosh->printcalc[iprint][iarg]+1,
 						nosh->apolname[nosh->printcalc[iprint][iarg]]);
 		}
 	}
 	Vnm_tprint(1, "end\n");
-	
+
 	/* First, go through and make sure we did the same type of force
 		* evaluation in each of the requested calculations */
 	calcid = nosh->apol2calc[nosh->printcalc[iprint][0]];
@@ -3150,16 +3151,16 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 			return 0;
 		}
 	}
-	
+
 	/* Now, allocate space to accumulate the forces */
 	lforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
 	gforce = (AtomForce *)Vmem_malloc(VNULL, refnforce, sizeof(AtomForce));
-	
+
 	/* Now, accumulate the forces */
 	calcid = nosh->apol2calc[nosh->printcalc[iprint][0]];
 	aforce = atomForce[calcid];
 	temp = nosh->calc[calcid]->apolparm->temp;
-	
+
 	/* Load up the first calculation */
 	if (refcalcforce == ACF_TOTAL) {
 		/* Set to total force */
@@ -3168,7 +3169,7 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 			lforce[0].savForce[ivc] = aforce[0].savForce[ivc];
 			lforce[0].wcaForce[ivc] = aforce[0].wcaForce[ivc];
 		}
-	} else if (refcalcforce == ACF_COMPS) { 
+	} else if (refcalcforce == ACF_COMPS) {
 		for (ifr=0; ifr<refnforce; ifr++) {
 			for (ivc=0; ivc<3; ivc++) {
 				lforce[ifr].sasaForce[ivc] = aforce[ifr].sasaForce[ivc];
@@ -3177,7 +3178,7 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 			}
 		}
 	}
-	
+
 	/* Load up the rest of the calculations */
 	for (iarg=1; iarg<nosh->printnarg[iprint]; iarg++) {
 		calcid = nosh->apol2calc[nosh->printcalc[iprint][iarg]];
@@ -3205,14 +3206,14 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 			}
 		}
 	}
-	
+
 	Vnm_tprint( 0, "printForce:  Performing global reduction (sum)\n");
 	for (ifr=0; ifr<refnforce; ifr++) {
 		Vcom_reduce(com, lforce[ifr].sasaForce, gforce[ifr].sasaForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].savForce, gforce[ifr].savForce, 3, 2, 0);
 		Vcom_reduce(com, lforce[ifr].wcaForce, gforce[ifr].wcaForce, 3, 2, 0);
 	}
-	
+
 	if (refcalcforce == ACF_TOTAL) {
 		Vnm_tprint( 1, "  Printing net forces (kJ/mol/A)\n");
 		Vnm_tprint( 1, "  Legend:\n");
@@ -3220,24 +3221,24 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    sasa  -- SASA force\n");
 		Vnm_tprint( 1, "    sav   -- SAV force\n");
 		Vnm_tprint( 1, "    wca   -- WCA force\n\n");
-		
+
 		for (ivc=0; ivc<3; ivc++) {
-			totforce[ivc] = 
+			totforce[ivc] =
 			gforce[0].sasaForce[ivc] + gforce[0].savForce[ivc] \
 			+ gforce[0].wcaForce[ivc];
 		}
-		
-		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0], 
+
+		Vnm_tprint( 1, "  tot %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
-		Vnm_tprint( 1, "  sasa  %1.12E  %1.12E  %1.12E\n", gforce[0].sasaForce[0], 
+		Vnm_tprint( 1, "  sasa  %1.12E  %1.12E  %1.12E\n", gforce[0].sasaForce[0],
 					gforce[0].sasaForce[1], gforce[0].sasaForce[2]);
-		Vnm_tprint( 1, "  sav  %1.12E  %1.12E  %1.12E\n", gforce[0].savForce[0], 
+		Vnm_tprint( 1, "  sav  %1.12E  %1.12E  %1.12E\n", gforce[0].savForce[0],
 					gforce[0].savForce[1], gforce[0].savForce[2]);
-		Vnm_tprint( 1, "  wca  %1.12E  %1.12E  %1.12E\n", gforce[0].wcaForce[0], 
+		Vnm_tprint( 1, "  wca  %1.12E  %1.12E  %1.12E\n", gforce[0].wcaForce[0],
 					gforce[0].wcaForce[1], gforce[0].wcaForce[2]);
-		
+
 	} else if (refcalcforce == ACF_COMPS) {
-		
+
 		Vnm_tprint( 1, "  Printing per atom forces (kJ/mol/A)\n");
 		Vnm_tprint( 1, "  Legend:\n");
 		Vnm_tprint( 1, "    tot   n -- Total force for atom n\n");
@@ -3245,25 +3246,25 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "    sav   n -- SAV force for atom n\n");
 		Vnm_tprint( 1, "    wca   n -- WCA force for atom n\n");
 		Vnm_tprint( 1, "    tot all -- Total force for system\n");
-		
+
 		//Vnm_tprint( 1, "    gamma, pressure, bconc are: %f %f %f\n\n",
 		//			gamma,press,bconc);
-		
+
 		totforce[0] = 0.0;
 		totforce[1] = 0.0;
 		totforce[2] = 0.0;
-		
+
 		for (ifr=0; ifr<refnforce; ifr++) {
-			Vnm_tprint( 1, "  sasa  %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].sasaForce[0], gforce[ifr].sasaForce[1], 
+			Vnm_tprint( 1, "  sasa  %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].sasaForce[0], gforce[ifr].sasaForce[1],
 						gforce[ifr].sasaForce[2]);
-			Vnm_tprint( 1, "  sav   %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  sav   %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						gforce[ifr].savForce[0], gforce[ifr].savForce[1],
 						gforce[ifr].savForce[2]);
-			Vnm_tprint( 1, "  wca   %d  %1.12E  %1.12E  %1.12E\n", ifr, 
-						gforce[ifr].wcaForce[0], gforce[ifr].wcaForce[1], 
+			Vnm_tprint( 1, "  wca   %d  %1.12E  %1.12E  %1.12E\n", ifr,
+						gforce[ifr].wcaForce[0], gforce[ifr].wcaForce[1],
 						gforce[ifr].wcaForce[2]);
-			Vnm_tprint( 1, "  tot   %d  %1.12E  %1.12E  %1.12E\n", ifr, 
+			Vnm_tprint( 1, "  tot   %d  %1.12E  %1.12E  %1.12E\n", ifr,
 						(gforce[ifr].wcaForce[0] \
 						 + gforce[ifr].savForce[0] +
 						 gforce[ifr].sasaForce[0]),
@@ -3282,7 +3283,7 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 		Vnm_tprint( 1, "  tot all  %1.12E  %1.12E  %1.12E\n", totforce[0],
 					totforce[1], totforce[2]);
 	}
-	
+
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&lforce));
 	Vmem_free(VNULL, refnforce, sizeof(AtomForce), (void **)(&gforce));
 
@@ -3292,15 +3293,15 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
 #ifdef HAVE_MC_H
 
 
-VPUBLIC void killFE(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC], 
+VPUBLIC void killFE(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC],
 					Vfetk *fetk[NOSH_MAXCALC], Gem *gm[NOSH_MAXMOL]) {
-	
+
 	int i;
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint(1, "Destroying finite element structures.\n");
 #endif
-	
+
 	for(i=0;i<nosh->ncalc;i++){
 		Vpbe_dtor(&(pbe[i]));
 		Vfetk_dtor(&(fetk[i]));
@@ -3309,10 +3310,10 @@ VPUBLIC void killFE(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC],
 }
 
 
-VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbeparm, 
-				   Vpbe *pbe[NOSH_MAXCALC], Valist *alist[NOSH_MAXMOL], 
+VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbeparm,
+				   Vpbe *pbe[NOSH_MAXCALC], Valist *alist[NOSH_MAXMOL],
 				   Vfetk *fetk[NOSH_MAXCALC], Gem *gm[NOSH_MAXMOL]) {
-	
+
 	Gem *tempGm = VNULL;
 	int iatom, imesh, i, j, theMol, focusFlag;
 	Vio *sock = VNULL;
@@ -3320,18 +3321,18 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 	Vfetk_MeshLoad meshType;
 	double length[3], center[3];
 	Vrc_Codes vrc;
-	
+
 	double sparm, q, iparm;
 	Valist *myalist;
 	Vatom *atom = VNULL;
-	
+
 	Vnm_tstart(27, "Setup timer");
-	
+
 	/* Print some warning messages */
 	if (pbeparm->useDielMap)  Vnm_tprint(2, "FEM ignoring dielectric map!\n");
 	if (pbeparm->useKappaMap)  Vnm_tprint(2, "FEM ignoring kappa map!\n");
 	if (pbeparm->useChargeMap)  Vnm_tprint(2, "FEM ignoring charge map!\n");
-	
+
 	/* Fix mesh center for "GCENT MOL #" types of declarations. */
 	Vnm_tprint(0, "Re-centering mesh...\n");
 	theMol = pbeparm->molid-1;
@@ -3339,13 +3340,13 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 	for (j=0; j<3; j++) {
 		if (theMol < nosh->nmol) {
 			center[j] = (myalist)->center[j];
-		} else{ 
-			Vnm_tprint(2, "ERROR!  Bogus molecule number (%d)!\n", 
+		} else{
+			Vnm_tprint(2, "ERROR!  Bogus molecule number (%d)!\n",
 					   (theMol+1));
 			return VRC_FAILURE;
 		}
 	}
-	
+
 	/* Check for completely-neutral molecule */
 	q = 0;
 	for (iatom=0; iatom<Valist_getNumberAtoms(myalist); iatom++) {
@@ -3359,14 +3360,14 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 		return VRC_FAILURE;
 	}
 	*/
-	
+
 	/* Set the femparm pkey value based on the presence of an HB solver */
 #ifdef USE_HB
 	feparm->pkey = 1;
 #else
 	feparm->pkey = 0;
 #endif
-	
+
 	/* Set up PBE object */
 	Vnm_tprint(0, "Setting up PBE object...\n");
 	if (pbeparm->srfm == VSM_SPLINE) sparm = pbeparm->swin;
@@ -3375,20 +3376,20 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 	else iparm = 0.0;
 	focusFlag = 0;
 	pbe[icalc] = Vpbe_ctor(myalist, pbeparm->nion,
-						   pbeparm->ionc, pbeparm->ionr, pbeparm->ionq, 
-						   pbeparm->temp, pbeparm->pdie, 
-						   pbeparm->sdie, sparm, focusFlag, pbeparm->sdens, 
-						   pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie, 
+						   pbeparm->ionc, pbeparm->ionr, pbeparm->ionq,
+						   pbeparm->temp, pbeparm->pdie,
+						   pbeparm->sdie, sparm, focusFlag, pbeparm->sdens,
+						   pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie,
 						   pbeparm->memv);
-	
+
 	/* Print a few derived parameters */
 	Vnm_tprint(1, "  Debye length:  %g A\n", Vpbe_getDeblen(pbe[icalc]));
-	
+
 	/* Set up FEtk objects */
 	Vnm_tprint(0, "Setting up FEtk object...\n");
 	fetk[icalc] = Vfetk_ctor(pbe[icalc], pbeparm->pbetype);
 	Vfetk_setParameters(fetk[icalc], pbeparm, feparm);
-	
+
 	/* Build mesh */
 	Vnm_tprint(0, "Setting up mesh...\n");
 	sock = VNULL;
@@ -3401,7 +3402,7 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 		}
 		Vnm_print(0, "Using mesh %d (%s) in calculation.\n", imesh+1,
 				  nosh->meshpath[imesh]);
-		switch (nosh->meshfmt[imesh]) {				
+		switch (nosh->meshfmt[imesh]) {
 			case VDF_DX:
 				Vnm_tprint(2, "DX finite element mesh input not supported yet!\n");
 				return VRC_FAILURE;
@@ -3416,7 +3417,7 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 						   nosh->meshpath[imesh]);
 				sock = Vio_ctor("FILE", "ASC", VNULL, nosh->meshpath[imesh], "r");
 				if (sock == VNULL) {
-					Vnm_print(2, "Problem opening virtual socket %s!\n", 
+					Vnm_print(2, "Problem opening virtual socket %s!\n",
 							  nosh->meshpath[imesh]);
 					return VRC_FAILURE;
 				}
@@ -3426,9 +3427,9 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 					return VRC_FAILURE;
 				}
 				break;
-				
+
 			default:
-				Vnm_tprint( 2, "Invalid data format (%d)!\n", 
+				Vnm_tprint( 2, "Invalid data format (%d)!\n",
 						   nosh->meshfmt[imesh]);
 				return VRC_FAILURE;
 		}
@@ -3439,7 +3440,7 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 			length[i] = feparm->glen[i];
 		}
 	}
-	
+
 	vrc = Vfetk_loadMesh(fetk[icalc], center, length, meshType, sock);
 	if (vrc == VRC_FAILURE) {
 		Vnm_print(2, "Error constructing finite element mesh!\n");
@@ -3447,8 +3448,8 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 	}
 	Vnm_redirect(0);
 	Gem_shapeChk(fetk[icalc]->gm);
-	Vnm_redirect(1);	
-		
+	Vnm_redirect(1);
+
 	/* Uniformly refine the mesh a bit */
 	for (j=0; j<2; j++) {
 		AM_markRefine(fetk[icalc]->am, 0, -1, 0, 0.0);
@@ -3457,28 +3458,28 @@ VPUBLIC Vrc_Codes initFE(int icalc, NOsh *nosh, FEMparm *feparm, PBEparm *pbepar
 		Gem_shapeChk(fetk[icalc]->gm);
 		Vnm_redirect(1);
 	}
-	
+
 	/* Setup time statistics */
 	Vnm_tstop(27, "Setup timer");
-	
+
 	/* Memory statistics */
 	bytesTotal = Vmem_bytesTotal();
 	highWater = Vmem_highWaterTotal();
-	
+
 #ifndef VAPBSQUIET
 	Vnm_tprint( 1, "  Current memory usage:  %4.3f MB total, \
 %4.3f MB high water\n", (double)(bytesTotal)/(1024.*1024.),
 				(double)(highWater)/(1024.*1024.));
 #endif
-	
-	
+
+
 	return VRC_SUCCESS;
 }
 
-VPUBLIC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm, 
+VPUBLIC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm,
 						 Vfetk *fetk[NOSH_MAXCALC]) {
-	
-	Vnm_tprint(1, "  Domain size:  %g A x %g A x %g A\n", 
+
+	Vnm_tprint(1, "  Domain size:  %g A x %g A x %g A\n",
 			   feparm->glen[0], feparm->glen[1],
 			   feparm->glen[2]);
 	switch(feparm->ekey) {
@@ -3522,7 +3523,7 @@ VPUBLIC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm,
 			Vnm_tprint(2, "Invalid akeySOLVE (%d)!\n", feparm->akeySOLVE);
 			break;
 	}
-	Vnm_tprint(1, "  Refinement of initial mesh to ~%d vertices\n", 
+	Vnm_tprint(1, "  Refinement of initial mesh to ~%d vertices\n",
 			   feparm->targetNum);
 	Vnm_tprint(1, "  Geometry-based refinment lower bound:  %g A\n",
 			   feparm->targetRes);
@@ -3530,7 +3531,7 @@ VPUBLIC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm,
 			   feparm->maxsolve);
 	Vnm_tprint(1, "  Maximum number of vertices in mesh:  %d\n",
 			   feparm->maxvert);
-	
+
 	/* FOLLOWING IS SOLVER-RELATED; BAIL IF NOT SOLVING */
 	if (nosh->bogus)  return;
 #ifdef USE_HB
@@ -3605,21 +3606,21 @@ VPUBLIC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm,
 			Vnm_tprint(1, "???\n");
 			break;
 	}
-	
+
 }
 
-VPUBLIC int partFE(int icalc, NOsh *nosh, FEMparm *feparm, 
+VPUBLIC int partFE(int icalc, NOsh *nosh, FEMparm *feparm,
 				   Vfetk *fetk[NOSH_MAXCALC]) {
-	
+
 	Vfetk_setAtomColors(fetk[icalc]);
 	return 1;
 }
 
-VPUBLIC int preRefineFE(int icalc, NOsh *nosh, FEMparm *feparm, 
+VPUBLIC int preRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 						Vfetk *fetk[NOSH_MAXCALC]) {
-	
+
 	int nverts, marked;
-	
+
 	switch(feparm->akeyPRE) {
 		case FRT_UNIF:
 			Vnm_tprint(1, "  Commencing uniform refinement to %d verts.\n",
@@ -3644,8 +3645,8 @@ before you solve!\n");
 			VASSERT(0);
 			break;
 	}
-	
-	Vnm_tprint(1, "  Initial mesh has %d vertices\n", 
+
+	Vnm_tprint(1, "  Initial mesh has %d vertices\n",
 			   Gem_numVV(fetk[icalc]->gm));
 	while (1) {
 		nverts = Gem_numVV(fetk[icalc]->gm);
@@ -3653,7 +3654,7 @@ before you solve!\n");
 			Vnm_tprint(1, "  Hit vertex number limit.\n");
 			break;
 		}
-		marked = AM_markRefine(fetk[icalc]->am, feparm->akeyPRE, -1, 
+		marked = AM_markRefine(fetk[icalc]->am, feparm->akeyPRE, -1,
 							   feparm->ekey, feparm->etol);
 		if (marked == 0) {
 			Vnm_tprint(1, "  Marked 0 simps; hit error/size tolerance.\n");
@@ -3665,30 +3666,30 @@ before you solve!\n");
 	}
 	nverts = Gem_numVV(fetk[icalc]->gm);
 	Vnm_tprint(1, "  Done refining; have %d verts.\n", nverts);
-	
+
 	return 1;
 }
 
-VPUBLIC int solveFE(int icalc, NOsh *nosh, PBEparm *pbeparm, FEMparm *feparm, 
+VPUBLIC int solveFE(int icalc, NOsh *nosh, PBEparm *pbeparm, FEMparm *feparm,
 					Vfetk *fetk[NOSH_MAXCALC]) {
-	
+
 	int lkeyHB = 3;  /**<  AM_hPcg */
 	int meth = 2;  /**< Coarse-grid solver; 0 = SLU, 1 = MG, 2 = CG, 3 = BCG, 4 = PCG, 5 = PBCG */
 	int prob = 0;  /**< Primal problem */
 	int prec = 0;  /** < Preconditioner; 0 = identity. */
-	
+
 	if ((pbeparm->pbetype==PBE_NPBE)||(pbeparm->pbetype == PBE_NRPBE)||(pbeparm->pbetype == PBE_SMPBE) /* SMPBE Added */) {
 
 		AM_nSolve(
 				  fetk[icalc]->am,
 				  fetk[icalc]->nkey,
-				  fetk[icalc]->nmax, 
+				  fetk[icalc]->nmax,
 				  fetk[icalc]->ntol,
 				  meth,
-				  fetk[icalc]->lmax, 
+				  fetk[icalc]->lmax,
 				  fetk[icalc]->ltol,
 				  prec,
-				  fetk[icalc]->gues, 
+				  fetk[icalc]->gues,
 				  fetk[icalc]->pjac
 				  );
 	} else if ((pbeparm->pbetype==PBE_LPBE)||(pbeparm->pbetype==PBE_LRPBE)) {
@@ -3699,15 +3700,15 @@ VPUBLIC int solveFE(int icalc, NOsh *nosh, PBEparm *pbeparm, FEMparm *feparm,
 #ifdef USE_HB
 		Vnm_print(2, "SORRY!  DON'T USE HB!!!\n");
 		VASSERT(0);
-		AM_hlSolve(fetk[icalc]->am, meth, lkeyHB, fetk[icalc]->lmax, 
+		AM_hlSolve(fetk[icalc]->am, meth, lkeyHB, fetk[icalc]->lmax,
 			fetk[icalc]->ltol, fetk[icalc]->gues, fetk[icalc]->pjac);
 #else
-		
+
 		AM_lSolve(
 				  fetk[icalc]->am,
 				  prob,
-				  meth, 
-				  fetk[icalc]->lmax, 
+				  meth,
+				  fetk[icalc]->lmax,
 				  fetk[icalc]->ltol,
 				  prec,
 				  fetk[icalc]->gues,
@@ -3715,24 +3716,24 @@ VPUBLIC int solveFE(int icalc, NOsh *nosh, PBEparm *pbeparm, FEMparm *feparm,
 				  );
 #endif
 	}
-	
+
 	return 1;
 }
 
-VPUBLIC int energyFE(NOsh *nosh, int icalc, Vfetk *fetk[NOSH_MAXCALC], 
-					 int *nenergy, double *totEnergy, double *qfEnergy, 
+VPUBLIC int energyFE(NOsh *nosh, int icalc, Vfetk *fetk[NOSH_MAXCALC],
+					 int *nenergy, double *totEnergy, double *qfEnergy,
 					 double *qmEnergy,
 					 double *dielEnergy) {
-	
+
 	double tenergy;
 	FEMparm *feparm;
 	PBEparm *pbeparm;
-	
+
 	feparm = nosh->calc[icalc]->femparm;
 	pbeparm = nosh->calc[icalc]->pbeparm;
-	
+
 	*nenergy = 1;
-	
+
 	/* Some processors don't count */
 	if (nosh->bogus == 0) {
 		if ((pbeparm->pbetype==PBE_NPBE)||(pbeparm->pbetype==PBE_NRPBE)||(pbeparm->pbetype == PBE_SMPBE) /* SMPBE Added */) {
@@ -3740,32 +3741,32 @@ VPUBLIC int energyFE(NOsh *nosh, int icalc, Vfetk *fetk[NOSH_MAXCALC],
 		} else if ((pbeparm->pbetype==PBE_LPBE)||(pbeparm->pbetype==PBE_LRPBE)) {
 			*totEnergy = Vfetk_energy(fetk[icalc], -1, 0);
 		} else VASSERT(0);
-		
+
 #ifndef VAPBSQUIET
-		Vnm_tprint(1, "      Total electrostatic energy = %1.12E kJ/mol\n", 
+		Vnm_tprint(1, "      Total electrostatic energy = %1.12E kJ/mol\n",
 				   Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na*(*totEnergy));
 		fflush(stdout);
 #endif
 	} else *totEnergy = 0;
-	
+
 	if (pbeparm->calcenergy == PCE_COMPS) {
-		
+
 		Vnm_tprint(2, "Error!  Verbose energy evaluation not available for FEM yet!\n");
 		Vnm_tprint(2, "E-mail nathan.baker@pnl.gov if you want this.\n");
 		*qfEnergy = 0;
 		*qmEnergy = 0;
 		*dielEnergy = 0;
-		
+
 	} else *nenergy = 0;
-	
+
 	return 1;
 }
 
-VPUBLIC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm, 
+VPUBLIC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 						 Vfetk *fetk[NOSH_MAXCALC]) {
-	
+
 	int nverts, marked;
-	
+
 	nverts = Gem_numVV(fetk[icalc]->gm);
 	if (nverts > feparm->maxvert) {
 		Vnm_tprint(1, "    Current number of vertices (%d) exceeds max (%d)!\n",
@@ -3773,7 +3774,7 @@ VPUBLIC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 		return 0;
 	}
 	Vnm_tprint(1, "      Mesh currently has %d vertices\n", nverts);
-	
+
 	switch(feparm->akeySOLVE) {
 		case FRT_UNIF:
 			Vnm_tprint(1, "      Commencing uniform refinement.\n");
@@ -3791,13 +3792,13 @@ VPUBLIC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 			Vnm_tprint(1, "      Commencing local-based refinement.\n.");
 			break;
 		default:
-			Vnm_tprint(2, "      Error -- unknown refinement type (%d)!\n", 
+			Vnm_tprint(2, "      Error -- unknown refinement type (%d)!\n",
 					   feparm->akeySOLVE);
 			return 0;
 			break;
 	}
-	
-	marked = AM_markRefine(fetk[icalc]->am, feparm->akeySOLVE, -1, 
+
+	marked = AM_markRefine(fetk[icalc]->am, feparm->akeySOLVE, -1,
 						   feparm->ekey, feparm->etol);
 	if (marked == 0) {
 		Vnm_tprint(1, "      Marked 0 simps; hit error/size tolerance.\n");
@@ -3811,131 +3812,131 @@ VPUBLIC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 	Vnm_redirect(0);
 	Gem_shapeChk(fetk[icalc]->gm);
 	Vnm_redirect(1);
-	
+
 	return 1;
 }
 
 
 VPUBLIC int writedataFE(int rank, NOsh *nosh, PBEparm *pbeparm, Vfetk *fetk) {
-	
+
 	char writestem[VMAX_ARGLEN];
 	char outpath[VMAX_ARGLEN];
 	int i, nx, ny, nz, writeit;
 	double hx, hy, hzed, xcent, ycent, zcent, xmin, ymin, zmin;
 	AM *am;
 	Bvec *vec;
-	
+
 	if (nosh->bogus) return 1;
-	
+
 	am = fetk->am;
 	vec = am->w0;
-	
-	for (i=0; i<pbeparm->numwrite; i++) { 
-		
+
+	for (i=0; i<pbeparm->numwrite; i++) {
+
 		writeit = 1;
-		
+
 		switch (pbeparm->writetype[i]) {
-			
+
 			case VDT_CHARGE:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write charge distribution for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_POT:
-				
+
 				Vnm_tprint(1, "    Writing potential to ");
 				Vfetk_fillArray(fetk, vec, VDT_POT);
 				break;
-				
+
 			case VDT_SMOL:
-				
+
 				Vnm_tprint(1, "    Writing molecular accessibility to ");
 				Vfetk_fillArray(fetk, vec, VDT_SMOL);
 				break;
-				
+
 			case VDT_SSPL:
-				
+
 				Vnm_tprint(1, "    Writing spline-based accessibility to ");
 				Vfetk_fillArray(fetk, vec, VDT_SSPL);
 				break;
-				
+
 			case VDT_VDW:
-				
+
 				Vnm_tprint(1, "    Writing van der Waals accessibility to ");
 				Vfetk_fillArray(fetk, vec, VDT_VDW);
 				break;
-				
+
 			case VDT_IVDW:
-				
+
 				Vnm_tprint(1, "    Writing ion accessibility to ");
 				Vfetk_fillArray(fetk, vec, VDT_IVDW);
 				break;
-				
+
 			case VDT_LAP:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write charge distribution for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_EDENS:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write energy density for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_NDENS:
-				
+
 				Vnm_tprint(1, "    Writing number density to ");
 				Vfetk_fillArray(fetk, vec, VDT_NDENS);
 				break;
-				
+
 			case VDT_QDENS:
-				
+
 				Vnm_tprint(1, "    Writing charge density to ");
 				Vfetk_fillArray(fetk, vec, VDT_QDENS);
 				break;
-				
+
 			case VDT_DIELX:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write x-shifted dielectric map for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_DIELY:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write y-shifted dielectric map for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_DIELZ:
-				
+
 				Vnm_tprint(2, "    Sorry; can't write z-shifted dielectric map for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			case VDT_KAPPA:
-				
+
 				Vnm_tprint(1, "    Sorry; can't write kappa map for FEM!\n");
 				writeit = 0;
 				break;
 
 			case VDT_ATOMPOT:
-				
+
 				Vnm_tprint(1, "    Sorry; can't write atom potentials for FEM!\n");
 				writeit = 0;
 				break;
-				
+
 			default:
-				
+
 				Vnm_tprint(2, "Invalid data type for writing!\n");
 				writeit = 0;
 				return 0;
 		}
-		
+
 		if (!writeit) return 0;
-		
-		
+
+
 #ifdef HAVE_MPI_H
 		sprintf(writestem, "%s-PE%d", pbeparm->writestem[i], rank);
 #else
@@ -3945,69 +3946,72 @@ VPUBLIC int writedataFE(int rank, NOsh *nosh, PBEparm *pbeparm, Vfetk *fetk) {
 			sprintf(writestem, "%s", pbeparm->writestem[i]);
 		}
 #endif
-		
+
 		switch (pbeparm->writefmt[i]) {
-			
+
 			case VDF_DX:
 				sprintf(outpath, "%s.%s", writestem, "dx");
 				Vnm_tprint(1, "%s\n", outpath);
 				Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DX);
 				break;
-				
+
 			case VDF_AVS:
 				sprintf(outpath, "%s.%s", writestem, "ucd");
 				Vnm_tprint(1, "%s\n", outpath);
 				Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_AVS);
 				break;
-				
+
 			case VDF_UHBD:
 				Vnm_tprint(2, "UHBD format not supported for FEM!\n");
 				break;
-				
+
 			case VDF_MCSF:
 				Vnm_tprint(2, "MCSF format not supported yet!\n");
 				break;
-				
+
 			default:
-				Vnm_tprint(2, "Bogus data format (%d)!\n", 
+				Vnm_tprint(2, "Bogus data format (%d)!\n",
 						   pbeparm->writefmt[i]);
 				break;
 		}
-		
+
 	}
-	
+
 	return 1;
 }
 #endif /* ifdef HAVE_MCX_H */
 
+/////////////////////////////////////////////////////////////////////////////////
+////////////// Modified for g_mmpbsa////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 					 int *nforce, AtomForce **atomForce, Valist *alist, double *AtomEnergyOut) {
 
 	int i;
-	
+
 	Vclist *clist = VNULL;
 	Vacc *acc = VNULL;
 	Vatom *atom = VNULL;
 	Vparam_AtomData *atomData = VNULL;
-	
+
 	int inhash[3];
 	int rc = 0;
-	
+
 	double sasa, sav;
-	
+
 	double nhash[3];
 	double sradPad, x, y, z;
 	double atomRadius, srad;
 	double *atomsasa, *atomwcaEnergy;
 	double energy = 0.0;        //WCA energy per atom
-	
+
 	double dist, charge, xmin, xmax, ymin, ymax, zmin, zmax;
 	double disp[3], center[3];
 	double soluteXlen, soluteYlen, soluteZlen;
 
 	atomsasa = (double *)Vmem_malloc(VNULL, Valist_getNumberAtoms(alist), sizeof(double));
 	atomwcaEnergy = (double *)Vmem_malloc(VNULL, Valist_getNumberAtoms(alist), sizeof(double));
-	
+
 	/* Determine solute length and charge*/
     atom = Valist_getAtom(alist, 0);
     xmin = Vatom_getPosition(atom)[0];
@@ -4032,33 +4036,33 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
         disp[0] = (x - center[0]);
         disp[1] = (y - center[1]);
         disp[2] = (z - center[2]);
-        dist = (disp[0]*disp[0]) + (disp[1]*disp[1]) + (disp[2]*disp[2]); 
+        dist = (disp[0]*disp[0]) + (disp[1]*disp[1]) + (disp[2]*disp[2]);
         dist = VSQRT(dist) + atomRadius;
         charge += Vatom_getCharge(Valist_getAtom(alist, i));
     }
     soluteXlen = xmax - xmin;
     soluteYlen = ymax - ymin;
     soluteZlen = zmax - zmin;
-	
+
 	/* Set up the hash table for the cell list */
 	Vnm_print(0, "APOL: Setting up hash table and accessibility object...\n");
 	nhash[0] = soluteXlen/0.5;
 	nhash[1] = soluteYlen/0.5;
 	nhash[2] = soluteZlen/0.5;
     for (i=0; i<3; i++) inhash[i] = (int)(nhash[i]);
-	
-	for (i=0;i<3;i++){ 
-        if (inhash[i] < 3) inhash[i] = 3; 
+
+	for (i=0;i<3;i++){
+        if (inhash[i] < 3) inhash[i] = 3;
         if (inhash[i] > MAX_HASH_DIM) inhash[i] = MAX_HASH_DIM;
 	}
-	
+
 	/* Pad the radius by 2x the maximum displacement value */
 	srad = apolparm->srad;
 	sradPad = srad + (2*apolparm->dpos);
-	clist = Vclist_ctor(alist, sradPad , inhash, CLIST_AUTO_DOMAIN, 
+	clist = Vclist_ctor(alist, sradPad , inhash, CLIST_AUTO_DOMAIN,
 									VNULL, VNULL);
 	acc = Vacc_ctor(alist, clist, apolparm->sdens);
-	
+
 	/* Get WAT (water) LJ parameters from Vparam object */
 	if (param == VNULL && (apolparm->bconc != 0.0)) {
 		Vnm_tprint(2, "initAPOL:  Got NULL Vparam object!\n");
@@ -4070,7 +4074,7 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 		Vnm_tprint(2, "initAPOL:  where the relevant parameter files can be found in apbs/tools/conversion/param/vparam.\n");
 		return VRC_FAILURE;
 	}
-	
+
 	if (apolparm->bconc != 0.0){
 		atomData = Vparam_getAtomData(param, "WAT", "OW");
 		if (atomData == VNULL) atomData = Vparam_getAtomData(param, "WAT", "O");
@@ -4084,7 +4088,7 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 		apolparm->watsigma = atomData->radius;
 		apolparm->setwat = 1;
 	}
-	
+
 	/* Calculate Energy and Forces */
 	if(apolparm->calcforce) {
 		rc = forceAPOL(acc, mem, apolparm, nforce, atomForce, alist, clist);
@@ -4093,11 +4097,11 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 			return VRC_FAILURE;
 		}
 	}
-	
+
 	/* Get the SAV and SAS */
 	sasa = 0.0;
 	sav = 0.0;
-	
+
 	if (apolparm->calcenergy) {
 		if (VABS(apolparm->gamma) > VSMALL) {
 			/* Total Solvent Accessible Surface Area (SASA) */
@@ -4121,7 +4125,7 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 		if (VABS(apolparm->press) > VSMALL){
 		    apolparm->sav = Vacc_totalSAV(acc, clist, apolparm, srad);
 		} else {
-			apolparm->sav = 0.0; 
+			apolparm->sav = 0.0;
 		}
 
 		/* wcaEnergy integral code */
@@ -4133,14 +4137,14 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 					Vnm_print(2, "Error in apolar energy calculation!\n");
 					return 0;
 				}
-				atomwcaEnergy[i] = energy;		
+				atomwcaEnergy[i] = energy;
 			}
 			/* Total WCA Energy */
 			rc = Vacc_wcaEnergy(acc, apolparm, alist, clist);
 			if (rc == 0) {
 				Vnm_print(2, "Error in apolar energy calculation!\n");
 				return 0;
-			}		
+			}
 		} else {
 			apolparm->wcaEnergy = 0.0;
 		}
@@ -4159,7 +4163,7 @@ VPUBLIC int initAPOL(NOsh *nosh, Vmem *mem, Vparam *param, APOLparm *apolparm,
 	Vmem_free(VNULL, Valist_getNumberAtoms(alist), sizeof(double), (void **)&(atomwcaEnergy));
 	Vclist_dtor(&clist);
 	Vacc_dtor(&acc);
-	
+
 	return VRC_SUCCESS;
 }
 
@@ -4191,7 +4195,7 @@ VPUBLIC int energyAPOL(APOLparm *apolparm, double sasa, double sav, double atoms
 			Vnm_print(1,"energyAPOL: Cannot calculate component energy, skipping.\n");
 			break;
 		case ACE_TOTAL:
-			energy = (apolparm->gamma*sasa) + (apolparm->press*sav) 
+			energy = (apolparm->gamma*sasa) + (apolparm->press*sav)
 						+ (apolparm->wcaEnergy);
 #ifndef VAPBSQUIET
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4222,34 +4226,34 @@ VPUBLIC int energyAPOL(APOLparm *apolparm, double sasa, double sav, double atoms
 			Vnm_print(2,"energyAPOL: Error in energyAPOL. Unknown option.\n");
 			break;
 	}
-	
+
 	return VRC_SUCCESS;
 }
 
-VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm, 
+VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
 					  int *nforce, AtomForce **atomForce, Valist *alist,
 					  Vclist *clist){
-	
+
 	int i,j,natom;
-	
+
 	double srad; /* Probe radius */
 	double xF, yF, zF;	/* Individual forces */
-	
+
 	double press, gamma, offset, bconc;
 	double dSASA[3], dSAV[3], force[3];
-	
+
 	double *apos;
-	
+
 	Vatom *atom = VNULL;
-	
+
 	srad = apolparm->srad;
 	press = apolparm->press;
 	gamma = apolparm->gamma;
 	offset = apolparm->dpos;
 	bconc = apolparm->bconc;
-		
+
 	natom = Valist_getNumberAtoms(alist);
-	
+
 	/* Check to see if we need to build the surface */
     if (acc->surf == VNULL) {
         acc->surf = Vmem_malloc(acc->mem, natom, sizeof(VaccSurf *));
@@ -4261,7 +4265,7 @@ VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
             acc->surf[i] = Vacc_atomSurf(acc, atom, acc->refSphere, srad);
         }
     }
-	
+
 	if(apolparm->calcforce == ACF_TOTAL){
 		*nforce = 1;
 		if(*atomForce == VNULL){
@@ -4272,40 +4276,40 @@ VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
 			*atomForce = (AtomForce *)Vmem_malloc(mem, *nforce,
 												  sizeof(AtomForce));
 		}
-		
+
 		/* Clear out force arrays */
 		for (j=0; j<3; j++) {
 			(*atomForce)[0].sasaForce[j] = 0.0;
 			(*atomForce)[0].savForce[j] = 0.0;
 			(*atomForce)[0].wcaForce[j] = 0.0;
 		}
-		
+
 		for (i=0; i<natom; i++) {
 			atom = Valist_getAtom(alist, i);
-			
+
 			for(j=0;j<3;j++){
 				dSASA[j] = 0.0;
 				dSAV[j] = 0.0;
 				force[j] = 0.0;
 			}
-			
+
 			if(VABS(gamma) > VSMALL) Vacc_atomdSASA(acc, offset, srad, atom, dSASA);
 			if(VABS(press) > VSMALL) Vacc_atomdSAV(acc, srad, atom, dSAV);
 			if(VABS(bconc) > VSMALL) Vacc_wcaForceAtom(acc, apolparm, clist, atom, force);
-			
+
 			for(j=0;j<3;j++){
 				(*atomForce)[0].sasaForce[j] += dSASA[j];
 				(*atomForce)[0].savForce[j] += dSAV[j];
 				(*atomForce)[0].wcaForce[j] += force[j];
 			}
 		}
-		
+
 		Vnm_tprint( 1, "  Printing net forces (kJ/mol/A)\n");
 		Vnm_tprint( 1, "  Legend:\n");
 		Vnm_tprint( 1, "    sasa  -- SASA force\n");
 		Vnm_tprint( 1, "    sav   -- SAV force\n");
 		Vnm_tprint( 1, "    wca   -- WCA force\n\n");
-				
+
 		Vnm_tprint( 1, "  sasa  %4.3e %4.3e %4.3e\n",
 					(*atomForce)[0].sasaForce[0],
 					(*atomForce)[0].sasaForce[1],
@@ -4318,7 +4322,7 @@ VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
 					(*atomForce)[0].wcaForce[0],
 					(*atomForce)[0].wcaForce[1],
 					(*atomForce)[0].wcaForce[2]);
-		
+
 	} else if (apolparm->calcforce == ACF_COMPS ){
 		*nforce = Valist_getNumberAtoms(alist);
 		if(*atomForce == VNULL){
@@ -4337,43 +4341,43 @@ VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
 		Vnm_tprint( 1, "    sasa n -- SASA force for atom n\n");
 		Vnm_tprint( 1, "    sav  n -- SAV force for atom n\n");
 		Vnm_tprint( 1, "    wca  n -- WCA force for atom n\n\n");
-		
+
 		Vnm_tprint( 1, "    gamma    %f\n" \
 					   "    pressure %f\n" \
 					   "    bconc    %f \n\n",
 							gamma,press,bconc);
 #endif
-		
+
 		for (i=0; i<natom; i++) {
 			atom = Valist_getAtom(alist, i);
-			
+
 			for(j=0;j<3;j++){
 				dSASA[j] = 0.0;
 				dSAV[j] = 0.0;
 				force[j] = 0.0;
 			}
-			
+
 			/* Clear out force arrays */
 			for (j=0; j<3; j++) {
 				(*atomForce)[i].sasaForce[j] = 0.0;
 				(*atomForce)[i].savForce[j] = 0.0;
 				(*atomForce)[i].wcaForce[j] = 0.0;
 			}
-			
+
 			if(VABS(gamma) > VSMALL) Vacc_atomdSASA(acc, offset, srad, atom, dSASA);
 			if(VABS(press) > VSMALL) Vacc_atomdSAV(acc, srad, atom, dSAV);
 			if(VABS(bconc) > VSMALL) Vacc_wcaForceAtom(acc,apolparm,clist,atom,force);
-				
+
 			xF = -((gamma*dSASA[0]) + (press*dSAV[0]) + (bconc*force[0]));
 			yF = -((gamma*dSASA[1]) + (press*dSAV[1]) + (bconc*force[1]));
 			zF = -((gamma*dSASA[2]) + (press*dSAV[2]) + (bconc*force[2]));
-			
+
 			for(j=0;j<3;j++){
 				(*atomForce)[i].sasaForce[j] += dSASA[j];
 				(*atomForce)[i].savForce[j] += dSAV[j];
 				(*atomForce)[i].wcaForce[j] += force[j];
 			}
-			
+
 #ifndef VAPBSQUIET
 			Vnm_print( 1, "  tot  %i %4.3e %4.3e %4.3e\n",
 						i,
@@ -4396,15 +4400,13 @@ VPUBLIC int forceAPOL(Vacc *acc, Vmem *mem, APOLparm *apolparm,
 						(*atomForce)[i].wcaForce[1],
 						(*atomForce)[i].wcaForce[2]);
 #endif
-			
+
 		}
 	} else *nforce = 0;
-	
+
 #ifndef VAPBSQUIET
 	Vnm_print(1,"\n");
 #endif
-	
+
 	return VRC_SUCCESS;
 }
-
-

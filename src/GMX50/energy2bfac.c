@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,23 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
-#include "statutil.h"
-#include "typedefs.h"
-#include "smalloc.h"
-#include "vec.h"
-#include "tpxio.h"
+
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/vec.h"
+#include "gromacs/legacyheaders/gmx_fatal.h"
+#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/legacyheaders/index.h"
+#include "gromacs/utility/smalloc.h"
+#include "gromacs/fileio/tpxio.h"
+#include "gromacs/fileio/pdbio.h"
+#include "gromacs/fileio/filenm.h"
+#include "gromacs/fileio/futil.h"
+#include "gromacs/commandline/pargs.h"
+#include "gromacs/commandline/cmdlineinit.h"
+
+
 
 void CopyRightMsg()	{
 	char *copyright[] =	{
@@ -50,7 +61,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"      Copyright (C) 2013, 2014 Rashmi Kumari and Andrew Lynn            ",
+			"      Copyright (C) 2013 - 2015 Rashmi Kumari and Andrew Lynn           ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -94,7 +105,7 @@ int get_energy( char *fnEnergy, int nres, real *energy)	{
 	FILE *fin;
 	real *tmpData;
 
-	fin = ffopen(fnEnergy,"r");
+	fin = gmx_ffopen(fnEnergy,"r");
 	snew(tmpData, 1);
 
 	while (fgetc(fin) != EOF)	{
@@ -242,13 +253,13 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
 	  }
   }
 
-  fComplex = ffopen(opt2fn("-c", NFILE, fnm),"w");
+  fComplex = gmx_ffopen(opt2fn("-c", NFILE, fnm),"w");
   write_pdbfile_indexed(fComplex,NULL,atoms,xtop,ePBC,box,' ',-1,isize[2],index[2],NULL,TRUE);
 
-  fS1 = ffopen(opt2fn("-s1", NFILE, fnm),"w");
+  fS1 = gmx_ffopen(opt2fn("-s1", NFILE, fnm),"w");
   write_pdbfile_indexed(fS1,NULL,atoms,xtop,ePBC,box,' ',-1,isize[0],index[0],NULL,TRUE);
 
-  fS2 = ffopen(opt2fn("-s2", NFILE, fnm),"w");
+  fS2 = gmx_ffopen(opt2fn("-s2", NFILE, fnm),"w");
   write_pdbfile_indexed(fS2,NULL,atoms,xtop,ePBC,box,' ',-1,isize[1],index[1],NULL,TRUE);
 
 return 0;
@@ -257,7 +268,6 @@ return 0;
 
 int main(int argc, char *argv[])
 {
-  gmx_energy2bfac(argc, argv);
+  gmx_run_cmain(argc, argv, &gmx_energy2bfac);
   return 0;
 }
-

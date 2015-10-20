@@ -4,7 +4,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ cmake_minimum_required(VERSION 2.8)
 project(g_mmpbsa)
 
 set(g_mmpbsa_MAJOR_VERSION 1)
-set(g_mmpbsa_MINOR_VERSION 5)
+set(g_mmpbsa_MINOR_VERSION 6)
 set(g_mmpbsa_PATCH_VERSION 0)
 set(g_mmpbsa_VERSION
   ${g_mmpbsa_MAJOR_VERSION}.${g_mmpbsa_MINOR_VERSION}.${g_mmpbsa_PATCH_VERSION})
@@ -63,11 +63,14 @@ foreach(p LIB BIN INCLUDE CMAKE)
 	endif()
 endforeach()
 
+# Cmake modules/macros are in a subdirectory to keep this file cleaner
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # set up include-directories
 include_directories(
 	"${g_mmpbsa_SOURCE_DIR}"   # to find src/*.h
 	"${g_mmpbsa_BINARY_DIR}")  # to find src/config.h
-	 
+
 # Add sub-directories
 add_subdirectory(src)
 

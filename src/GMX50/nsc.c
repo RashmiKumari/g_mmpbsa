@@ -45,11 +45,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdarg.h>
+
 /* Modified DvdS */
-#include "pbc.h"
-#include "macros.h"
-#include "vec.h"
-#include "smalloc.h"
+#include "gromacs/legacyheaders/pbc.h"
+#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/legacyheaders/vec.h"
+#include "gromacs/utility/smalloc.h"
 #include "g_mmpbsa.h"
 
 #define TEST_NSC 0

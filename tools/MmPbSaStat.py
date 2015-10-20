@@ -5,7 +5,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,10 @@
 #
 #
 
+from __future__ import absolute_import, division, print_function
+from builtins import range
+from builtins import object
+
 import re
 import sys
 import numpy as np
@@ -45,7 +49,11 @@ import math
 def main():
 	args = ParseOptions()
 	#File => Frame wise component energy
-	frame_wise = open(args.outfr, 'w')
+	try:
+		frame_wise = open(args.outfr, 'w')
+	except:
+		raise IOError ('Could not open file {0} for writing. \n' .format(args.outfr))
+
 	frame_wise.write('#Time E_VdW_mm(Protein)\tE_Elec_mm(Protein)\tE_Pol(Protein)\tE_Apol(Protein)\tE_VdW_mm(Ligand)\tE_Elec_mm(Ligand)\tE_Pol(Ligand)\tE_Apol(Ligand)\tE_VdW_mm(Complex)\tE_Elec_mm(Complex)\tE_Pol(Complex)\tE_Apol(Complex)\tDelta_E_mm\tDelta_E_Pol\tDelta_E_Apol\tDelta_E_binding\n')
 	#Complex Energy
 	c = []
@@ -62,7 +70,7 @@ def main():
 	#Summary in output files => "--outsum" and "--outmeta" file options
 	Summary_Output_File(c, args)
 
-class Complex():
+class Complex(object):
 	def __init__(self,MmFile,PolFile,APolFile):
 		self.TotalEn = []
 		self.Vdw, self.Elec, self.Pol, self.Sas, self.Sav, self.Wca =[], [], [], [], [], []
@@ -73,14 +81,14 @@ class Complex():
 		self.CI = []
 		self.FinalAvgEnergy = 0
 		self.StdErr = 0
-	
+
 	def CalcEnergy(self,args,frame_wise,idx):
 		mmEn = ReadData(self.MmFile,n=7)
 		polEn = ReadData(self.PolFile,n=4)
 		apolEn = ReadData(self.APolFile,n=10)
 		CheckEnData(mmEn,polEn,apolEn)
-	
-		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav, Wca = [], [], [], [], [], [], [], [], []	
+
+		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav, Wca = [], [], [], [], [], [], [], [], []
 		for i in range(len(mmEn[0])):
 			#Vacuum MM
 			Energy = mmEn[5][i] + mmEn[6][i] - (mmEn[1][i] + mmEn[2][i] + mmEn[3][i] + mmEn[4][i])
@@ -125,7 +133,7 @@ class Complex():
 			self.Elec.append(error)
 			avg_energy, error = BootStrap(Pol,bsteps)
 			self.Pol.append(avg_energy)
-			self.Pol.append(error)	
+			self.Pol.append(error)
 			avg_energy, error = BootStrap(Sas,bsteps)
 			self.Sas.append(avg_energy)
 			self.Sas.append(error)
@@ -137,9 +145,9 @@ class Complex():
 			self.Wca.append(error)
 			#Bootstrap => Final Average Energy
 			self.AvgEnBS, AvgEn, EnErr, CI = ComplexBootStrap(self.TotalEn,bsteps)
-                        self.FinalAvgEnergy = AvgEn
-                        self.StdErr = EnErr
-                        self.CI = CI
+			self.FinalAvgEnergy = AvgEn
+			self.StdErr = EnErr
+			self.CI = CI
 		#If not bootstrap then average and standard deviation
 		else:
 			self.Vdw.append(np.mean(Vdw))
@@ -156,17 +164,23 @@ class Complex():
 			self.Wca.append(np.std(Wca))
 			self.FinalAvgEnergy = np.mean(self.TotalEn)
 			self.StdErr = np.std(self.TotalEn)
-				
+
 
 def Summary_Output_File(AllComplex,args):
-        fs = open(args.outsum,'w')
+	try:
+		fs = open(args.outsum,'w')
+	except:
+		raise IOError ('Could not open file {0} for writing. \n' .format(args.outsum))
 
 	if args.multiple:
-		fm = open(args.outmeta,'w')
+		try:
+			fm = open(args.outmeta,'w')
+		except:
+			raise IOError ('Could not open file {0} for writing. \n' .format(args.outmeta))
 		fm.write('# Complex_Number\t\tTotal_Binding_Energy\t\tError\n')
-	
+
 	for n in range(len(AllComplex)):
-		fs.write('\n\n#Complex Number: %4d\n' % (n+1))	
+		fs.write('\n\n#Complex Number: %4d\n' % (n+1))
 		fs.write('===============\n   SUMMARY   \n===============\n\n')
 		fs.write('\n van der Waal energy      = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Vdw[0], AllComplex[n].Vdw[1]))
 		fs.write('\n Electrostattic energy    = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Elec[0],AllComplex[n].Elec[1]))
@@ -178,22 +192,22 @@ def Summary_Output_File(AllComplex,args):
 		fs.write('\n===============\n    END     \n===============\n\n')
 
 		if args.multiple:
-				fm.write('%5d %15.3lf %7.3lf\n' % (n+1 , AllComplex[n].FinalAvgEnergy, AllComplex[n].StdErr))
+			fm.write('%5d %15.3lf %7.3lf\n' % (n+1 , AllComplex[n].FinalAvgEnergy, AllComplex[n].StdErr))
 
 def CheckEnData(mmEn,polEn,apolEn):
 	frame = len(mmEn[0])
 	for i in range(len(mmEn)):
 		if(len(mmEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
+			raise ValueError("In MM file, size of columns are not equal.")
+
 	for i in range(len(polEn)):
 		if(len(polEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
-	for i in range(len(polEn)):
-		if(len(polEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
+			raise ValueError("In Polar file, size of columns are not equal.")
+
+	for i in range(len(apolEn)):
+		if(len(apolEn[i]) != frame):
+			raise ValueError("In APolar file, size of columns are not equal.")
+
 
 def ParseOptions():
 	parser = argparse.ArgumentParser()
@@ -202,42 +216,47 @@ def ParseOptions():
                                                        [MM file] [Polar file] [ Non-polar file] ',action="store", default='metafile.dat', metavar='metafile.dat')
 	parser.add_argument("-m", "--molmech", help='Vacuum Molecular Mechanics energy file obtained from g_mmpbsa',action="store", default='energy_MM.xvg', metavar='energy_MM.xvg')
 	parser.add_argument("-p", "--polar", help='Polar solvation energy file obtained from g_mmpbsa',action="store",default='polar.xvg', metavar='polar.xvg')
-	parser.add_argument("-a", "--apolar", help='Non-Polar solvation energy file obtained from g_mmpbsa',action="store",default='apolar.xvg',metavar='polar.xvg')
+	parser.add_argument("-a", "--apolar", help='Non-Polar solvation energy file obtained from g_mmpbsa',action="store",default='apolar.xvg',metavar='apolar.xvg')
 	parser.add_argument("-bs", "--bootstrap", help='If given, Enable Boot Strap analysis',action="store_true")
 	parser.add_argument("-nbs", "--nbstep", help='Number of boot strap steps for average energy calculation',action="store", type=int, default=500, metavar=500)
 	parser.add_argument("-of", "--outfr", help='Energy File: All energy components frame wise',action="store",default='full_energy.dat', metavar='full_energy.dat')
 	parser.add_argument("-os", "--outsum", help='Final Energy File: Full Summary of energy components',action="store",default='summary_energy.dat', metavar='summary_energy.dat')
 	parser.add_argument("-om", "--outmeta", help='Final Energy File for Multiple Complexes: Complex wise final binding nergy',action="store",default='meta_energy.dat',metavar='meta_energy.dat')
-	
+
 	if len(sys.argv) < 2:
+		print('ERROR: No input files. Need help!!!')
 		parser.print_help()
-		exit(1)
-	
+		sys.exit(1)
+
 	args = parser.parse_args()
-	
+
 	if args.multiple:
 		if not os.path.exists(args.metafile):
-			print '\nERROR: {0} not found....\n' .format(args.metafile)
+			print('\nERROR: {0} not found....\n' .format(args.metafile))
 			parser.print_help()
-			exit(1)
+			sys.exit(1)
 	else:
 		if not os.path.exists(args.molmech):
-			print '\nERROR: {0} not found....\n' .format(args.molmech)
+			print('\nERROR: {0} not found....\n' .format(args.molmech))
 			parser.print_help()
-			exit(1)
+			sys.exit(1)
 		if not os.path.exists(args.polar):
-			print '\nERROR: {0} not found....\n' .format(args.polar)
+			print('\nERROR: {0} not found....\n' .format(args.polar))
 			parser.print_help()
-			exit(1)
+			sys.exit(1)
 		if not os.path.exists(args.apolar):
-			print '\nERROR: {0} not found....\n' .format(args.apolar)
+			print('\nERROR: {0} not found....\n' .format(args.apolar))
 			parser.print_help()
-			exit(1)
-	
+			sys.exit(1)
+
 	return args
 
 def ReadData(FileName,n=2):
-	infile = open(FileName,'r')
+	try:
+		infile = open(FileName,'r')
+	except:
+		raise IOError('Could not open file {0} for reading. \n' .format(FileName))
+
 	x, data = [],[]
 	for line in infile:
 		line = line.rstrip('\n')
@@ -249,7 +268,12 @@ def ReadData(FileName,n=2):
 	for j in range(0,n):
 		x_temp =[]
 		for i in range(len(data)):
-			x_temp.append(float(data[i][j]))
+			try:
+				value = float(data[i][j])
+			except:
+				raise FloatingPointError('\nCould not convert {0} to floating point number.. Something is wrong in {1}..\n' .format(data[i][j], FileName))
+
+			x_temp.append(value)
 		x.append(x_temp)
 	return x
 
@@ -288,22 +312,20 @@ def ReadMetafile(metafile):
 		line = line.rstrip('\n')
 		if not line.strip():
 			continue
-		temp = line.split()	
+		temp = line.split()
 		MmFile.append(temp[0])
 		PolFile.append(temp[1])
 		APolFile.append(temp[2])
-		
-		
+
 		if not os.path.exists(temp[0]):
-			print '\n{0} not found....\n' .format(temp[0])
-			exit(1)
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[0]))
+
 		if not os.path.exists(temp[1]):
-			print '\n{0} not found....\n' .format(temp[1])
-			exit(1)
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[1]))
+
 		if not os.path.exists(temp[2]):
-			print '\n{0} not found....\n' .format(temp[2])
-			exit(1)
-						
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[2]))
+
 	return MmFile, PolFile, APolFile
 
 if __name__=="__main__":

@@ -1,6 +1,6 @@
 /**
  *  @file    main.c
- *  @ingroup Frontend
+ *  @ingroup  Frontend_APBS
  *  @author  Nathan Baker
  *  @brief   APBS "front end" program using formatted input files.
  *
@@ -72,10 +72,14 @@
 
 #include <time.h>
 
-#include "apbs14_routines.h"
+#include "apbs_routines.h"
 
 //// Added for the g_mmpbsa/////////////
-#include "smalloc.h"
+#ifdef HAVE_GROMACS50
+#include "gromacs/utility/smalloc.h"
+#else
+#include "gromacs/smalloc.h"
+#endif
 ///////////////////////////////////////
 
 // VEMBED(rcsid="$Id$")      // Removed for the g_mmpbsa
@@ -88,8 +92,7 @@
  */
 
 /* Modified main function for g_mmpbsa */
- int apbs( int argc,  char **argv, char *input_path, double *PolarEnergy, 
-          double *APolarEnergy, double *AtomEnergyOut)
+ int apbs( int argc,  char **argv, char *input_path, double *PolarEnergy, double *APolarEnergy, double *AtomEnergyOut)
 {
     // PCE: Adding below variables temporarily
     clock_t ts, te;
@@ -671,7 +674,7 @@
                     VJMPERR1(0);
                 }
                 break;
-                
+
         /* Boundary Element (tabi) */
             case NCT_BEM:
 #ifdef ENABLE_BEM
@@ -801,13 +804,13 @@
                 fflush(stdout);
                 fflush(stderr);
                 break;
-                
+
             default:
                 Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
                 exit(2);
                 break;
             }
-              
+
     }
 
     //Clear out the parameter file memory

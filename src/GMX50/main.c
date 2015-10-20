@@ -1,10 +1,10 @@
-/*
+/**
  * This file is part of g_mmpbsa.
  *
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,14 +36,24 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include "statutil.h"
-#include "typedefs.h"
-#include "smalloc.h"
-#include "vec.h"
-#include "tpxio.h"
-#include "rmpbc.h"
-#include "xvgr.h"
-#include "string2.h"
+#include <string.h>
+
+#include "gromacs/fileio/tpxio.h"
+#include "gromacs/fileio/trxio.h"
+#include "gromacs/fileio/filenm.h"
+#include "gromacs/fileio/futil.h"
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/rmpbc.h"
+#include "gromacs/legacyheaders/pbc.h"
+#include "gromacs/legacyheaders/xvgr.h"
+#include "gromacs/legacyheaders/gmx_fatal.h"
+#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/legacyheaders/index.h"
+#include "gromacs/utility/cstringutil.h"
+#include "gromacs/utility/smalloc.h"
+#include "gromacs/commandline/pargs.h"
+#include "gromacs/commandline/cmdlineinit.h"
+
 
 #include "g_mmpbsa.h"
 
@@ -55,7 +65,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"       Copyright (C) 2013, 2014  Rashmi Kumari and Andrew Lynn          ",
+			"       Copyright (C) 2013 - 2015 Rashmi Kumari and Andrew Lynn          ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -190,7 +200,7 @@ void cite(gmx_bool bPolar, gmx_bool bAPolar, t_APolKey APolarKeyWords){
 	fprintf(stderr,"-------- -------- ------------------- -------- --------\n");
 	fprintf(stderr,"g_mmpbsa—A GROMACS Tool for High-Throughput MM-PBSA Calculations.\n");
 	fprintf(stderr,"Kumari R. et al. (2014)\n");
-	fprintf(stderr,"J. Chem. Inf. Model., Article ASAP\n");
+	fprintf(stderr,"J. Chem. Inf. Model., 54 (7), 1951–1962\n");
 	fprintf(stderr,"URL: http://pubs.acs.org/doi/abs/10.1021/ci500020m \n");
 	fprintf(stderr,"-------- -------- ------------------- -------- --------\n\n");
 
@@ -243,17 +253,17 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   };
 
   /* Command-line arguments */
-  static real rvdw = 1.0, pdie = 1 ;
+  static real rvdw = 0.1, pdie = 1 ;
   static int ndots = 24;
   static gmx_bool bDIFF = TRUE, bMM = TRUE, bDCOMP = FALSE, bPBSA = FALSE, bFocus = FALSE;
   gmx_bool bIncl14 = FALSE, bVerbose=FALSE;
-  static const char *rtype[] = { NULL, "bondi", "mbondi", "mbondi2", "amber", NULL };
+  static const char *rtype[] = { NULL, "bondi", "mbondi", "mbondi2", "force-field", NULL };
 
   t_pargs pa[] =
         {
           { "-silent", FALSE,  etBOOL, {&bVerbose}, "Display messages, output and errors from external APBS program. Only works with external APBS program" },
           { "-rad",    FALSE,  etENUM, { rtype   }, "van der Waal radius type" },
-          { "-rvdw",   FALSE,  etREAL, { &rvdw   }, "Default van der Waal radius (in nm) if not found" },
+          { "-rvdw",   FALSE,  etREAL, { &rvdw   }, "Default van der Waal radius (in nm) if radius not found for any atom-types" },
           { "-mme",    TRUE,   etBOOL, { &bMM    }, "To calculate vacuum molecular mechanics energy" },
           { "-pdie",   TRUE,   etREAL, { &pdie   }, "Dielectric constant of solute. Should be same as of polar solvation" },
           { "-incl_14",FALSE,  etBOOL, { &bIncl14}, "Include 1-4 atom-pairs, exclude 1-2 and 1-3 atom pairs during MM calculation. Should be \"yes\" when groups are bonded with each other." },
@@ -334,6 +344,9 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT | PCA_BE_NICE, NFILE, fnm,
       asize(pa), pa, asize(desc), desc, 0, NULL, &oenv);
 
+  // change rvdw to Angstrom
+  rvdw = rvdw * 10;
+
   /* Reverting silent to verbosity for easy use */
   if (bVerbose==FALSE)
 	  bVerbose = TRUE;
@@ -406,7 +419,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
     eRadType = eMbondi2;
   }
 
-  if (strcmp(rtype[0], "amber") == 0)
+  if (strcmp(rtype[0], "force-field") == 0)
 	  eRadType = eFF;
 
 ///////////END/////
@@ -705,7 +718,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 ////Removing PBC from first frame
   natoms = read_first_x(oenv, &status, ftp2fn(efTRX, NFILE, fnm), &t, &x, box);
   gmx_rmpbc_t gpbc = NULL;
-  gpbc = gmx_rmpbc_init(&top.idef, ePBC, natoms, box);
+  gpbc = gmx_rmpbc_init(&top.idef, ePBC, natoms);
 ////END////
 
 ////OPENING of OUTPUT XVG FILES and Writing Legends
@@ -752,7 +765,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   if (bDCOMP)
     {
 	  if(bMM)	{
-		  fDecompMM = ffopen(fnDecompMM,"w");
+		  fDecompMM = gmx_ffopen(fnDecompMM,"w");
 		  fprintf(fDecompMM,"# Time\t");
 		  for(i=0;i<top.atoms.nres;i++)
 		  {
@@ -768,7 +781,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 	  }
 
 	  if(bPolar)	{
-		  fDecompPol = ffopen(fnDecompPol,"w");
+		  fDecompPol = gmx_ffopen(fnDecompPol,"w");
 		  fprintf(fDecompPol,"# Time\t");
 		  for(i=0;i<top.atoms.nres;i++)
 		  {
@@ -781,7 +794,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 	  }
 
 	  if(bAPolar)	{
-		  fDecompAPol = ffopen(fnDecompAPol,"w");
+		  fDecompAPol = gmx_ffopen(fnDecompAPol,"w");
 		  fprintf(fDecompAPol,"# Time\t");
 		  for(i=0;i<top.atoms.nres;i++)
 		  {
@@ -1112,7 +1125,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
         }
       nframe++;
     }
-  while (read_next_x(oenv, status, &t, natoms, x, box));
+  while (read_next_x(oenv, status, &t, x, box));
 
   cite(bPolar, bAPolar, APolarKeyWords);
   remove("io.mc");
@@ -1130,6 +1143,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-  gmx_do_mmpbsa(argc, argv);
+  gmx_run_cmain(argc, argv, &gmx_do_mmpbsa);
+
   return 0;
 }

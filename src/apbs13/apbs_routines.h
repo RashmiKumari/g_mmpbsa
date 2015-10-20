@@ -1,12 +1,11 @@
 /**
- * @defgroup  Frontend  High-level front-end routines
+ * @defgroup  MMPBSA_APBS  APBS routines modified for g_mmpbsa
  */
-
 /**
- *  @file    routines.h
+ *  @file    apbs13/apbs_routines.h
  *  @author  Nathan Baker
- *  @brief   Header file for front end auxiliary routines
- *  @ingroup  Frontend
+ *  @brief   APBS-1.3 Header file for front end routines
+ *  @ingroup  Frontend_APBS
  *  @version $Id: routines.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @attention
  *  @verbatim
@@ -20,21 +19,21 @@
  *
  * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
  *
  * -  Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.  
- * 
+ * list of conditions and the following disclaimer.
+ *
  * - Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation
  * and/or other materials provided with the distribution.
- * 
+ *
  * - Neither the name of Washington University in St. Louis nor the names of its
  * contributors may be used to endorse or promote products derived from this
  * software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -58,23 +57,23 @@
 #ifndef _APBS13_ROUTINES_H_
 #define _APBS13_ROUTINES_H_
 
-#include "apbs/apbs.h"  
-#include "apbs/nosh.h"  
-#include "apbs/mgparm.h"  
-#include "apbs/pbeparm.h"  
-#include "apbs/femparm.h"  
-#include "apbs/vparam.h"  
+#include "apbs/apbs.h"
+#include "apbs/nosh.h"
+#include "apbs/mgparm.h"
+#include "apbs/pbeparm.h"
+#include "apbs/femparm.h"
+#include "apbs/vparam.h"
 #include "apbs/vgrid.h"
 #include "apbs/vacc.h"
 
 /**
  * @brief  Return code for APBS during failure
- * @ingroup  Frontend */
+ * @ingroup  Frontend_APBS */
 #define APBSRC 13
 
 /**
  * @brief  Structure to hold atomic forces
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker */
 struct AtomForce {
    double ibForce[3];  /**< Ion-boundary force */
@@ -87,12 +86,12 @@ struct AtomForce {
 
 /**
  * @brief  Define AtomForce type
- * @ingroup  Frontend */
+ * @ingroup  Frontend_APBS */
 typedef struct AtomForce AtomForce;
 
 /**
  * @brief  Loads and returns parameter object
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @returns  Pointer to parameter object or NULL */
 VEXTERNC Vparam* loadParameter(
@@ -102,7 +101,7 @@ VEXTERNC Vparam* loadParameter(
 
 /**
  * @brief  Load the molecules given in NOsh into atom lists
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @returns  1 if successful, 0 otherwise */
 VEXTERNC int loadMolecules(
@@ -115,7 +114,7 @@ VEXTERNC int loadMolecules(
 
 /**
  * @brief  Destroy the loaded molecules
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  alist  List of atom list objects */
@@ -123,7 +122,7 @@ VEXTERNC void killMolecules(NOsh *nosh, Valist *alist[NOSH_MAXMOL]);
 
 /**
  * @brief  Load the dielectric maps given in NOsh into grid objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  dielXMap  List of x-shifted dielectric maps
@@ -135,7 +134,7 @@ VEXTERNC int loadDielMaps(NOsh *nosh, Vgrid *dielXMap[NOSH_MAXMOL],
 
 /**
  * @brief  Destroy the loaded dielectric
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  dielXMap  List of x-shifted dielectric maps
@@ -146,7 +145,7 @@ VEXTERNC void killDielMaps(NOsh *nosh, Vgrid *dielXMap[NOSH_MAXMOL],
 
 /**
  * @brief  Load the kappa maps given in NOsh into grid objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  kappa  List of kappa maps
@@ -154,8 +153,8 @@ VEXTERNC void killDielMaps(NOsh *nosh, Vgrid *dielXMap[NOSH_MAXMOL],
 VEXTERNC int loadKappaMaps(NOsh *nosh, Vgrid *kappa[NOSH_MAXMOL]);
 
 /**
- * @brief  Destroy the loaded kappa maps 
- * @ingroup  Frontend
+ * @brief  Destroy the loaded kappa maps
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  kappa  List of kappa maps */
@@ -163,7 +162,7 @@ VEXTERNC void killKappaMaps(NOsh *nosh, Vgrid *kappa[NOSH_MAXMOL]);
 
 /**
  * @brief  Load the potential maps given in NOsh into grid objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  David Gohara
  * @param  nosh  NOsh object with input file information
  * @param  pot  List of potential maps
@@ -171,8 +170,8 @@ VEXTERNC void killKappaMaps(NOsh *nosh, Vgrid *kappa[NOSH_MAXMOL]);
 VEXTERNC int loadPotMaps(NOsh *nosh, Vgrid *pot[NOSH_MAXMOL]);
 
 /**
- * @brief  Destroy the loaded potential maps 
- * @ingroup  Frontend
+ * @brief  Destroy the loaded potential maps
+ * @ingroup  Frontend_APBS
  * @author  David Gohara
  * @param  nosh  NOsh object with input file information
  * @param  pot  List of potential maps */
@@ -180,7 +179,7 @@ VEXTERNC void killPotMaps(NOsh *nosh, Vgrid *pot[NOSH_MAXMOL]);
 
 /**
  * @brief  Load the charge maps given in NOsh into grid objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  charge  List of kappa maps
@@ -188,8 +187,8 @@ VEXTERNC void killPotMaps(NOsh *nosh, Vgrid *pot[NOSH_MAXMOL]);
 VEXTERNC int loadChargeMaps(NOsh *nosh, Vgrid *charge[NOSH_MAXMOL]);
 
 /**
- * @brief  Destroy the loaded charge maps 
- * @ingroup  Frontend
+ * @brief  Destroy the loaded charge maps
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  nosh  NOsh object with input file information
  * @param  charge  List of charge maps */
@@ -197,14 +196,14 @@ VEXTERNC void killChargeMaps(NOsh *nosh, Vgrid *charge[NOSH_MAXMOL]);
 
 /**
  * @brief  Print out generic PBE params loaded from input
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  pbeparm  PBEparm object */
 VEXTERNC void printPBEPARM(PBEparm *pbeparm);
 
 /**
  * @brief  Print out MG-specific params loaded from input
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  realCenter  Center of mesh for actual calculation
  * @param  mgparm  MGparm object */
@@ -212,7 +211,7 @@ VEXTERNC void printMGPARM(MGparm *mgparm, double realCenter[3]);
 
 /**
  * @brief  Initialize an MG calculation
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @return  1 if succesful, 0 otherwise */
 VEXTERNC int initMG(
@@ -235,7 +234,7 @@ VEXTERNC int initMG(
 
 /**
  * @brief  Kill structures initialized during an MG calculation
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  */
 VEXTERNC void killMG(
@@ -247,7 +246,7 @@ VEXTERNC void killMG(
 
 /**
  * @brief  Solve the PBE with MG
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param nosh  Object with parsed input file parameters
  * @param pmg  MG objects for this calculation
@@ -257,21 +256,21 @@ VEXTERNC int solveMG(NOsh *nosh, Vpmg *pmg, MGparm_CalcType type);
 
 /**
  * @brief  Set MG partitions for calculating observables and performing I/O
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param nosh  Object with parsed input file parameters
  * @param mgparm  MG parameters from input file
- * @param pmg  MG object 
+ * @param pmg  MG object
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int setPartMG(NOsh *nosh, MGparm *mgparm, Vpmg *pmg);
 
 /**
  * @brief  Calculate electrostatic energies from MG solution
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param nosh  Object with parsed input file parameters
- * @param icalc  Index of calculation 
- * @param pmg  MG object 
+ * @param icalc  Index of calculation
+ * @param pmg  MG object
  * @param nenergy  Set to number of entries in energy arrays
  * @param totEnergy  Set to total energy (in kT)
  * @param qfEnergy  Set to charge-potential energy (in kT)
@@ -282,15 +281,15 @@ VEXTERNC int energyMG(NOsh* nosh, int icalc, Vpmg *pmg,
   int *nenergy, double *totEnergy, double *qfEnergy, double *qmEnergy,
   double *dielEnergy);
 
-/** 
+/**
  * @brief  Kill arrays allocated for energies
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker */
 VEXTERNC void killEnergy();
 
 /**
  * @brief  Calculate forces from MG solution
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  mem  Memory management object
  * @param  nosh  Parameters from input file
@@ -306,7 +305,7 @@ VEXTERNC int forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm,  MGparm *mgparm,
 
 /**
  * @brief  Free memory from MG force calculation
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  mem  Memory management object
  * @param  nosh  Parameters from input file
@@ -317,7 +316,7 @@ VEXTERNC void killForce(Vmem *mem, NOsh *nosh, int nforce[NOSH_MAXCALC],
 
 /**
  * @brief Store energy in arrays for future use
- * @ingroup Frontend
+ * @ingroup Frontend_APBS
  * @author Todd Dolinsky */
 VEXTERNC void storeAtomEnergy(
 		Vpmg *pmg, /**< MG object */
@@ -328,7 +327,7 @@ VEXTERNC void storeAtomEnergy(
 
 /**
  * @brief Write out information to a flat file
- * @ingroup Frontend
+ * @ingroup Frontend_APBS
  * @author  Todd Dolinsky
  * @param nosh  Parameters from input file
  * @param com   The communications object
@@ -342,18 +341,18 @@ VEXTERNC void storeAtomEnergy(
  * @param nforce  An array containing the number of forces calculated per-calc
  * @param atomForce An array containing per-atom forces per calc
  * @return 1 if successful, 0 otherwise */
-VEXTERNC int writedataFlat(NOsh *nosh, Vcom *com, const char *fname, 
-  double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC], 
+VEXTERNC int writedataFlat(NOsh *nosh, Vcom *com, const char *fname,
+  double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC],
   double qmEnergy[NOSH_MAXCALC], double dielEnergy[NOSH_MAXCALC],
   int nenergy[NOSH_MAXCALC], double *atomEnergy[NOSH_MAXCALC],
   int nforce[NOSH_MAXCALC], AtomForce *atomForce[NOSH_MAXCALC]);
 
 /**
  * @brief Write out information to an XML file
- * @ingroup Frontend
+ * @ingroup Frontend_APBS
  * @author  Todd Dolinsky
  * @param nosh  Parameters from input file
- * @param com   The communications object 
+ * @param com   The communications object
  * @param fname The target XML file name
  * @param totEnergy An array with per-calc total energies (in kT)
  * @param qfEnergy  An array with per-calc charge-potential energies (in kT)
@@ -364,15 +363,15 @@ VEXTERNC int writedataFlat(NOsh *nosh, Vcom *com, const char *fname,
  * @param nforce  An array containing the number of forces calculated per-calc
  * @param atomForce An array containing per-atom forces per calc
  * @return 1 if successful, 0 otherwise */
-VEXTERNC int writedataXML(NOsh *nosh, Vcom *com, const char *fname, 
-  double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC], 
+VEXTERNC int writedataXML(NOsh *nosh, Vcom *com, const char *fname,
+  double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC],
   double qmEnergy[NOSH_MAXCALC], double dielEnergy[NOSH_MAXCALC],
   int nenergy[NOSH_MAXCALC], double *atomEnergy[NOSH_MAXCALC],
   int nforce[NOSH_MAXCALC], AtomForce *atomForce[NOSH_MAXCALC]);
 
 /**
  * @brief  Write out observables from MG calculation to file
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  rank  Processor rank (if parallel calculation)
  * @param  nosh  Parameters from input file
@@ -383,7 +382,7 @@ VEXTERNC int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg);
 
 /**
  * @brief  Write out operator matrix from MG calculation to file
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  rank  Processor rank (if parallel calculation)
  * @param  nosh  Parameters from input file
@@ -394,7 +393,7 @@ VEXTERNC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg);
 
 /**
 * @brief  Access net local energy
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Justin Xiang
  * @param  com  Communications object
  * @param  nosh  Parameters from input file
@@ -403,55 +402,61 @@ VEXTERNC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg);
  * @return  Net local energy */
 VEXTERNC double returnEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], int iprint);
 
-/** 
+/**
 * @brief  Combine and pretty-print energy data (deprecated...see printElecEnergy)
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int printEnergy(
 						 Vcom *com, /** Communications object */
 						 NOsh *nosh, /** Parameters from input file */
-						 double totEnergy[NOSH_MAXCALC], /** Array of energies 
+						 double totEnergy[NOSH_MAXCALC], /** Array of energies
 						 from different calculations */
 						 int iprint /** Index of energy statement to print */
 						 );
 
-/** 
-* @brief  Combine and pretty-print energy data
-* @ingroup  Frontend
+/////////////////////////////////////////////////////////////////////////////////
+////////////// Modified for g_mmpbsa ////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/**
+/**
+* @brief  <b> Mddified for g_mmpbsa </b> Combine and pretty-print energy data
+* @ingroup  MMPBSA_APBS
 * @author  David Gohara
-* @return  1 if successful, 0 otherwise */
+* @param com Communications object
+* @param nosh Parameters from input file
+* @param totEnergy[NOSH_MAXCALC] Array of energies from different calculations
+* @param iprint Index of energy statement to print
+* @param[out] PolarEnergy Added to retrun polar energy for \b g_mmpbsa
+* @see For APBS-1.4 version \link apbs14/apbs_routines.c printElecEnergy() \endlink
+* @return  1 if successful, 0 otherwise
+*
+*/
+VEXTERNC int printElecEnergy( Vcom *com,  NOsh *nosh, double totEnergy[NOSH_MAXCALC], int iprint, double *PolarEnergy);
+
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 /////////////////////////////////////////////////////////////////////////////////
-//////////////CHANGED for GROMACS///////////////////////////////////////////////
+////////////// Modified for g_mmpbsa///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-VEXTERNC int printElecEnergy(
-						 Vcom *com, /** Communications object */
-						 NOsh *nosh, /** Parameters from input file */
-						 double totEnergy[NOSH_MAXCALC], /** Array of energies 
-							 from different calculations */
-						 int iprint, /** Index of energy statement to print */
-						 double *PolarEnergy);
-//===============================================================================
-
-/** 
-* @brief  Combine and pretty-print energy data 
-* @ingroup  Frontend
+/**
+* @brief  <b> Mddified for g_mmpbsa </b> Combine and pretty-print energy data
+* @ingroup  MMPBSA_APBS
 * @author  David Gohara
-* @return  1 if successful, 0 otherwise */
-
-/////////////////////////////////////////////////////////////////////////////////
-//////////////CHANGED for g_mmpbsa///////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+* @return  1 if successful, 0 otherwise
+* @see For APBS-1.4 version \link apbs14/apbs_routines.c printApolEnergy() \endlink
+*/
 VEXTERNC int printApolEnergy(
 						 NOsh *nosh,  /**< Parameters from input file */
 						 int iprint,  /**< Index of energy statement to print */
-						 double *APolarEnergy);
+						 double *APolarEnergy /**< [out] Added to retrun energy for g_mmpbsa */);
 //===============================================================================
 
-/** 
+/**
  * @brief  Combine and pretty-print force data (deprecated...see printElecForce)
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int printForce(
@@ -462,9 +467,9 @@ VEXTERNC int printForce(
 						int i /** Index of force statement to print */
 						);
 
-/** 
+/**
 * @brief  Combine and pretty-print force data
-* @ingroup  Frontend
+* @ingroup  Frontend_APBS
 * @author  David Gohara
 * @return  1 if successful, 0 otherwise */
 VEXTERNC int printElecForce(
@@ -475,9 +480,9 @@ VEXTERNC int printElecForce(
 							int i /** Index of force statement to print */
 							);
 
-/** 
+/**
 * @brief  Combine and pretty-print force data
-* @ingroup  Frontend
+* @ingroup  Frontend_APBS
 * @author  David Gohara
 * @return  1 if successful, 0 otherwise */
 VEXTERNC int printApolForce(
@@ -490,13 +495,13 @@ VEXTERNC int printApolForce(
 
 /**
  * @brief  Wrapper to start MALOC Vio layer
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker and Robert Konecny */
 VEXTERNC void startVio();
 
 /**
  * @brief  Calculate non-polar energies
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  David Gohara
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int energyAPOL(
@@ -509,7 +514,7 @@ VEXTERNC int energyAPOL(
 						);
 /**
  * @brief  Calculate non-polar forces
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  David Gohara
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int forceAPOL(
@@ -517,7 +522,7 @@ VEXTERNC int forceAPOL(
 					   Vmem *mem,  /**< Memory manager */
 					   APOLparm *apolparm,  /**< Apolar calculation parameter
 					   object */
-					   int *nforce,  /**< Number of atomic forces to calculate 
+					   int *nforce,  /**< Number of atomic forces to calculate
 					   statements for */
 					   AtomForce **atomForce,  /**< Object for storing atom
 					   forces */
@@ -525,15 +530,17 @@ VEXTERNC int forceAPOL(
 					   Vclist *clist  /**< Cell list for accessibility object */
 					   );
 
-/**
- * @brief  Upperlevel routine to the non-polar energy and force routines
- * @ingroup  Frontend
- * @author  David Gohara
- * @return  1 if successful, 0 otherwise */
 
 /////////////////////////////////////////////////////////////////////////////////
-//////////////CHANGED for g_mmpbsa///////////////////////////////////////////////
+////////////// Modified for g_mmpbsa////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief  <b> Mddified for g_mmpbsa </b> Upperlevel routine to the non-polar energy and force routines
+ * @ingroup  MMPBSA_APBS
+ * @author  David Gohara
+ * @return  1 if successful, 0 otherwise
+ * @see For APBS-1.4 version \link apbs14/apbs_routines.c initAPOL() \endlink
+ */
 VEXTERNC int initAPOL(
 					  NOsh *nosh,  /**< Input parameter object */
 					  Vmem *mem,  /**< Memory manager */
@@ -542,7 +549,7 @@ VEXTERNC int initAPOL(
 					  int *nforce,  /**< Number of force calculations */
 					  AtomForce **atomForce,  /**< Atom force storage object */
 					  Valist *alist,  /**< Atom list */
-					  double *AtomEnergyOut
+					  double *AtomEnergyOut /**< [out] Return array of atomic energy for g_mmpbsa */
 					  );
 //================================================================================
 
@@ -551,21 +558,21 @@ VEXTERNC int initAPOL(
 
 /**
  * @brief  Print out FE-specific params loaded from input
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  icalc  Calculation index
  * @param  nosh  Master parameter object
- * @param feparm  FE-specific parameters 
+ * @param feparm  FE-specific parameters
  * @param fetk  Array of FE solver objects  */
 VEXTERNC void printFEPARM(int icalc, NOsh *nosh, FEMparm *feparm,
   Vfetk *fetk[NOSH_MAXCALC]);
 
 /**
  * @brief  Calculate electrostatic energies from FE solution
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param nosh  Object with parsed input file parameters
- * @param icalc  Index of calculation 
+ * @param icalc  Index of calculation
  * @param fetk  FE object  array
  * @param nenergy  Set to number of entries in energy arrays
  * @param totEnergy  Set to total energy (in kT)
@@ -580,13 +587,13 @@ VEXTERNC int energyFE(NOsh* nosh, int icalc, Vfetk *fetk[NOSH_MAXCALC],
 
 /**
  * @brief  Initialize FE solver objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @bug  THIS FUNCTION IS HARD-CODED TO SOLVE LRPBE
  * @todo  THIS FUNCTION IS HARD-CODED TO SOLVE LRPBE
  */
 VEXTERNC Vrc_Codes initFE(
-					int icalc, /** Index in pb, fetk to initialize (calculation 
+					int icalc, /** Index in pb, fetk to initialize (calculation
  index) */
 					NOsh *nosh,  /** Master parmaeter object */
 					FEMparm *feparm,  /** FE-specific parameters */
@@ -599,7 +606,7 @@ VEXTERNC Vrc_Codes initFE(
 
 /**
  * @brief  Kill structures initialized during an FE calculation
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  */
 VEXTERNC void killFE(
@@ -611,49 +618,49 @@ VEXTERNC void killFE(
 
 /**
  * @brief  Pre-refine mesh before solve
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  i  Calculation index
  * @param  nosh  Master parameter object
- * @param feparm  FE-specific parameters 
- * @param fetk  Array of FE solver objects 
+ * @param feparm  FE-specific parameters
+ * @param fetk  Array of FE solver objects
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int preRefineFE(int i, NOsh *nosh, FEMparm *feparm,
   Vfetk *fetk[NOSH_MAXCALC]);
 
 /**
  * @brief  Partition mesh (if applicable)
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  i  Calculation index
  * @param  nosh  Master parameter object
- * @param feparm  FE-specific parameters 
- * @param fetk  Array of FE solver objects 
+ * @param feparm  FE-specific parameters
+ * @param fetk  Array of FE solver objects
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int partFE(int i, NOsh *nosh, FEMparm *feparm,
   Vfetk *fetk[NOSH_MAXCALC]);
 
 /**
  * @brief  Solve-estimate-refine
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  i  Calculation index
  * @param  nosh  Master parameter object
- * @param feparm  FE-specific parameters 
+ * @param feparm  FE-specific parameters
  * @param pbeparm  Generic PBE parameters
- * @param fetk  Array of FE solver objects 
+ * @param fetk  Array of FE solver objects
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int solveFE(int i, NOsh *nosh, PBEparm *pbeparm, FEMparm *feparm,
   Vfetk *fetk[NOSH_MAXCALC]);
 
 /**
  * @brief  Estimate error, mark mesh, and refine mesh after solve
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  icalc  Calculation index
  * @param  nosh  Master parameter object
- * @param feparm  FE-specific parameters 
- * @param fetk  Array of FE solver objects 
+ * @param feparm  FE-specific parameters
+ * @param fetk  Array of FE solver objects
  * @return  1 if successful, 0 otherwise -- note that a 0 will likely imply
  * that either the max number of vertices have been met or no vertices were
  * marked for refinement.  In either case, this should not be treated as a
@@ -663,7 +670,7 @@ VEXTERNC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
 
 /**
  * @brief  Write FEM data to files
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @param  rank  Rank of processor (for parallel runs)
  * @param  nosh  NOsh object
@@ -674,7 +681,7 @@ VEXTERNC int writedataFE(int rank, NOsh *nosh, PBEparm *pbeparm, Vfetk *fetk);
 
 /**
  * @brief  Load the meshes given in NOsh into geometry objects
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker
  * @returns  Error code on success/failure */
 VEXTERNC Vrc_Codes loadMeshes(
@@ -682,10 +689,10 @@ VEXTERNC Vrc_Codes loadMeshes(
 							Gem *gm[NOSH_MAXMOL]  /**< List of geometry objects
 							(to be populated) */
 						   );
-						
+
 /**
  * @brief  Destroy the loaded meshes
- * @ingroup  Frontend
+ * @ingroup  Frontend_APBS
  * @author  Nathan Baker */
 VEXTERNC void killMeshes(
 							NOsh *nosh, /**< NOsh object with input file information */

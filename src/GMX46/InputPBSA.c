@@ -1,10 +1,18 @@
-/*
+/**
+ * @file GMX46/InputPBSA.c
+ * @brief Definition of routines to setup PBSA calculations
+ * @ingroup PBSA_INPUT
+ * @author Rashmi Kumari, Rajendra Kumar and Andrew Lynn
+ * @attention
+ * @verbatim
+ *
+ *
  * This file is part of g_mmpbsa.
  *
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,14 +39,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
+ * @endverbatim
  *
  */
 
 
-#include "typedefs.h"
-#include "readinp.h"
-#include "warninp.h"
-#include "string2.h"
+#include "gromacs/typedefs.h"
+#include "gromacs/readinp.h"
+#include "gromacs/warninp.h"
+#include "gromacs/string2.h"
 #include "g_mmpbsa.h"
 
 #define MAXPTR 254

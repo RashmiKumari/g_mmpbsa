@@ -1,6 +1,6 @@
 /**
  *  @file    main.c
- *  @ingroup Frontend
+ *  @ingroup  Frontend_APBS
  *  @author  Nathan Baker
  *  @brief   APBS "front end" program using formatted input files.
  *
@@ -68,10 +68,14 @@
 #include "apbs/pbeparm.h"
 #include "apbs/femparm.h"
 
-#include "apbs13_routines.h"
+#include "apbs_routines.h"
 
 ////Added for the g_mmpbsa/////////////
-#include "smalloc.h"
+#ifdef HAVE_GROMACS50
+#include "gromacs/utility/smalloc.h"
+#else
+#include "gromacs/smalloc.h"
+#endif
 ///////////////////////////////////////
 
 

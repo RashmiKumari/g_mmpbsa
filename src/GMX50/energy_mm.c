@@ -1,10 +1,17 @@
-/*
+/**
+ * @file GMX50/energy_mm.c
+ * @brief Definition of routines for molecular mechanics energy
+ * @ingroup MMEN
+ * @author Rashmi Kumari, Rajendra Kumar and Andrew Lynn
+ * @attention
+ * @verbatim
+ *
  * This file is part of g_mmpbsa.
  *
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,19 +39,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
+ * @endverbatim
+ *
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "statutil.h"
-#include "typedefs.h"
-#include "smalloc.h"
-#include "copyrite.h"
-#include "vec.h"
-#include "tpxio.h"
-#include "rmpbc.h"
-#include "xvgr.h"
+
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/rmpbc.h"
+#include "gromacs/legacyheaders/xvgr.h"
+#include "gromacs/utility/smalloc.h"
+#include "gromacs/fileio/tpxio.h"
 
 #include "g_mmpbsa.h"
 

@@ -1,4 +1,11 @@
-/*
+/**
+ * @file GMX50/psize.c
+ * @brief Definition of routines for grid dimension calculation
+ * @ingroup PSIZE
+ * @author Rajendra Kumar
+ * @attention
+ * @verbatim
+ *
  * Originally written by Dave Sept.
  * Additional APBS-specific features added by Nathan Baker.
  * Ported to Python/Psize class by Todd Dolinsky and subsequently hacked by Nathan Baker.
@@ -6,19 +13,18 @@
  * ------------------------------------------------------
  * Ported to C by Rajendra Kumar for g_mmpbsa
  * ------------------------------------------------------
+ * @endverbatim
  */
 
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
-#include "statutil.h"
-#include "typedefs.h"
-#include "smalloc.h"
-#include "vec.h"
-#include "tpxio.h"
-#include "rmpbc.h"
-#include "xvgr.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/vec.h"
+#include "gromacs/utility/smalloc.h"
+#include "gromacs/fileio/tpxio.h"
 
 #include "g_mmpbsa.h"
 
@@ -41,8 +47,8 @@ int psize (t_topology *top, atom_id *index, int isize, rvec *x, t_PolKey *param,
 	real nsmem, gmem, zofac;
 	real r, np_float;
 
-	minlen[XX] = 999; minlen[YY] = 999; minlen[ZZ] = 999;
-	maxlen[XX] = -999; maxlen[YY] = -999; maxlen[ZZ] = -999;
+	minlen[XX] = 9999; minlen[YY] = 9999; minlen[ZZ] = 9999;
+	maxlen[XX] = -9999; maxlen[YY] = -9999; maxlen[ZZ] = -9999;
 
 	for (i=0;i<isize;i++)	{
 		r = top->atoms.pdbinfo[index[i]].bfac;

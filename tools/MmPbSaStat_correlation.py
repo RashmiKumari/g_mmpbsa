@@ -5,7 +5,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013, 2014, 2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,23 +35,28 @@
 #
 #
 
+from __future__ import absolute_import, division, print_function
+from builtins import range
+from builtins import object
 
-import re
+import re, sys
 import numpy as np
-from scipy import stats
 import argparse
 import os
 import math
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
-import scipy.stats as spstat
 
 def main():
 	args = ParseOptions()
-	CheckInput(args)
 	#File => Frame wise component energy
-	frame_wise = open(args.outfr, 'w')
+	try:
+		frame_wise = open(args.outfr, 'w')
+	except:
+		raise IOError ('Could not open file {0} for writing. \n' .format(args.outfr))
+
 	frame_wise.write('#Time E_VdW_mm(Protein)\tE_Elec_mm(Protein)\tE_Pol(Protein)\tE_Apol(Protein)\tE_VdW_mm(Ligand)\tE_Elec_mm(Ligand)\tE_Pol(Ligand)\tE_Apol(Ligand)\tE_VdW_mm(Complex)\tE_Elec_mm(Complex)\tE_Pol(Complex)\tE_Apol(Complex)\tDelta_E_mm\tDelta_E_Pol\tDelta_E_Apol\tDelta_E_binding\n')
+
 	#Complex Energy
 	c = []
 	if args.multiple:
@@ -75,15 +80,15 @@ def PlotEnrgy(c,FitCoef_all, args, fname):
 		CompEn.append(c[i].FinalAvgEnergy)
 		ExpEn.append(c[i].freeEn)
 		CompEnErr.append(c[i].StdErr)
-		CI.append(c[i].CI)	
+		CI.append(c[i].CI)
 	fig = plt.figure()
 	plt.subplots_adjust(left=0.15, right=0.9, top=0.9, bottom=0.15)
 	ax = fig.add_subplot(111)
 	CI = np.array(CI).T
-	
+
 	#To plot data
 	ax.errorbar(ExpEn, CompEn, yerr=CI, fmt='o', ecolor='k',color='k',zorder=20000)
-	
+
 	#To plot straight line having median correlation coefficiant
 	fit = np.polyfit(ExpEn, CompEn, 1)
 	fitCompEn = np.polyval(fit, ExpEn)
@@ -124,7 +129,7 @@ def PlotCorr(c,args,fname):
 	r, FitCoef = [], []
 	Id_0_FitCoef, Id_1_FitCoef = [], []
 
-	f_corrdist = open(args.corrdist,'w')	
+	f_corrdist = open(args.corrdist,'w')
 	#Bootstrap analysis for correlation coefficiant
 	nbstep = args.nbstep
 	for i in range(nbstep):
@@ -140,13 +145,13 @@ def PlotCorr(c,args,fname):
 		r.append(rtmp)
 		fit = np.polyfit(temp_x, temp_y, 1)
 		FitCoef.append(fit)
-			
+
 		f_corrdist.write('{0}\n' .format(rtmp))
 
-	#Seprating Slope and intercept 
+	#Seprating Slope and intercept
 	Id_0_FitCoef = np.transpose(FitCoef)[0]
 	Id_1_FitCoef = np.transpose(FitCoef)[1]
-	
+
 	#Calculating mode of coorelation coefficiant
 	density, r_hist = np.histogram(r,25,normed=True)
 	mode = (r_hist[np.argmax(density)+1] + r_hist[np.argmax(density)])/2
@@ -154,10 +159,10 @@ def PlotCorr(c,args,fname):
 	#Calculating Confidence Interval
 	r = np.sort(r)
 	CI_min_idx = int(0.005*nbstep)
-	CI_max_idx = int(0.995*nbstep)	
+	CI_max_idx = int(0.995*nbstep)
 	CI_min = mode - r[CI_min_idx]
 	CI_max = r[CI_max_idx] - mode
-	print ("%5.3f %5.3f  %5.3f  %5.3f" % (main_r, mode, CI_min, CI_max))
+	print("%5.3f %5.3f  %5.3f  %5.3f" % (main_r, mode, CI_min, CI_max))
 
 	#Plotting Correlation Coefficiant Distribution
 	fig = plt.figure()
@@ -177,7 +182,7 @@ def PlotCorr(c,args,fname):
 	plt.savefig(fname,dpi=300, orientation='landscape')
 	return [Id_0_FitCoef, Id_1_FitCoef]
 
-class Complex():
+class Complex(object):
 	def __init__(self,MmFile,PolFile,APolFile,K):
 		self.TotalEn = []
 		self.Vdw, self.Elec, self.Pol, self.Sas, self.Sav, self.Wca =[], [], [], [], [], []
@@ -189,14 +194,14 @@ class Complex():
 		self.CI = []
 		self.FinalAvgEnergy = 0
 		self.StdErr = 0
-	
+
 	def CalcEnergy(self,args,frame_wise,idx):
 		mmEn = ReadData(self.MmFile,n=7)
 		polEn = ReadData(self.PolFile,n=4)
 		apolEn = ReadData(self.APolFile,n=10)
 		CheckEnData(mmEn,polEn,apolEn)
-	
-		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav, Wca = [], [], [], [], [], [], [], [], []	
+
+		time, MM, Vdw, Elec, Pol, Apol, Sas, Sav, Wca = [], [], [], [], [], [], [], [], []
 		for i in range(len(mmEn[0])):
 			#Vacuum MM
 			Energy = mmEn[5][i] + mmEn[6][i] - (mmEn[1][i] + mmEn[2][i] + mmEn[3][i] + mmEn[4][i])
@@ -241,7 +246,7 @@ class Complex():
 			self.Elec.append(error)
 			avg_energy, error = BootStrap(Pol,bsteps)
 			self.Pol.append(avg_energy)
-			self.Pol.append(error)	
+			self.Pol.append(error)
 			avg_energy, error = BootStrap(Sas,bsteps)
 			self.Sas.append(avg_energy)
 			self.Sas.append(error)
@@ -253,9 +258,9 @@ class Complex():
 			self.Wca.append(error)
 			#Bootstrap => Final Average Energy
 			self.AvgEnBS, AvgEn, EnErr, CI = ComplexBootStrap(self.TotalEn,bsteps)
-                        self.FinalAvgEnergy = AvgEn
-                        self.StdErr = EnErr
-                        self.CI = CI
+			self.FinalAvgEnergy = AvgEn
+			self.StdErr = EnErr
+			self.CI = CI
 		#If not bootstrap then average and standard deviation
 		else:
 			self.Vdw.append(np.mean(Vdw))
@@ -272,17 +277,23 @@ class Complex():
 			self.Wca.append(np.std(Wca))
 			self.FinalAvgEnergy = np.mean(self.TotalEn)
 			self.StdErr = np.std(self.TotalEn)
-				
+
 
 def Summary_Output_File(AllComplex,args):
-        fs = open(args.outsum,'w')
+	try:
+		fs = open(args.outsum,'w')
+	except:
+		raise IOError ('Could not open file {0} for writing. \n' .format(args.outsum))
 
 	if args.multiple:
-		fm = open(args.outmeta,'w')
+		try:
+			fm = open(args.outmeta,'w')
+		except:
+			raise IOError ('Could not open file {0} for writing. \n' .format(args.outmeta))
 		fm.write('# Complex_Number\t\tTotal_Binding_Energy\t\tError\n')
-	
+
 	for n in range(len(AllComplex)):
-		fs.write('\n\n#Complex Number: %4d\n' % (n+1))	
+		fs.write('\n\n#Complex Number: %4d\n' % (n+1))
 		fs.write('===============\n   SUMMARY   \n===============\n\n')
 		fs.write('\n van der Waal energy      = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Vdw[0], AllComplex[n].Vdw[1]))
 		fs.write('\n Electrostattic energy    = %15.3lf   +/-  %7.3lf kJ/mol\n' % (AllComplex[n].Elec[0],AllComplex[n].Elec[1]))
@@ -300,33 +311,16 @@ def CheckEnData(mmEn,polEn,apolEn):
 	frame = len(mmEn[0])
 	for i in range(len(mmEn)):
 		if(len(mmEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
-	for i in range(len(polEn)):
-		if(len(polEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
-	for i in range(len(polEn)):
-		if(len(polEn[i]) != frame):
-			print "Number of row is not same for all column"
-			exit(1)
+			raise ValueError("In MM file, size of columns are not equal.")
 
-def CheckInput(args):
-	if args.multiple:
-		if not os.path.exists(args.metafile):
-			print '\n{0} not found....\n' .format(args.metafile)
-			exit(1)
-	else:
-		if not os.path.exists(args.molmech):
-			print '\n{0} not found....\n' .format(args.molmech)
-			exit(1)
-		if not os.path.exists(args.polar):
-			print '\n{0} not found....\n' .format(args.polar)
-			exit(1)
-		if not os.path.exists(args.apolar):
-			print '\n{0} not found....\n' .format(args.polar)
-			exit(1)
-	
+	for i in range(len(polEn)):
+		if(len(polEn[i]) != frame):
+			raise ValueError("In Polar file, size of columns are not equal.")
+
+	for i in range(len(apolEn)):
+		if(len(apolEn[i]) != frame):
+			raise ValueError("In APolar file, size of columns are not equal.")
+
 def ParseOptions():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-mt", "--multiple", help='If given, calculate for multiple complexes. Need Metafile containing path of energy files',action="store_true")
@@ -344,7 +338,33 @@ def ParseOptions():
 	parser.add_argument("-ep", "--enplot", help='Experimental Energy vs Calculated Energy Correlation Plot',action="store",default='enplot.png', metavar='enplot.png')
 	parser.add_argument("-cd", "--corrdist", help='Correlation distribution data from bootstrapping',action="store",default='corrdist.dat', metavar='corrdist.dat')
 	parser.add_argument("-cp", "--corrplot", help='Plot of correlation distribution',action="store",default='corrdist.png', metavar='corrdist.png')
+
+	if len(sys.argv) < 2:
+		print('ERROR: No input files. Need help!!!')
+		parser.print_help()
+		sys.exit(1)
+
 	args = parser.parse_args()
+
+	if args.multiple:
+		if not os.path.exists(args.metafile):
+			print('\nERROR: {0} not found....\n' .format(args.metafile))
+			parser.print_help()
+			sys.exit(1)
+	else:
+		if not os.path.exists(args.molmech):
+			print('\nERROR: {0} not found....\n' .format(args.molmech))
+			parser.print_help()
+			sys.exit(1)
+		if not os.path.exists(args.polar):
+			print('\nERROR: {0} not found....\n' .format(args.polar))
+			parser.print_help()
+			sys.exit(1)
+		if not os.path.exists(args.apolar):
+			print('\nERROR: {0} not found....\n' .format(args.apolar))
+			parser.print_help()
+			sys.exit(1)
+
 	return args
 
 def ReadData(FileName,n=2):
@@ -360,7 +380,13 @@ def ReadData(FileName,n=2):
 	for j in range(0,n):
 		x_temp =[]
 		for i in range(len(data)):
-			x_temp.append(float(data[i][j]))
+			try:
+				value = float(data[i][j])
+			except:
+				raise FloatingPointError('\nCould not convert {0} to floating point number.. Something is wrong in {1}..\n' .format(data[i][j], FileName))
+
+			x_temp.append(value)
+
 		x.append(x_temp)
 	return x
 
@@ -399,23 +425,21 @@ def ReadMetafile(metafile):
 		line = line.rstrip('\n')
 		if not line.strip():
 			continue
-		temp = line.split()	
+		temp = line.split()
 		MmFile.append(temp[0])
 		PolFile.append(temp[1])
 		APolFile.append(temp[2])
 		Ki.append(float(temp[3]))
-		
-		
+
 		if not os.path.exists(temp[0]):
-			print '\n{0} not found....\n' .format(temp[0])
-			exit(1)
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[0]))
+
 		if not os.path.exists(temp[1]):
-			print '\n{0} not found....\n' .format(temp[1])
-			exit(1)
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[1]))
+
 		if not os.path.exists(temp[2]):
-			print '\n{0} not found....\n' .format(temp[2])
-			exit(1)
-						
+			raise IOError('Could not open file {0} for reading. \n' .format(temp[2]))
+
 	return MmFile, PolFile, APolFile, Ki
 
 if __name__=="__main__":
