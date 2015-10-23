@@ -219,7 +219,7 @@ td {
 
 /* Wrapper */
 .wrapper {
-    width: 1024px;
+    width: 1110px;
     position: absolute;
 	left:0;
 	right:0;
@@ -250,7 +250,7 @@ header {
 /* Section - for main page content */
 
 section {
-  width:700px;
+  width:800px;
   float:right;
   margin-top: 10px;
   padding-bottom:50px;
@@ -371,43 +371,48 @@ nav ul {
 	position: relative;
 	display: inline-block;
 	text-align: center;
+	overflow: hidden;
 	padding: 0;
 	margin: 0;
 }
+
+/*
 nav ul:after {
 	content: ""; clear: both; display: inline-block;
 	position:static;
 }
+*/
 
 nav ul li {
 	float: left;
 	display: block;
 }
-	nav ul li:hover {
-		background: #AF0011;
-		display: block;
-	}
-		nav ul li:hover a {
-			color: #fff;
-			display: inline-block;
-			font-size: 18px;
-			padding-left: 0;
-			padding-right:3px;
-			padding-top: 3px;
-			padding-bottom: 3px;
-			text-align: center;
 
-		}
+nav ul li:hover {
+	background: #AF0011;
+	display: block;
+}
+nav ul li:hover a {
+	color: #fff;
+	display: inline-block;
+	font-size: 18px;
+	text-align: center;
+	padding-left: 1px;
+	padding-right:20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+}
 	
-	nav ul li a {
-		display: inline-block;
-		color: #fff; font-size: 18px;
-		padding-left: 0;
-		padding-right:3px;
-		padding-top: 3px;
-		padding-bottom: 3px;
-		text-align: center;
-	}
+nav ul li a {
+	display: inline-block;
+	color: #fff; font-size: 18px;
+	text-align: center;
+	padding-left: 1px;
+	padding-right:20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
 	
 nav ul ul {
 	background: #171717; border-radius: 0px; padding: 0;

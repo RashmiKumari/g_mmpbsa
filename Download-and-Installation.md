@@ -29,13 +29,40 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
 ##### <a name="download-binary"></a> Download
 
 
-|                         |    Gromacs-4.5.x     |     Gromacs-4.6.x    |     Gromacs-5.0.x    |
-|:------------------|:--------------------:|:--------------------:|:--------------------:|
-|  Linux x86_64 (64 bit)  |   [Download][1]      |    [Download][5]     |    [Download][9]     |
-|  Linux x86 (32 bit)     |   [Download][2]      |    [Download][6]     |    [Download][10]    |
-|                      **To use with external APBS program**                                   |
-|  Linux x86_64 (64 bit)  |   [Download][3]      |    [Download][7]     |    [Download][11]    |
-|  Linux x86 (32 bit)     |   [Download][4]      |    [Download][8]     |    [Download][12]    |
+<table>
+  <tr>
+    <th rowspan="2"></th>
+    <th colspan="2">Includes APBS functionality</th>
+    <th colspan="2">To use with external APBS program</th>
+  </tr>
+  <tr>
+    <th>Linux x86_64</th>
+    <th>Linux x86_64</th>
+    <th>Linux x86_64</th>
+    <th>Linux x86_64</th>
+  </tr>
+  <tr>
+    <th>Gromacs-4.5.x</th>
+    <td> <a href="package/GMX45x/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX45x_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX45x_extrn_APBS/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX45x_extrn_APBS_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+  </tr>
+  <tr>
+    <th>Gromacs-4.6.x</th>
+    <td> <a href="package/GMX46x/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX46x_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX46x_extrn_APBS/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX46x_extrn_APBS_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+  </tr>
+  <tr>
+    <th>Gromacs-5.0.x</th>
+    <td> <a href="package/GMX50x/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX50x_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX50x_extrn_APBS/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX50x_extrn_APBS_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+  </tr>
+</table>
 
 
 [**Download Python Scripts**][13]
@@ -84,7 +111,7 @@ Also, these files can be downloaded from the left side of current webpage. After
 
 **Warning:**{: style="color: red"} Compiler for GROMACS, APBS and g_mmpbsa should be same.
 
-**Required Library from GROMACS:** `libgmx`
+**Required Library from GROMACS:** `libgmx` or `libgromacs`
 
 **Required Libraries from APBS:** `libapbsmainroutines`, `libapbs`, `libapbsblas`, `libmaloc`, `libapbsgen` and `libz`.
 
@@ -107,7 +134,7 @@ Also, these files can be downloaded from the left side of current webpage. After
     
 `--prefix=/opt/gromacs` specifies the path where gromacs will be installed.
 
-**2. Installation of GROMACS-4.5.7 or GROMACS-4.6.x**
+**2. Installation of GROMACS-4.5.7 or GROMACS-4.6.x or Gromacs-5.0.x**
 
     tar -zxvf gromacs-4.6.7.tar.gz
     cd gromacs-4.6.7
@@ -119,7 +146,7 @@ Also, these files can be downloaded from the left side of current webpage. After
 
 `-DCMAKE_INSTALL_PREFIX=/opt/gromacs` specifies the path where gromacs will be installed.
 
-##### Installation of APBS 1.2.x or 1.3.x
+##### B. Installation of APBS 1.2.x or 1.3.x
 
 [APBS](http://www.poissonboltzmann.org/apbs) should be compiled and installed from the source-code. 
 
@@ -153,17 +180,29 @@ Follow these steps:
 * `-DAPBS_SRC`: path to APBS source code directroy from where APBS is configured and installed.
 * `-DCMAKE_INSTALL_PREFIX`: path to a directory where g\_mmpbsa will be installed. If this option is not provided, g\_mmpbsa will install either in `/usr/local/bin` or in `$HOME/bin` directory.
 
+* Instead of `GMX_PATH` and `-DAPBS_INSTALL`, `CMAKE_PREFIX_PATH` can be used before running cmake as follows. However, `-DAPBS_SRC` is still required.
+    * `export CMAKE_PREFIX_PATH=/opt/gromacs`
+    * `export CMAKE_PREFIX_PATH=/opt/gromacs:/path/to/fftw`
+
+
 * In case of **ERROR:**{: style="color: red"} `FFTW library file libfftw3f.so or libfftw3f.a not found...`; use `-DFFTW_LIB=/path/to/fftw/lib/` to give a path for the directory containing either of the two files.
+
+* In **Gromacs-5.0.x** version, if, **ERROR:**{: style="color: red"} `undefined reference to 'uncompress'`. Then use: `-DZLIB_PATH=/path/to/zlib.a(so)`.
+
+* In **Gromacs-5.0.x** version, by default, TNG format trajectory support is enabled. This conflicts with the APBS-1.3 library. To resolve this problem, do either of the followings:
+    * Re-install Gromacs by using `-DGMX_USE_TNG=off` option to disable TNG trajectory support.  
+    * Install with APBS-1.4 version.
+
 
 #### <a name="install-with-apbs14"> </a> Install with APBS-1.4.x
 
 **Warning:**{: style="color: red"} Compiler for GROMACS, APBS and g_mmpbsa should be same.
 
-**Required Library from GROMACS:** `libgmx`
+**Required Library from GROMACS:** `libgmx` or `libgromacs`
 
 **Required Libraries from APBS:** `libmaloc`, `libapbs_geoflow`, `libapbs_mg`, `libapbs_pmgc` and `libapbs_generic`.
 
-##### A. Install GROMACS 4.5.x/4.6.x
+##### A. Install GROMACS 4.5.x/4.6.x/5.0.x
 
 Install as described [above](#install-gromacs).
 
@@ -200,13 +239,21 @@ Follow these steps to download and install APBS-1.4.1 version:
 * `-DAPBS_INSTALL`: path to APBS installation directory.
 * `-DCMAKE_INSTALL_PREFIX`: path to a directory where g\_mmpbsa will be installed. If this option is not provided, g\_mmpbsa will install either in `/usr/local/bin` or in `$HOME/bin` directory.
 
+* Instead of `GMX_PATH` and `-DAPBS_INSTALL`, `CMAKE_PREFIX_PATH` can be used before running cmake as follows:
+    * `export CMAKE_PREFIX_PATH=/opt/gromacs:/opt/apbs`
+    * `export CMAKE_PREFIX_PATH=/opt/gromacs:/opt/apbs:/path/to/fftw`
+
+
 * In case of **ERROR:**{: style="color: red"} `FFTW library file libfftw3f.so or libfftw3f.a not found...`; use `-DFFTW_LIB=/path/to/fftw/lib/` to give a path for the directory containing either of the two files.
+
+* In **Gromacs-5.0.x** version, if, **ERROR:**{: style="color: red"} `undefined reference to 'uncompress'`. Then use: `-DZLIB_PATH=/path/to/zlib.a(so)`.
+
 
 #### <a name="install-without-apbs"> </a>Installation without APBS (to use with external APBS)
 
-**Required Library from GROMACS:** `libgmx`
+**Required Library from GROMACS:** `libgmx` or `libgromacs`
 
-##### A. Install GROMACS 4.5.x/4.6.x
+##### A. Install GROMACS 4.5.x/4.6.x/5.0.x
 
 Install as described [above](#install-gromacs).
 
@@ -215,8 +262,8 @@ Install as described [above](#install-gromacs).
     cd g_mmpbsa
     mkdir build
     cd build
-    cmake -DGMX_PATH=/opt/gromacs \
-          -DEXT_APBS=on \
+    export CMAKE_PREFIX_PATH=/opt/gromacs
+    cmake -DEXT_APBS=on \
           -DCMAKE_INSTALL_PREFIX=/opt/g_mmpbsa \
           ..
     make
@@ -227,6 +274,9 @@ Install as described [above](#install-gromacs).
 * `-DCMAKE_INSTALL_PREFIX`: path to a directory where g\_mmpbsa will be installed. If this option is not provided, g\_mmpbsa will install either in `/usr/local/bin` or in `$HOME/bin` directory.
 
 * In case of **ERROR:**{: style="color: red"} `FFTW library file libfftw3f.so or libfftw3f.a not found...`; use `-DFFTW_LIB=/path/to/fftw/lib/` to give a path for the directory containing either of the two files.
+
+* In **Gromacs-5.0.x** version, if, **ERROR:**{: style="color: red"} `undefined reference to 'uncompress'`. Then use: `-DZLIB_PATH=/path/to/zlib.a(so)`.
+
 
 
 ---
