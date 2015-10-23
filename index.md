@@ -34,7 +34,7 @@ Kindly post problems and queries in [**g_mmpbsa forum**][forum]{:target="_blank"
 
 *   It is implemented through open source software [GROMACS][GROMACS]{:target="_blank"} and [APBS][APBS]{:target="_blank"}, making it accessible to large number of users.
 
-*   Supports **GROMACS 4.5.x** and **4.6.x** versions.
+*   Supports **GROMACS 4.5.x**, **4.6.x** and **GROMACS 5.0.x** versions.
 
 *   Supports **APBS 1.2.x**, **1.3.x** and **1.4.x** versions
 
