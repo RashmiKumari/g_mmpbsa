@@ -37,9 +37,9 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
   </tr>
   <tr>
     <th>Linux x86_64</th>
+    <th>Linux x86 </th>
     <th>Linux x86_64</th>
-    <th>Linux x86_64</th>
-    <th>Linux x86_64</th>
+    <th>Linux x86 </th>
   </tr>
   <tr>
     <th>Gromacs-4.5.x</th>
