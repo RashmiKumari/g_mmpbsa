@@ -27,7 +27,7 @@ Kindly post problems and queries in [**g_mmpbsa forum**][forum]{:target="_blank"
 ***
 
 
-### Features v1.5
+### Features v1.6
 
 
 *   It is an open source tool and can be modified under the terms of the GNU public license
