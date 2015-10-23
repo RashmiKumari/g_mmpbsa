@@ -35,11 +35,11 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
     <th colspan="2">Includes APBS functionality</th>
     <th colspan="2">To use with external APBS program</th>
   </tr>
-  <tr>
-    <th>Linux x86_64</th>
-    <th>Linux x86 </th>
-    <th>Linux x86_64</th>
-    <th>Linux x86 </th>
+  <tr>  
+    <th>Linux x86_64 <br>(64 Bit)</th>
+    <th>Linux x86 <br> (32 Bit) </th>
+    <th>Linux x86_64 <br> (64 Bit) </th>
+    <th>Linux x86 <br> (32 Bit) </th>
   </tr>
   <tr>
     <th>Gromacs-4.5.x</th>
