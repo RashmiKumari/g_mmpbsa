@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,17 +38,31 @@
 #include <math.h>
 #include <string.h>
 
-#include "gromacs/fileio/tpxio.h"
-#include "gromacs/fileio/trxio.h"
-#include "gromacs/fileio/filenm.h"
-#include "gromacs/fileio/futil.h"
-#include "gromacs/legacyheaders/typedefs.h"
+#ifdef HAVE_GROMACS50
+
+#include "gromacs/legacyheaders/gmx_fatal.h"
 #include "gromacs/legacyheaders/rmpbc.h"
 #include "gromacs/legacyheaders/pbc.h"
 #include "gromacs/legacyheaders/xvgr.h"
-#include "gromacs/legacyheaders/gmx_fatal.h"
-#include "gromacs/legacyheaders/macros.h"
 #include "gromacs/legacyheaders/index.h"
+#include "gromacs/fileio/futil.h"
+
+#else
+
+#include "gromacs/utility/fatalerror.h"
+#include "gromacs/pbcutil/rmpbc.h"
+#include "gromacs/pbcutil/pbc.h"
+#include "gromacs/fileio/xvgr.h"
+#include "gromacs/topology/index.h"
+#include "gromacs/utility/futil.h"
+
+#endif
+
+#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/fileio/tpxio.h"
+#include "gromacs/fileio/trxio.h"
+#include "gromacs/fileio/filenm.h"
+#include "gromacs/legacyheaders/typedefs.h"
 #include "gromacs/utility/cstringutil.h"
 #include "gromacs/utility/smalloc.h"
 #include "gromacs/commandline/pargs.h"
@@ -65,7 +79,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"       Copyright (C) 2013 - 2015 Rashmi Kumari and Andrew Lynn          ",
+			"       Copyright (C) 2013 - 2016 Rashmi Kumari and Andrew Lynn          ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -277,7 +291,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   t_filenm fnm[] =
     {
       { efTRX, "-f", NULL, ffREAD },
-      { efTPX, "-s", NULL, ffREAD },
+      { efTPS, "-s", NULL, ffREAD },
       { efMDP, "-i", NULL, ffOPTRD },
       { efNDX, "-n", "index", ffOPTRD },
       { efXVG, "-mm", "energy_MM", ffOPTWR },
@@ -341,7 +355,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
 
   //To show the option on the screen and to take the all option
   parse_common_args(&argc, argv,
-      PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT | PCA_BE_NICE, NFILE, fnm,
+      PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT , NFILE, fnm,
       asize(pa), pa, asize(desc), desc, 0, NULL, &oenv);
 
   // change rvdw to Angstrom
@@ -353,7 +367,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
   else
 	  bVerbose = FALSE;
 
-  if(!fn2bTPX(ftp2fn(efTPX, NFILE, fnm)))
+  if(!fn2bTPX(ftp2fn(efTPS, NFILE, fnm)))
 	  gmx_fatal(FARGS, "tpr file is necessary\n");
 
   if ((!bPBSA) && (!bMM))
@@ -382,7 +396,7 @@ int gmx_do_mmpbsa(int argc, char *argv[]) {
     }
 
 
-  read_tps_conf(ftp2fn(efTPX, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
+  read_tps_conf(ftp2fn(efTPS, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
   atoms = &(top.atoms);
 
   if ((bMM) && (!bDIFF) && (!bIncl14))

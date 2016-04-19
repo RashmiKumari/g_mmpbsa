@@ -71,7 +71,7 @@
 #include "apbs_routines.h"
 
 ////Added for the g_mmpbsa/////////////
-#ifdef HAVE_GROMACS50
+#if defined(HAVE_GROMACS50) || defined(HAVE_GROMACS51)
 #include "gromacs/utility/smalloc.h"
 #else
 #include "gromacs/smalloc.h"

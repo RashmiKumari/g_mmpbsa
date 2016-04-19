@@ -47,9 +47,15 @@
 #include <stdarg.h>
 
 /* Modified DvdS */
-#include "gromacs/legacyheaders/pbc.h"
-#include "gromacs/legacyheaders/macros.h"
+#ifdef HAVE_GROMACS50
 #include "gromacs/legacyheaders/vec.h"
+#include "gromacs/legacyheaders/pbc.h"
+#else
+#include "gromacs/math/vec.h"
+#include "gromacs/pbcutil/pbc.h"
+#endif
+
+#include "gromacs/legacyheaders/macros.h"
 #include "gromacs/utility/smalloc.h"
 #include "g_mmpbsa.h"
 

@@ -12,7 +12,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,8 +47,18 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifdef HAVE_GROMACS50
+
 #include "gromacs/legacyheaders/rmpbc.h"
 #include "gromacs/legacyheaders/xvgr.h"
+
+#else
+
+#include "gromacs/pbcutil/rmpbc.h"
+#include "gromacs/fileio/xvgr.h"
+
+#endif
+
 #include "gromacs/legacyheaders/typedefs.h"
 #include "gromacs/utility/smalloc.h"
 #include "gromacs/fileio/tpxio.h"

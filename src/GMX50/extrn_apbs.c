@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,13 @@
 #include <string.h>
 #include <ctype.h>
 #include "gromacs/utility/smalloc.h"
+
+#ifdef HAVE_GROMACS50
 #include "gromacs/legacyheaders/gmx_fatal.h"
+#else
+#include "gromacs/utility/fatalerror.h"
+#endif
+
 #include "../ExtractData.h"
 
 double get_totEnergy(char *line)	{

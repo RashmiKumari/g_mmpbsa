@@ -4,7 +4,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,19 +38,26 @@
 #include <string.h>
 #include <math.h>
 
-#include "gromacs/legacyheaders/typedefs.h"
+#ifdef HAVE_GROMACS50
 #include "gromacs/legacyheaders/vec.h"
 #include "gromacs/legacyheaders/gmx_fatal.h"
-#include "gromacs/legacyheaders/macros.h"
 #include "gromacs/legacyheaders/index.h"
+#include "gromacs/fileio/futil.h"
+#else
+#include "gromacs/math/vec.h"
+#include "gromacs/utility/fatalerror.h"
+#include "gromacs/topology/index.h"
+#include "gromacs/utility/futil.h"
+#endif
+
+#include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/legacyheaders/macros.h"
 #include "gromacs/utility/smalloc.h"
 #include "gromacs/fileio/tpxio.h"
 #include "gromacs/fileio/pdbio.h"
 #include "gromacs/fileio/filenm.h"
-#include "gromacs/fileio/futil.h"
 #include "gromacs/commandline/pargs.h"
 #include "gromacs/commandline/cmdlineinit.h"
-
 
 
 void CopyRightMsg()	{
@@ -61,7 +68,7 @@ void CopyRightMsg()	{
 			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
 			"               Contribution: Rajendra Kumar                             ",
 			"                                                                        ",
-			"      Copyright (C) 2013 - 2015 Rashmi Kumari and Andrew Lynn           ",
+			"      Copyright (C) 2013 - 2016 Rashmi Kumari and Andrew Lynn           ",
 			"                                                                        ",
 			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
 			"it under the terms of the GNU General Public License as published by    ",
@@ -174,7 +181,7 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
   CopyRightMsg();
   //To show the option on the screen and to take the all option
   parse_common_args(&argc, argv,
-      PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT | PCA_BE_NICE, NFILE, fnm,
+      PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT , NFILE, fnm,
       0, NULL, asize(desc), desc, 0, NULL, &oenv);
 
   read_tps_conf(ftp2fn(efTPS, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);

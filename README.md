@@ -1,11 +1,11 @@
 ### Introduction
 
 
-The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD], which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc. 
+The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD], which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc.
 
-g_mmpbsa is developed using two widely used open source software i.e. [GROMACS][GROMACS] and [APBS][APBS] and it has similar user interface like other GROMACS tools. 
+g_mmpbsa is developed using two widely used open source software i.e. [GROMACS][GROMACS] and [APBS][APBS] and it has similar user interface like other GROMACS tools.
 
-The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme. 
+The tool calculates components of binding energy using MM-PBSA method except the entropic term and energetic contribution of each residue to the binding using energy decomposition scheme.
 
 The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
 
@@ -30,7 +30,7 @@ The output from the tool is used further as input in python scripts which is pro
 
 *   It is implemented through open source software [GROMACS][GROMACS] and [APBS][APBS], making it accessible to large number of users.
 
-*   Supports **GROMACS 4.5.x**, **4.6.x** and **5.0.x** versions.
+*   Supports **GROMACS 4.5.x**, **4.6.x**, **5.0.x** and **5.1.x** versions.
 
 *   Supports **APBS 1.2.x**, **1.3.x** and **1.4.x** versions
 
@@ -46,7 +46,7 @@ The output from the tool is used further as input in python scripts which is pro
 
 *   Simultaneous computations of binding energy components and residue wise energy contribution, and thus it is computationally less expensive.
 
-*   This tool can be modified and/or redistributed under terms of GNU public license. 
+*   This tool can be modified and/or redistributed under terms of GNU public license.
 
 
 ***

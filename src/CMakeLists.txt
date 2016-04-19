@@ -4,7 +4,7 @@
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
 #
-# Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+# Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
 #
 # g_mmpbsa is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,10 +78,17 @@ if(${GROMACS_VERSION} VERSION_LESS "4.5.0")
 	message(FATAL_ERROR, "\n Not implemented for Gromacs version: ${GROMACS_VERSION} \n")
 endif()
 
-if(${GROMACS_VERSION} VERSION_EQUAL "5.0" OR ${GROMACS_VERSION} VERSION_GREATER "5.0")
+if(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
 	set(HAVE_GROMACS50 TRUE)
-	add_definitions("-DHAVE_GROMACS50")
-endif(${GROMACS_VERSION} VERSION_EQUAL "5.0" OR ${GROMACS_VERSION} VERSION_GREATER "5.0")
+	ADD_DEFINITIONS("-DHAVE_GROMACS50")
+  ENABLE_LANGUAGE(CXX)
+endif(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
+
+if(${GROMACS_VERSION} VERSION_GREATER "5.1")
+	set(HAVE_GROMACS51 TRUE)
+	ADD_DEFINITIONS("-DHAVE_GROMACS51")
+  ENABLE_LANGUAGE(CXX)
+endif(${GROMACS_VERSION} VERSION_GREATER "5.1")
 
 include_directories( ${GROMACS_INCLUDE_DIRS} )
 add_definitions( ${GROMACS_DEFINITIONS} )
@@ -226,7 +233,7 @@ endif()
 ##############################################################
 ###### GROMACS-45/46: Compiling and linking Without APBS #####
 ##############################################################
-if(EXT_APBS AND NOT HAVE_GROMACS50)
+if(EXT_APBS AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c  GMX46/radius.c GMX46/extrn_apbs.c ExtractData.c ExtractData.h)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
 endif()
@@ -236,7 +243,7 @@ endif()
 ##############################################################
 ##### GROMACS-45/46: Compiling and linking With APBS-1.3 #####
 ##############################################################
-if(NOT EXT_APBS AND NOT APBS14 AND NOT HAVE_GROMACS50)
+if(NOT EXT_APBS AND NOT APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs13/apbs_main.c apbs13/apbs_routines.c apbs13/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE Fortran)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} )
@@ -247,7 +254,7 @@ endif()
 ##############################################################
 ##### GROMACS-45/46: Compiling and linking With APBS-1.4 #####
 ##############################################################
-if(NOT EXT_APBS AND APBS14 AND NOT HAVE_GROMACS50)
+if(NOT EXT_APBS AND APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs14/apbs.h apbs14/apbs_main.c apbs14/apbs_routines.c apbs14/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-fopenmp")
@@ -258,7 +265,7 @@ endif()
 ##############################################################
 ####### GROMACS-50: Compiling and linking Without APBS #######
 ##############################################################
-if(EXT_APBS AND HAVE_GROMACS50)
+if(EXT_APBS AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
 	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c  GMX50/radius.c GMX50/extrn_apbs.c ExtractData.c ExtractData.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
@@ -269,7 +276,7 @@ endif()
 ##############################################################
 ###### GROMACS-50 Compiling and linking With APBS-1.3 ########
 ##############################################################
-if(NOT EXT_APBS AND NOT APBS14 AND HAVE_GROMACS50)
+if(NOT EXT_APBS AND NOT APBS14 AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
 	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c GMX50/radius.c apbs13/apbs_main.c apbs13/apbs_routines.c apbs13/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-lgfortran -lz")
@@ -280,7 +287,7 @@ endif()
 ##############################################################
 ####### GROMACS-50: Compiling and linking With APBS-1.4 ######
 ##############################################################
-if(NOT EXT_APBS AND APBS14 AND HAVE_GROMACS50)
+if(NOT EXT_APBS AND APBS14 AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
 	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c GMX50/radius.c apbs14/apbs.h apbs14/apbs_main.c apbs14/apbs_routines.c apbs14/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-lgfortran")
@@ -289,7 +296,7 @@ endif()
 
 
 ################# energy2bfac ###############################
-if(NOT HAVE_GROMACS50)
+if(NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
 	add_executable(energy2bfac GMX46/energy2bfac.c)
 	target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
 else()

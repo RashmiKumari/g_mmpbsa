@@ -12,7 +12,7 @@
  * Authors: Rashmi Kumari and Andrew Lynn
  * Contribution: Rajendra Kumar
  *
- * Copyright (C) 2013-2015 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,12 +45,19 @@
  */
 
 #include <ctype.h>
+#include "g_mmpbsa.h"
+
+#ifdef HAVE_GROMACS50
+#include "gromacs/legacyheaders/gmx_fatal.h"
+#else
+#include "gromacs/utility/fatalerror.h"
+#endif
+
 #include "gromacs/legacyheaders/typedefs.h"
+#include "gromacs/utility/cstringutil.h"
 #include "gromacs/legacyheaders/readinp.h"
 #include "gromacs/legacyheaders/warninp.h"
-#include "gromacs/legacyheaders/gmx_fatal.h"
-#include "gromacs/utility/cstringutil.h"
-#include "g_mmpbsa.h"
+
 
 #define MAXPTR 254
 static char grid[STRLEN], polar[STRLEN], apolar[STRLEN], wca[STRLEN];

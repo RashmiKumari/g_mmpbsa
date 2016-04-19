@@ -15,7 +15,7 @@
  *
  * Authors: Rajendra Kumar
  *
- * Copyright (C) 2013, 2014, 2015 Rajendra Kumar
+ * Copyright (C) 2013-2016 Rajendra Kumar
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

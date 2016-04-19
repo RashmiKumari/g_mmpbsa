@@ -21,8 +21,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "gromacs/legacyheaders/typedefs.h"
+#ifdef HAVE_GROMACS50
 #include "gromacs/legacyheaders/vec.h"
+#else
+#include "gromacs/math/vec.h"
+#endif
+
+#include "gromacs/legacyheaders/typedefs.h"
 #include "gromacs/utility/smalloc.h"
 #include "gromacs/fileio/tpxio.h"
 
