@@ -5,24 +5,24 @@ layout: page
 #### Contents
 
 * [**Pre-compiled binary**](#binary)
-    
+
     * [**Download**](#download-binary)
-    
+
     * [**Installation**](#install-binary)
 
 * [**Installation from source code**](#source)
-    
+
     * [**Download**](#download-source)
-    
+
     * [**With APBS-1.3.x**](#install-with-apbs13)
-    
+
     * [**With APBS-1.4.x**](#install-with-apbs14)
-    
+
     * [**Without APBS (To use with external APBS)**](#install-without-apbs)
 
 ***
 
-###  <a name="binary"></a> Pre-compiled executable program 
+###  <a name="binary"></a> Pre-compiled executable program
 
 Pre-compiled program **does not require** any external library or GROMACS and APBS package. These programs are standalone and without any dependency. Download, extract and use it.
 
@@ -62,6 +62,13 @@ Pre-compiled program **does not require** any external library or GROMACS and AP
     <td> <a href="package/GMX50x_extrn_APBS/g_mmpbsa.tar.gz"> Download </a> </td>
     <td> <a href="package/GMX50x_extrn_APBS_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
   </tr>
+  <tr>
+    <th>Gromacs-5.1.x</th>
+    <td> <a href="package/GMX51x/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX51x_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX51x_extrn_APBS/g_mmpbsa.tar.gz"> Download </a> </td>
+    <td> <a href="package/GMX51x_extrn_APBS_32bit/g_mmpbsa.tar.gz"> Download </a> </td>
+  </tr>
 </table>
 
 
@@ -75,15 +82,15 @@ Extract the package. Copy `g_mmpbsa` and `energy2bfac` from `bin` directory to `
     cd bin
     sudo cp g_mmpbsa /usr/local/bin/.
     sudo cp energy2bfac /usr/local/bin/.
-    
+
 or
-    
+
     tar -zxvf g_mmpbsa.tar.gz
     cd bin
     cp g_mmpbsa $HOME/bin/.
     cp energy2bfac $HOME/bin/.
-    
-or 
+
+or
 
 add `g_mmpbsa/bin` to `PATH` environment variable by adding following line in `.bashrc` file:
 
@@ -100,12 +107,12 @@ add `g_mmpbsa/bin` to `PATH` environment variable by adding following line in `.
 
 The [ZIP](https://github.com/RashmiKumari/g_mmpbsa/zipball/master) file or [TAR](https://github.com/RashmiKumari/g_mmpbsa/tarball/master) for the tool can be downloaded from [github](https://github.com/RashmiKumari/g_mmpbsa).
 
-Also, these files can be downloaded from the left side of current webpage. After downloading the file, extract ZIP/TAR file. 
+Also, these files can be downloaded from the left side of current webpage. After downloading the file, extract ZIP/TAR file.
 
 **2. Using git**
 
     git clone --depth 1 https://github.com/RashmiKumari/g_mmpbsa
-    
+
 
 #### <a name="install-with-apbs13"> </a> Install with APBS-1.2.x or 1.3.x
 
@@ -118,9 +125,9 @@ Also, these files can be downloaded from the left side of current webpage. After
 
 ##### <a name="install-gromacs"></a> A. Installation of GROMACS 4.5.x/4.6.x
 
-[GROMACS](http://www.gromacs.org/) should be compiled and installed from the source-code. 
+[GROMACS](http://www.gromacs.org/) should be compiled and installed from the source-code.
 
-`g_mmpbsa` cannot use GPU and cannot be compiled with CUDA. If CUDA is in PATH variable, GROMACS-4.6.x compiled by default with CUDA for GPU acceleration. To avoid error in g\_mmpbsa compilation, use `-DGMX_GPU=off` with `cmake` during installation of GROMACS-4.6.x. 
+`g_mmpbsa` cannot use GPU and cannot be compiled with CUDA. If CUDA is in PATH variable, GROMACS-4.6.x compiled by default with CUDA for GPU acceleration. To avoid error in g\_mmpbsa compilation, use `-DGMX_GPU=off` with `cmake` during installation of GROMACS-4.6.x.
 
 **Warning:**{: style="color: red"} Currently, double precision GROMACS is not supported.
 
@@ -131,7 +138,7 @@ Also, these files can be downloaded from the left side of current webpage. After
     ./configure --prefix=/opt/gromacs
     make
     sudo make install
-    
+
 `--prefix=/opt/gromacs` specifies the path where gromacs will be installed.
 
 **2. Installation of GROMACS-4.5.7 or GROMACS-4.6.x or Gromacs-5.0.x**
@@ -148,7 +155,7 @@ Also, these files can be downloaded from the left side of current webpage. After
 
 ##### B. Installation of APBS 1.2.x or 1.3.x
 
-[APBS](http://www.poissonboltzmann.org/apbs) should be compiled and installed from the source-code. 
+[APBS](http://www.poissonboltzmann.org/apbs) should be compiled and installed from the source-code.
 
 **Warning:**{: style="color: red"} Downloaded binaries and libraries would not work as some required libraries are missing.
 
@@ -220,7 +227,7 @@ Follow these steps to download and install APBS-1.4.1 version:
     cmake -DCMAKE_INSTALL_PREFIX=/opt/apbs -DENABLE_BEM=off -DENABLE_iAPBS=on ..
     make
     sudo make install
-    
+
 ##### C. Installation of g_mmpbsa
 
     cd g_mmpbsa
@@ -281,9 +288,9 @@ Install as described [above](#install-gromacs).
 
 ---
 [1]: package/GMX45x/g_mmpbsa.tar.gz
-[2]: package/GMX45x_32bit/g_mmpbsa.tar.gz 
+[2]: package/GMX45x_32bit/g_mmpbsa.tar.gz
 [3]: package/GMX45x_extrn_APBS/g_mmpbsa.tar.gz
-[4]: package/GMX45x_extrn_APBS_32bit/g_mmpbsa.tar.gz 
+[4]: package/GMX45x_extrn_APBS_32bit/g_mmpbsa.tar.gz
 [5]: package/GMX46x/g_mmpbsa.tar.gz
 [6]: package/GMX46x_32bit/g_mmpbsa.tar.gz
 [7]: package/GMX46x_extrn_APBS/g_mmpbsa.tar.gz
