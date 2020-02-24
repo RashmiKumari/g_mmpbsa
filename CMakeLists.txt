@@ -39,7 +39,7 @@ cmake_minimum_required(VERSION 2.8)
 project(g_mmpbsa)
 
 set(g_mmpbsa_MAJOR_VERSION 1)
-set(g_mmpbsa_MINOR_VERSION 6)
+set(g_mmpbsa_MINOR_VERSION 7)
 set(g_mmpbsa_PATCH_VERSION 0)
 set(g_mmpbsa_VERSION
   ${g_mmpbsa_MAJOR_VERSION}.${g_mmpbsa_MINOR_VERSION}.${g_mmpbsa_PATCH_VERSION})
