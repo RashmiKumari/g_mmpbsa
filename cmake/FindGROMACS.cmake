@@ -57,7 +57,7 @@ foreach(_dir $ENV{CMAKE_PREFIX_PATH})
 	if(IS_DIRECTORY "${_dir}/lib/pkgconfig/")
 		set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${_dir}/lib/pkgconfig")
 	endif()
-	# In gormacs 5.0 and later
+	# In gromacs-5.0 and later
 	if(IS_DIRECTORY "${_dir}/${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
 		set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${_dir}/${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 	endif()
