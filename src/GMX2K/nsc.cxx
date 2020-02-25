@@ -47,7 +47,8 @@
 #include "gromacs/math/vec.h"
 #include "gromacs/pbcutil/pbc.h"
 
-//#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/version.h"
+
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b) )
 #endif
@@ -653,8 +654,12 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
       copy_rvec(coords[iat],x[i]);
     }
     /* Updated 2020-02-24 slu */
+#if GMX_API_VERSION < 20180000
+    put_atoms_in_triclinic_unitcell(ecenterTRIC,box,nat,x);
+#else
     auto atomsArrayRef = gmx::arrayRefFromArray(reinterpret_cast<gmx::RVec *>(x), nat);
     put_atoms_in_triclinic_unitcell(ecenterTRIC,box,atomsArrayRef);
+#endif
     nxbox = max(1,floor(norm(box[XX])/ra2max));
     nybox = max(1,floor(norm(box[YY])/ra2max));
     nzbox = max(1,floor(norm(box[ZZ])/ra2max));
