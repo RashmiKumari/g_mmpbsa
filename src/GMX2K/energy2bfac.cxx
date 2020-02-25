@@ -254,7 +254,7 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
   }
 
   fComplex = gmx_ffopen(opt2fn("-c", NFILE, fnm),"w");
-#if GMX_API_VERSION < 20190000
+#if GMX_API_VERSION < 20180002
   write_pdbfile_indexed(fComplex,NULL,atoms,xtop,ePBC,box,' ',-1,isize[2],index[2],NULL,TRUE);
 #elif GMX_API_VERSION < 20200000
   write_pdbfile_indexed(fComplex,NULL,atoms,xtop,ePBC,box,' ',-1,isize[2],index[2],NULL,TRUE,FALSE);
@@ -263,7 +263,7 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
 #endif
 
   fS1 = gmx_ffopen(opt2fn("-s1", NFILE, fnm),"w");
-#if GMX_API_VERSION < 20190000
+#if GMX_API_VERSION < 20180002
   write_pdbfile_indexed(fS1,NULL,atoms,xtop,ePBC,box,' ',-1,isize[0],index[0],NULL,TRUE);
 #elif GMX_API_VERSION < 20200000
   write_pdbfile_indexed(fS1,NULL,atoms,xtop,ePBC,box,' ',-1,isize[0],index[0],NULL,TRUE,FALSE);
@@ -272,7 +272,7 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
 #endif
 
   fS2 = gmx_ffopen(opt2fn("-s2", NFILE, fnm),"w");
-#if GMX_API_VERSION < 20190000
+#if GMX_API_VERSION < 20180002
   write_pdbfile_indexed(fS2,NULL,atoms,xtop,ePBC,box,' ',-1,isize[1],index[1],NULL,TRUE);
 #elif GMX_API_VERSION < 20200000
   write_pdbfile_indexed(fS2,NULL,atoms,xtop,ePBC,box,' ',-1,isize[1],index[1],NULL,TRUE,FALSE);
