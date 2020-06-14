@@ -40,7 +40,7 @@
 
 #include <string.h>
 
-#include "warninp.h"
+#include "gromacs/fileio/warninp.h"
 #include "gromacs/utility/basedefinitions.h"
 
 #ifdef __cplusplus

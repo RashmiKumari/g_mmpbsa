@@ -41,14 +41,15 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "readinp.h"
-#include "warninp.h"
+#include "gromacs/fileio/readinp.h"
+#include "gromacs/fileio/warninp.h"
 
-#include "gromacs/fileio/gmxfio.h"
 #include "gromacs/utility/cstringutil.h"
 #include "gromacs/utility/fatalerror.h"
 #include "gromacs/utility/futil.h"
 #include "gromacs/utility/smalloc.h"
+
+#ifndef HAVE_GROMACS_FILEIO_READINP_H
 
 enum {
     eMultentOptName, eMultentOptNo, eMultentOptLast, eMultentOptNR
@@ -486,3 +487,5 @@ int get_eenum(int *ninp, t_inpfile **inp, const char *name, const char **defs)
 
     return get_eeenum(ninp, inp, name, defs, NULL);
 }
+
+#endif

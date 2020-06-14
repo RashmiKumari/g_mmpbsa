@@ -49,8 +49,8 @@
 
 #include "gromacs/utility/fatalerror.h"
 #include "gromacs/utility/cstringutil.h"
-#include "ported/readinp.h"
-#include "ported/warninp.h"
+#include "gromacs/fileio/readinp.h"
+#include "gromacs/fileio/warninp.h"
 
 
 #define MAXPTR 254

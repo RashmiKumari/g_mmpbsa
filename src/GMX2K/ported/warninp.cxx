@@ -38,7 +38,7 @@
 
 #include <string.h>
 
-#include "warninp.h"
+#include "gromacs/fileio/warninp.h"
 
 #include "gromacs/utility/cstringutil.h"
 #include "gromacs/utility/exceptions.h"
@@ -46,6 +46,7 @@
 #include "gromacs/utility/programcontext.h"
 #include "gromacs/utility/smalloc.h"
 
+#ifndef HAVE_GROMACS_FILEIO_WARNIMP_H
 
 const char *ShortProgram(void)
 {
@@ -241,3 +242,5 @@ void _incorrect_n_param(warninp_t wi, const char *fn, int line)
             fn, line);
     warning(wi, buf);
 }
+
+#endif

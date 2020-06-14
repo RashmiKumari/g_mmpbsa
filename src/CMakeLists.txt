@@ -3,6 +3,7 @@
 #
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
+# Contribution: Ievgen Sliusar
 #
 # Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
 #
@@ -311,10 +312,40 @@ endif()
 ###### GROMACS-20xx: Compiling and linking Without APBS ######
 ##############################################################
 if(EXT_APBS AND HAVE_GROMACS2016)
-	add_executable(g_mmpbsa GMX2K/main.cxx GMX2K/g_mmpbsa.h GMX2K/energy_mm.cxx GMX2K/InputPBSA.cxx GMX2K/nsc.cxx GMX2K/PbsaPrep.cxx GMX2K/psize.cxx GMX2K/radius.cxx GMX2K/extrn_apbs.cxx GMX2K/ported/readinp.cxx GMX2K/ported/readinp.h GMX2K/ported/warninp.cxx GMX2K/ported/warninp.h ExtractData.c ExtractData.h)
+	add_executable(g_mmpbsa GMX2K/main.cxx GMX2K/g_mmpbsa.h GMX2K/energy_mm.cxx GMX2K/InputPBSA.cxx GMX2K/nsc.cxx GMX2K/PbsaPrep.cxx GMX2K/psize.cxx GMX2K/radius.cxx GMX2K/extrn_apbs.cxx GMX2K/ported/readinp.cxx GMX2K/ported/warninp.cxx ExtractData.c ExtractData.h)
 	SET_SOURCE_FILES_PROPERTIES(ExtractData.c PROPERTIES LANGUAGE CXX)
 	#SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
+endif()
+##############################################################
+
+
+##############################################################
+###### GROMACS-2020 and newer: do header fixups         ######
+##############################################################
+if(HAVE_GROMACS2016)
+	include(FixupHeader)
+	set(FIXUP_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/GMX2K/fixups)
+	set(CMAKE_REQUIRED_INCLUDES "${GROMACS_INCLUDE_DIRS}")
+	FixupHeaderCXX("gromacs/commandline/cmdlineinit.h")
+	FixupHeaderCXX("gromacs/commandline/filenm.h")
+	FixupHeaderCXX("gromacs/commandline/pargs.h")
+	FixupHeaderCXX("gromacs/fileio/confio.h")
+	FixupHeaderCXX("gromacs/fileio/oenv.h")
+	FixupHeaderCXX("gromacs/fileio/filetypes.h")
+	FixupHeaderCXX("gromacs/fileio/readinp.h")
+	FixupHeaderCXX("gromacs/fileio/warninp.h")
+	FixupHeaderCXX("gromacs/fileio/xvgr.h")
+	FixupHeaderCXX("gromacs/math/vec.h")
+	FixupHeaderCXX("gromacs/pbcutil/pbc.h")
+	FixupHeaderCXX("gromacs/pbcutil/rmpbc.h")
+	FixupHeaderCXX("gromacs/topology/index.h")
+	FixupHeaderCXX("gromacs/utility/arrayref.h")
+	FixupHeaderCXX("gromacs/utility/arraysize.h")
+	FixupHeaderCXX("gromacs/utility/cstringutil.h")
+	FixupHeaderCXX("gromacs/utility/exceptions.h")
+	FixupHeaderCXX("gromacs/utility/fatalerror.h")
+	FixupHeaderCXX("gromacs/utility/futil.h")
 endif()
 ##############################################################
 
