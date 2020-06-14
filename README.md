@@ -23,14 +23,14 @@ The output from the tool is used further as input in python scripts which is pro
 ***
 
 
-### Features v1.6
+### Features v1.7
 
 
 *   It is an open source tool and can be modified under the terms of the GNU public license
 
 *   It is implemented through open source software [GROMACS][GROMACS] and [APBS][APBS], making it accessible to large number of users.
 
-*   Supports **GROMACS 4.5.x**, **4.6.x**, **5.0.x** and **5.1.x** versions.
+*   Supports **GROMACS 4.5.x**, **4.6.x**, **5.0.x**, **5.1.x**, **2016.x**, **2018.x** and **2019.x** versions.
 
 *   Supports **APBS 1.2.x**, **1.3.x** and **1.4.x** versions
 

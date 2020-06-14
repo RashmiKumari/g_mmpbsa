@@ -3,6 +3,7 @@
 #
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
+# Contribution: Ievgen Sliusar
 #
 # Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
 #
@@ -39,8 +40,8 @@ cmake_minimum_required(VERSION 2.8)
 project(g_mmpbsa)
 
 set(g_mmpbsa_MAJOR_VERSION 1)
-set(g_mmpbsa_MINOR_VERSION 6)
-set(g_mmpbsa_PATCH_VERSION 0)
+set(g_mmpbsa_MINOR_VERSION 7)
+set(g_mmpbsa_PATCH_VERSION 1)
 set(g_mmpbsa_VERSION
   ${g_mmpbsa_MAJOR_VERSION}.${g_mmpbsa_MINOR_VERSION}.${g_mmpbsa_PATCH_VERSION})
 
@@ -51,7 +52,7 @@ set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header fi
 if(WIN32 AND NOT CYGWIN)
 	set(DEF_INSTALL_CMAKE_DIR CMake)
 else()
-set(DEF_INSTALL_CMAKE_DIR lib/CMake/g_mmpbsa)
+set(DEF_INSTALL_CMAKE_DIR lib/CMake/${PROJECT_NAME})
 endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
 
@@ -67,9 +68,11 @@ endforeach()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # set up include-directories
+set(BUILD_INCLUDE ${CMAKE_BINARY_DIR}/include)
 include_directories(
-	"${g_mmpbsa_SOURCE_DIR}"   # to find src/*.h
-	"${g_mmpbsa_BINARY_DIR}")  # to find src/config.h
+	"${PROJECT_SOURCE_DIR}"   # to find src/*.h
+	"${PROJECT_BINARY_DIR}"   # to find src/config.h
+	"${BUILD_INCLUDE}")       # to find header fix-ups
 
 # Add sub-directories
 add_subdirectory(src)

@@ -1,6 +1,9 @@
+Version 1.7
+1. Added support for Gromacs-2016+ versions
+
 Version 1.6:
 
-1. Added support for Gromacs-5.0.x versions
+1. Added support for Gromacs-5.0.x and Gromacs-5.1.x versions
 
 2. Automatic detection of Gromacs versions. No need to write Gromacs version during compilation.
 
