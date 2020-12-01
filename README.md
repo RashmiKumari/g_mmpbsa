@@ -70,3 +70,5 @@ The output from the tool is used further as input in python scripts which is pro
 [gromacs paper]: http://bioinformatics.oxfordjournals.org/content/29/7/845.abstract
 [sasa paper]: http://onlinelibrary.wiley.com/doi/10.1002/jcc.540160303/abstract
 [wca paper]: http://www.pnas.org/content/103/22/8331.abstract
+
+Verified!
