@@ -57,15 +57,32 @@ set(CMAKE_PREFIX_PATH "" CACHE STRING "Extra locations to search for external li
 
 
 ##############################################################
+################### Including GROMACS SRC ####################
+##############################################################
+if(GMX_SRC)
+    if(EXISTS "${GMX_SRC}/src/gromacs")
+        set(GROMACS_SRC_INCLUDE "${GMX_SRC}/src/")
+        message(STATUS "Found GROMACS Source directory for header files: ${GMX_SRC}/src/")
+    else()
+        message(FATAL_ERROR "\n ${GMX_SRC}/src/gromacs not found in GROMACS SOURCE PATH. \nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
+    endif()
+else()
+    message(FATAL_ERROR "\nGROMACS SOURCE PATH is not defined.....\nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
+endif()
+
+##############################################################
+
+##############################################################
 ################### CHECKING GROMACS PATH ####################
 ##############################################################
-find_package(GROMACS COMPONENTS "libgromacs")
-if (NOT GROMACS_FOUND)
-	message(STATUS "Continue checking for other Gromacs version library file")
-endif(NOT GROMACS_FOUND)
+if(GMX_DOUBLE)
+    find_package(GROMACS COMPONENTS "libgromacs_d")
+else()
+    find_package(GROMACS COMPONENTS "libgromacs")
+endif()
 
 if (NOT GROMACS_FOUND)
-	find_package(GROMACS COMPONENTS "libgmx")
+	message(STATUS "Continue checking for other Gromacs version library file")
 endif(NOT GROMACS_FOUND)
 
 if (NOT GROMACS_FOUND)
@@ -74,237 +91,23 @@ endif(NOT GROMACS_FOUND)
 
 message(STATUS "Found Gromacs include directory: " ${GROMACS_INCLUDE_DIRS})
 
-if(${GROMACS_VERSION} VERSION_LESS "4.5.0")
-	message(FATAL_ERROR, "\n Not implemented for Gromacs version: ${GROMACS_VERSION} \n")
-endif()
+if(${GROMACS_VERSION} VERSION_LESS "2021")
+	message(FATAL_ERROR "Gromacs-${GROMACS_VERSION} not supported. Please use Gromacs-2021 and above versions.\n")
+endif(${GROMACS_VERSION} VERSION_LESS "2021")
 
-if(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
-	set(HAVE_GROMACS50 TRUE)
-	ADD_DEFINITIONS("-DHAVE_GROMACS50")
-  ENABLE_LANGUAGE(CXX)
-endif(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
-
-if(${GROMACS_VERSION} VERSION_GREATER "5.1")
-	set(HAVE_GROMACS51 TRUE)
-	ADD_DEFINITIONS("-DHAVE_GROMACS51")
-  ENABLE_LANGUAGE(CXX)
-endif(${GROMACS_VERSION} VERSION_GREATER "5.1")
-
+include_directories( ${GROMACS_SRC_INCLUDE} )
 include_directories( ${GROMACS_INCLUDE_DIRS} )
 add_definitions( ${GROMACS_DEFINITIONS} )
 ##############################################################
 
 
-##############################################################
-######################## APBS-1.3 PATH  ######################
-##############################################################
-if (NOT EXT_APBS AND NOT APBS14)
-
-	if(${GROMACS_VERSION} VERSION_EQUAL "5.0" OR ${GROMACS_VERSION} VERSION_GREATER "5.0")
-		message(WARNING "\nTNG format trajectory support in Gromacs-${GROMACS_VERSION} conflicts the APBS-1.3 library. \n 1) Re-install Gromacs by using \"-DGMX_USE_TNG=off\" option to disable TNG trajectory support. \n\tor\n 2) Use APBS-1.4.x.\n\t IGNORE this WARNING, IF any of the above option is already considered, ")
-	endif()
-
-	ENABLE_LANGUAGE(Fortran)
-	set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fopenmp")
-
-	if(BUILD_STATIC)
-		SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-	endif()
-
-	# Add definition to compile internal APBS code
-	ADD_DEFINITIONS(-DINT_APBS)
-
-	if(NOT APBS_INSTALL)
-		message(FATAL_ERROR "\nPath to APBS installation directory is not provided. \nUSE:\n -DAPBS_INSTALL=/path/to/APBS/installation/directory")
-	endif()
-
-	# Libraries from installation directory
-	find_library(APBS_LIB1 apbsmainroutines HINTS "${APBS_INSTALL}/lib")
-	find_library(APBS_LIB2 apbs HINTS "${APBS_INSTALL}/lib")
-
-	if (NOT APBS_LIB1)
-		message(FATAL_ERROR "\n libapbsmainroutines.a not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	if (NOT APBS_LIB2)
-		message(FATAL_ERROR "\n libapbs.a not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	list(APPEND APBS_LIBS "-L${APBS_INSTALL}/lib")
-	list(APPEND APBS_LIBS "-lapbsmainroutines")
-	list(APPEND APBS_LIBS "-lapbs")
-
-	# Libraries from source directory
-	if (NOT APBS_SRC)
-		message(FATAL_ERROR "\nPath to APBS source directory is not defined....\nUSE:\n -DAPBS_SRC=/path/to/apbs-1.3-source \n")
-	endif()
-
-	find_library(APBS_BLAS apbsblas HINTS "${APBS_SRC}/contrib/lib")
-	find_library(MALOC maloc HINTS "${APBS_SRC}/contrib/lib")
-	find_library(APBSGEN apbsgen HINTS "${APBS_SRC}/src/generic/.libs")
-	find_library(Z z HINTS "${APBS_SRC}/contrib/zlib/.libs")
-
-	if (NOT APBS_BLAS)
-		message(FATAL_ERROR "\n libapbsblas.a not found in \"${APBS_SRC}/contrib/lib\" directory \n")
-	endif()
-	if (NOT MALOC)
-		message(FATAL_ERROR "\n libmaloc.a not found in \"${APBS_SRC}/contrib/lib\" directory \n")
-	endif()
-	if (NOT APBSGEN)
-		message(FATAL_ERROR "\n libapbsgen.a not found in \"${APBS_SRC}/src/generic/.libs\" directory \n")
-	endif()
-	if (NOT Z)
-		message(FATAL_ERROR "\n libz.a not found in \"${APBS_SRC}/contrib/zlib/.libs\" directory \n")
-	endif()
-
-
-	list(APPEND APBS_LIBS "-L${APBS_SRC}/contrib/lib")
-	list(APPEND APBS_LIBS "-L${APBS_SRC}/contrib/zlib/.libs")
-	list(APPEND APBS_LIBS "-L${APBS_SRC}/src/generic/.libs")
-	list(APPEND APBS_LIBS "-lapbsblas")
-	list(APPEND APBS_LIBS "-lmaloc")
-	list(APPEND APBS_LIBS "-lapbsgen")
-	list(APPEND APBS_LIBS "-lz")
-
-	# Headers
-	include_directories("${APBS_SRC}/src/aaa_inc")
-	include_directories("${APBS_SRC}/contrib/include")
-endif()
-################### APBS-1.3 SECTION END #####################
-
-
-##############################################################
-######################## APBS-1.4 PATH  ######################
-##############################################################
-if (NOT EXT_APBS AND APBS14)
-
-	# Add definition to compile internal APBS code
-	ADD_DEFINITIONS(-DINT_APBS)
-
-	if(NOT APBS_INSTALL)
-		message(FATAL_ERROR "\nPath to APBS installation directory is not provided. \nUSE:\n -DAPBS_INSTALL=/path/to/APBS/installation/directory")
-	endif()
-
-	# Libraries from installation directory
-	find_library(MALOC maloc HINTS "${APBS_INSTALL}/lib")
-	find_library(GEOFLOW apbs_geoflow HINTS "${APBS_INSTALL}/lib")
-	find_library(MG apbs_mg HINTS "${APBS_INSTALL}/lib")
-	find_library(PMGC apbs_pmgc HINTS "${APBS_INSTALL}/lib")
-	find_library(GENERIC apbs_generic HINTS "${APBS_INSTALL}/lib")
-
-	if (NOT MALOC)
-		message(FATAL_ERROR "\n libmaloc.a or libmaloc.so not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	if (NOT GEOFLOW)
-		message(FATAL_ERROR "\n libapbs_geoflow.a  or libapbs_geoflow.so not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	if (NOT MG)
-		message(FATAL_ERROR "\n libapbs_mg.a  or libapbs_mg.so not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	if (NOT PMGC)
-		message(FATAL_ERROR "\n libapbs_pmgc.a  or libapbs_pmgc.so not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	if (NOT GENERIC)
-		message(FATAL_ERROR "\n libapbs_generic.a  or libapbs_generic.so not found in ${APBS_INSTALL}/lib directory \n")
-	endif()
-
-	list(APPEND APBS_LIBS "-L${APBS_INSTALL}/lib")
-	list(APPEND APBS_LIBS "-lmaloc")
-	list(APPEND APBS_LIBS "-lapbs_geoflow")
-	list(APPEND APBS_LIBS "-lapbs_mg")
-	list(APPEND APBS_LIBS "-lapbs_pmgc")
-	list(APPEND APBS_LIBS "-lapbs_generic")
-
-	# Headers
-	include_directories("${APBS_INSTALL}/include")
-	include_directories("${APBS_INSTALL}/include/apbs")
-endif()
-
-################### APBS-1.4 SECTION END #####################
-
-
-
-
-
-##############################################################
-###### GROMACS-45/46: Compiling and linking Without APBS #####
-##############################################################
-if(EXT_APBS AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
-	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c  GMX46/radius.c GMX46/extrn_apbs.c ExtractData.c ExtractData.h)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
-endif()
-##############################################################
-
-
-##############################################################
-##### GROMACS-45/46: Compiling and linking With APBS-1.3 #####
-##############################################################
-if(NOT EXT_APBS AND NOT APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
-	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs13/apbs_main.c apbs13/apbs_routines.c apbs13/apbs_routines.h)
-	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE Fortran)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} )
-endif()
-##############################################################
-
-
-##############################################################
-##### GROMACS-45/46: Compiling and linking With APBS-1.4 #####
-##############################################################
-if(NOT EXT_APBS AND APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
-	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs14/apbs.h apbs14/apbs_main.c apbs14/apbs_routines.c apbs14/apbs_routines.h)
-	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-fopenmp")
-endif()
-##############################################################
-
-
-##############################################################
-####### GROMACS-50: Compiling and linking Without APBS #######
-##############################################################
-if(EXT_APBS AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
-	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c  GMX50/radius.c GMX50/extrn_apbs.c ExtractData.c ExtractData.h)
-	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
-endif()
-##############################################################
-
-
-##############################################################
-###### GROMACS-50 Compiling and linking With APBS-1.3 ########
-##############################################################
-if(NOT EXT_APBS AND NOT APBS14 AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
-	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c GMX50/radius.c apbs13/apbs_main.c apbs13/apbs_routines.c apbs13/apbs_routines.h)
-	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-lgfortran -lz")
-endif()
-##############################################################
-
-
-##############################################################
-####### GROMACS-50: Compiling and linking With APBS-1.4 ######
-##############################################################
-if(NOT EXT_APBS AND APBS14 AND (HAVE_GROMACS50 OR HAVE_GROMACS51) )
-	add_executable(g_mmpbsa GMX50/main.c GMX50/g_mmpbsa.h GMX50/energy_mm.c GMX50/InputPBSA.c GMX50/nsc.c GMX50/PbsaPrep.c GMX50/psize.c GMX50/radius.c apbs14/apbs.h apbs14/apbs_main.c apbs14/apbs_routines.c apbs14/apbs_routines.h)
-	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
-	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-lgfortran")
-endif()
-##############################################################
-
-
-################# energy2bfac ###############################
-if(NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
-	add_executable(energy2bfac GMX46/energy2bfac.c)
-	target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
-else()
-	add_executable(energy2bfac GMX50/energy2bfac.c)
-	SET_TARGET_PROPERTIES(energy2bfac PROPERTIES LINKER_LANGUAGE CXX)
-	target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
-endif()
-
+add_executable(g_mmpbsa main.cpp nsc.cpp)
+SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
+target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
+	
+add_executable(energy2bfac energy2bfac.cpp)
+SET_TARGET_PROPERTIES(energy2bfac PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
+target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
 
 install(TARGETS g_mmpbsa DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 install(TARGETS energy2bfac DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)

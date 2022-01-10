@@ -1,6 +1,5 @@
 ### Introduction
 
-
 The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD], which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc.
 
 g_mmpbsa is developed using two widely used open source software i.e. [GROMACS][GROMACS] and [APBS][APBS] and it has similar user interface like other GROMACS tools.
@@ -22,31 +21,35 @@ The output from the tool is used further as input in python scripts which is pro
 
 ***
 
-
-### Features v1.6
-
+### Features v2.0
 
 *   It is an open source tool and can be modified under the terms of the GNU public license
 
 *   It is implemented through open source software [GROMACS][GROMACS] and [APBS][APBS], making it accessible to large number of users.
 
-*   Supports **GROMACS 4.5.x**, **4.6.x**, **5.0.x** and **5.1.x** versions.
+*   Supports **GROMACS 2021**  and all previous versions.
 
-*   Supports **APBS 1.2.x**, **1.3.x** and **1.4.x** versions
+*   Supports any **APBS** versions - now as an **external** tool
 
-*   Inherits APBS capability of parallel computation using **OpenMP**. See details [here](http://rashmikumari.github.io/g_mmpbsa/How-to-Run.html#openmp).
+*   Inherits APBS capability of parallel computation using **OpenMP**.
 
-*   Supports **external APBS** execuatble with **mpirun** for parallel computation on HPC. See details [here](http://rashmikumari.github.io/g_mmpbsa/How-to-Run.html#mpirun).
-
-*   Options for van der Waal radii that are used for solvation free energy calculation using implicit solvent models.
-
-*   Options for several non-polar solvation model such as SASA, SAV and Weeks–Chandler–Andersen (WCA).
+*   Options for several non-polar solvation model such as SASA and SAV.
 
 *   Options for calculating contribution of each residue in the net binding energy.
 
 *   Simultaneous computations of binding energy components and residue wise energy contribution, and thus it is computationally less expensive.
 
 *   This tool can be modified and/or redistributed under terms of GNU public license.
+
+***
+
+### Removed features from previous versions
+
+*   Removed internal APBS linking, now always requires an external APBS program.
+
+*   Removed van der Waal radii options. Now by default only Bondii radii is used. Any missing radius is taken from force-field parameters.
+
+*   Weeks–Chandler–Andersen (WCA) non-polar solvation model is removed.
 
 
 ***

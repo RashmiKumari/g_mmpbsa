@@ -36,9 +36,6 @@
  * Modified by Rajendra Kumar for g_mmpbsa
  * ------------------------------------------------------
  */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -46,18 +43,10 @@
 #include <math.h>
 #include <stdarg.h>
 
-/* Modified DvdS */
-#ifdef HAVE_GROMACS50
-#include "gromacs/legacyheaders/vec.h"
-#include "gromacs/legacyheaders/pbc.h"
-#else
-#include "gromacs/math/vec.h"
-#include "gromacs/pbcutil/pbc.h"
-#endif
+#include <gromacs/trajectoryanalysis.h>
 
-#include "gromacs/legacyheaders/macros.h"
-#include "gromacs/utility/smalloc.h"
-#include "g_mmpbsa.h"
+using namespace std;
+using namespace gmx;
 
 #define TEST_NSC 0
 
@@ -67,6 +56,10 @@
 
 #define UNSP_ICO_DOD      9
 #define UNSP_ICO_ARC     10
+
+#define FLAG_DOTS       01
+#define FLAG_VOLUME     02
+#define FLAG_ATOM_AREA  04
 
 real   *xpunsp=NULL;
 real   del_cube;
@@ -81,6 +74,10 @@ int    last_cubus=0;
 #define UPDATE_FL  __file__=__FILE__,__line__=__LINE__
 const char * __file__;   /* declared versions of macros */
 int  __line__;           /* __FILE__  and __LINE__ */
+
+// copied from #include <gromacs/utility/fatalerror.h>
+void _range_check(int n, int n_min, int n_max, const char* warn_str, const char* var, const char* file, int line);
+#define range_check(n, n_min, n_max) _range_check(n, n_min, n_max, NULL, #n, __FILE__, __LINE__)
 
 #ifdef ERROR
 #undef ERROR
@@ -291,7 +288,7 @@ int ico_dot_dod(int densit) { /* densit...required dots per unit sphere */
   real *xus=NULL;
   /* calculate tesselation level */
   a = sqrt((((real) densit)-2.)/30.);
-  tess = max((int) ceil(a), 1);
+  tess = std::max((int) ceil(a), 1);
   n_dot = 30*tess*tess+2;
   if (n_dot < densit) {
     ERROR("ico_dot_dod: error in formula for tessalation level (%d->%d, %d)",
@@ -464,18 +461,18 @@ int make_unsp(int densit, int mode, int * num_dot, int cubus) {
     last_cubus = 0;
     i=1;
     while (i*i*i*2 < ndot) i++;
-    ico_cube = max(i-1, 0);
+    ico_cube = std::max(i-1, 0);
   }
   ico_cube_cb = ico_cube*ico_cube*ico_cube;
   del_cube=2./((real)ico_cube);
   snew(work,ndot);
   xus = xpunsp;
   for (l=0; l<ndot; l++) {
-    i = max((int) floor((1.+xus[3*l])/del_cube), 0);
+    i = std::max((int) floor((1.+xus[3*l])/del_cube), 0);
     if (i>=ico_cube) i = ico_cube-1;
-    j = max((int) floor((1.+xus[1+3*l])/del_cube), 0);
+    j = std::max((int) floor((1.+xus[1+3*l])/del_cube), 0);
     if (j>=ico_cube) j = ico_cube-1;
-    k = max((int) floor((1.+xus[2+3*l])/del_cube), 0);
+    k = std::max((int) floor((1.+xus[2+3*l])/del_cube), 0);
     if (k>=ico_cube) k = ico_cube-1;
     ijk = i+j*ico_cube+k*ico_cube*ico_cube;
     work[l] = ijk;
@@ -511,7 +508,7 @@ int make_unsp(int densit, int mode, int * num_dot, int cubus) {
       }		/* cycle k */
     }			/* cycle j */
   }			/* cycle i */
-  free(work);
+  sfree(work);
 
   return 0;
 }
@@ -524,13 +521,13 @@ typedef struct _stwknb {
   real dot;
 } Neighb;
 
-int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
+int nsc_dclm(rvec *coords, real *radius, int nat,
 		 int  densit, int mode,
 		 real *value_of_area, double **at_area,
 		 real *value_of_vol,
 		 double ** at_vol,
 		 real **lidots, int *nu_dots,
-		 atom_id index[],int ePBC,matrix box)
+		 int index[])
 {
   int iat, i, ii, iii, ix, iy, iz, ixe, ixs, iye, iys, ize, izs, i_ac;
   int jat, j, jj, jjj, jx, jy, jz;
@@ -548,7 +545,6 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   int  nxbox, nybox, nzbox, nxy, nxyz;
   real xmin=0, ymin=0, zmin=0, xmax, ymax, zmax, ra2max, d, *pco;
   /* Added DvdS 2006-07-19 */
-  t_pbc pbc;
   rvec  ddx,*x=NULL;
   int   iat_xx,jat_xx;
 
@@ -573,8 +569,8 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   dotarea = FOURPI/(real) n_dot;
   area = 0.;
 
-  if (debug)
-    fprintf(debug,"nsc_dclm: n_dot=%5d %9.3f\n", n_dot, dotarea);
+  //if (debug)
+  //  fprintf(debug,"nsc_dclm: n_dot=%5d %9.3f\n", n_dot, dotarea);
 
   /* start with neighbour list */
   /* calculate neighbour list with the box algorithm */
@@ -615,28 +611,10 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   ra2max = radius[index[0]];
   for (iat_xx=1; (iat_xx<nat); iat_xx++) {
     iat = index[iat_xx];
-    ra2max = max(ra2max, radius[iat]);
+    ra2max = std::max(ra2max, radius[iat]);
   }
   ra2max = 2*ra2max;
 
-  /* Added DvdS 2006-07-19 */
-  /* Updated 2008-10-09 */
-  if (box) {
-    set_pbc(&pbc,ePBC,box);
-    snew(x,nat);
-    for(i=0; (i<nat); i++) {
-      iat  = index[0];
-      copy_rvec(coords[iat],x[i]);
-    }
-    put_atoms_in_triclinic_unitcell(ecenterTRIC,box,nat,x);
-    nxbox = max(1,floor(norm(box[XX])/ra2max));
-    nybox = max(1,floor(norm(box[YY])/ra2max));
-    nzbox = max(1,floor(norm(box[ZZ])/ra2max));
-    if (debug)
-      fprintf(debug,"nbox = %d, %d, %d\n",nxbox,nybox,nzbox);
-  }
-  else {
-    /* dimensions of atomic set, cell edge is 2*ra_max */
     iat  = index[0];
     xmin = coords[iat][XX]; xmax = xmin; xs=xmin;
     ymin = coords[iat][YY]; ymax = ymin; ys=ymin;
@@ -654,19 +632,19 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
     xs = xs/ (real) nat;
     ys = ys/ (real) nat;
     zs = zs/ (real) nat;
-    if (debug)
-      fprintf(debug,"nsc_dclm: n_dot=%5d ra2max=%9.3f %9.3f\n", n_dot, ra2max, dotarea);
+    //if (debug)
+    //  fprintf(debug,"nsc_dclm: n_dot=%5d ra2max=%9.3f %9.3f\n", n_dot, ra2max, dotarea);
 
-    d = xmax-xmin; nxbox = (int) max(ceil(d/ra2max), 1.);
+    d = xmax-xmin; nxbox = (int) max((double) ceil(d/ra2max), 1.);
     d = (((real)nxbox)*ra2max-d)/2.;
     xmin = xmin-d; xmax = xmax+d;
-    d = ymax-ymin; nybox = (int) max(ceil(d/ra2max), 1.);
+    d = ymax-ymin; nybox = (int) max((double) ceil(d/ra2max), 1.);
     d = (((real)nybox)*ra2max-d)/2.;
     ymin = ymin-d; ymax = ymax+d;
-    d = zmax-zmin; nzbox = (int) max(ceil(d/ra2max), 1.);
+    d = zmax-zmin; nzbox = (int) max((double) ceil(d/ra2max), 1.);
     d = (((real)nzbox)*ra2max-d)/2.;
     zmin = zmin-d; zmax = zmax+d;
-  }
+
   /* Help variables */
   nxy = nxbox*nybox;
   nxyz = nxy*nzbox;
@@ -677,41 +655,20 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   snew(wkdot,n_dot);
   snew(wkbox,nxyz+1);
 
-  if (box) {
-    matrix box_1;
-    rvec   x_1;
-    int    ix,iy,iz,m;
-    m_inv(box,box_1);
-    for(i=0; (i<nat); i++) {
-      mvmul(box_1,x[i],x_1);
-      ix = ((int)floor(x_1[XX]*nxbox) + 2*nxbox) % nxbox;
-      iy = ((int)floor(x_1[YY]*nybox) + 2*nybox) % nybox;
-      iz = ((int)floor(x_1[ZZ]*nzbox) + 2*nzbox) % nzbox;
-      j =  ix + iy*nxbox + iz*nxbox*nybox;
-      if (debug)
-	fprintf(debug,"Atom %d cell index %d. x = (%8.3f,%8.3f,%8.3f) fc = (%8.3f,%8.3f,%8.3f)\n",
-		i,j,x[i][XX],x[i][YY],x[i][ZZ],x_1[XX],x_1[YY],x_1[ZZ]);
-      range_check(j,0,nxyz);
-      wkat1[i] = j;
-      wkbox[j]++;
-    }
-  }
-  else {
     /* Put the atoms in their boxes */
     for (iat_xx=0; (iat_xx<nat); iat_xx++) {
       iat = index[iat_xx];
       pco = coords[iat];
-      i = (int) max(floor((pco[XX]-xmin)/ra2max), 0);
+      i = (int) max( (double) floor((pco[XX]-xmin)/ra2max), 0.);
       i = min(i,nxbox-1);
-      j = (int) max(floor((pco[YY]-ymin)/ra2max), 0);
+      j = (int) max( (double) floor((pco[YY]-ymin)/ra2max), 0.);
       j = min(j,nybox-1);
-      l = (int) max(floor((pco[ZZ]-zmin)/ra2max), 0);
+      l = (int) max( (double) floor((pco[ZZ]-zmin)/ra2max), 0.);
       l = min(l,nzbox-1);
       i = i+j*nxbox+l*nxy;
       wkat1[iat_xx] = i;
       wkbox[i]++;
     }
-  }
 
   /* sorting of atoms in accordance with box numbers */
   j = wkbox[0];
@@ -727,11 +684,11 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
     iat = index[iat_xx];
     range_check(wkat1[iat_xx],0,nxyz);
     wkatm[--wkbox[wkat1[iat_xx]]] = iat_xx;
-    if (debug)
-      fprintf(debug,"atom %5d on place %5d\n", iat, wkbox[wkat1[iat_xx]]);
+    //if (debug)
+      //fprintf(debug,"atom %5d on place %5d\n", iat, wkbox[wkat1[iat_xx]]);
   }
 
-  if (debug) {
+  /*if (debug) {
     fprintf(debug,"nsc_dclm: n_dot=%5d ra2max=%9.3f %9.3f\n",
 	    n_dot, ra2max, dotarea);
     fprintf(debug,"neighbour list calculated/box(xyz):%d %d %d\n",
@@ -743,60 +700,45 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
     for (i=0; i<nat; i++) {
       fprintf(debug,"list place %5d by atom %7d\n", i, index[wkatm[i]]);
     }
-  }
+  }*/
 
-  /* calculate surface for all atoms, step cube-wise */
-  for (iz=0; iz<nzbox; iz++) {
-    iii = iz*nxy;
-    if (box) {
-      izs = iz-1;
-      ize = min(iz+2,izs+nzbox);
-    }
-    else {
-      izs = max(iz-1,0);
-      ize = min(iz+2, nzbox);
-    }
-    for (iy=0; iy<nybox; iy++) {
-      ii = iy*nxbox+iii;
-      if (box) {
-	iys = iy-1;
-	iye = min(iy+2,iys+nybox);
-      }
-      else {
-	iys = max(iy-1,0);
-	iye = min(iy+2, nybox);
-      }
-      for (ix=0; ix<nxbox; ix++) {
-	i = ii+ix;
-	iii1=wkbox[i];
-	iii2=wkbox[i+1];
-	if (iii1 >= iii2)
-	  continue;
-	if (box) {
-	  ixs = ix-1;
-	  ixe = min(ix+2,ixs+nxbox);
-	}
-	else {
-	  ixs = max(ix-1,0);
-	  ixe = min(ix+2, nxbox);
-	}
-	iiat = 0;
-	/* make intermediate atom list */
-	for (jz=izs; jz<ize; jz++) {
-	  jjj = ((jz+nzbox) % nzbox)*nxy;
-	  for (jy=iys; jy<iye; jy++) {
-	    jj = ((jy+nybox) % nybox)*nxbox+jjj;
-	    for (jx=ixs; jx<ixe; jx++) {
-	      j = jj+((jx+nxbox) % nxbox);
-	      for (jat=wkbox[j]; jat<wkbox[j+1]; jat++) {
-		range_check(wkatm[jat],0,nat);
-		range_check(iiat,0,nat);
-		wkat1[iiat] = wkatm[jat];
-		iiat++;
-	      }     /* end of cycle "jat" */
-	    }       /* end of cycle "jx" */
-	  }       /* end of cycle "jy" */
-	}       /* end of cycle "jz" */
+    /* calculate surface for all atoms, step cube-wise */
+    for ( iz=0; iz<nzbox; iz++ ) {
+        iii = iz*nxy;
+        izs = max ( iz-1,0 );
+        ize = min ( iz+2, nzbox );
+        for ( iy=0; iy<nybox; iy++ ) {
+            ii = iy*nxbox+iii;
+            iys = max ( iy-1,0 );
+            iye = min ( iy+2, nybox );
+            
+            for ( ix=0; ix<nxbox; ix++ ) {
+                i = ii+ix;
+                iii1=wkbox[i];
+                iii2=wkbox[i+1];
+                if ( iii1 >= iii2 )
+                    continue;
+
+                ixs = max ( ix-1,0 );
+                ixe = min ( ix+2, nxbox );
+
+                iiat = 0;
+                /* make intermediate atom list */
+                for ( jz=izs; jz<ize; jz++ ) {
+                    jjj = ( ( jz+nzbox ) % nzbox ) *nxy;
+                    for ( jy=iys; jy<iye; jy++ ) {
+                        jj = ( ( jy+nybox ) % nybox ) *nxbox+jjj;
+                        for ( jx=ixs; jx<ixe; jx++ ) {
+                            j = jj+ ( ( jx+nxbox ) % nxbox );
+                            for ( jat=wkbox[j]; jat<wkbox[j+1]; jat++ ) {
+                                range_check ( wkatm[jat],0,nat );
+                                range_check ( iiat,0,nat );
+                                wkat1[iiat] = wkatm[jat];
+                                iiat++;
+                            }     /* end of cycle "jat" */
+                        }       /* end of cycle "jx" */
+                    }       /* end of cycle "jy" */
+                }       /* end of cycle "jz" */
 	for (iat=iii1; iat<iii2; iat++) {
 	  i_at = index[wkatm[iat]];
 	  ai   = radius[i_at];
@@ -816,24 +758,10 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 	    ajsq = aj*aj;
 	    pco  = coords[j_at];
 
-	    /* Added DvdS 2006-07-19 */
-	    if (box) {
-	      /*rvec xxi;
-
-	      xxi[XX] = xi;
-	      xxi[YY] = yi;
-	      xxi[ZZ] = zi;
-	      pbc_dx(&pbc,pco,xxi,ddx);*/
-	      pbc_dx(&pbc,coords[j_at],coords[i_at],ddx);
-	      dx = ddx[XX];
-	      dy = ddx[YY];
-	      dz = ddx[ZZ];
-	    }
-	    else {
 	      dx = pco[XX]-xi;
 	      dy = pco[YY]-yi;
 	      dz = pco[ZZ]-zi;
-	    }
+	    
 	    dd = dx*dx+dy*dy+dz*dz;
 	    as = ai+aj;
 	    if (dd > as*as) {
@@ -874,9 +802,8 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 	      wkdot[l] = 1;
 	  }
 
-	  if (debug)
-	    fprintf(debug,"i_ac=%d, dotarea=%8.3f, aisq=%8.3f\n",
-		    i_ac, dotarea, aisq);
+	  //if (debug)
+	  //  fprintf(debug,"i_ac=%d, dotarea=%8.3f, aisq=%8.3f\n", i_ac, dotarea, aisq);
 
 	  a = aisq*dotarea* (real) i_ac;
 	  area = area + a;
@@ -926,10 +853,7 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
   sfree(wkdot);
   sfree(wkbox);
   sfree(wknb);
-  if (box)
-  {
-    sfree(x);
-  }
+
   if (mode & FLAG_VOLUME) {
     vol = vol*FOURPI/(3.* (real) n_dot);
     *value_of_vol = vol;
@@ -953,79 +877,9 @@ int Mod_nsc_dclm_pbc(rvec *coords, real *radius, int nat,
 
   *value_of_area = area;
 
-  if (debug)
-    fprintf(debug,"area=%8.3f\n", area);
+  //if (debug)
+    //fprintf(debug,"area=%8.3f\n", area);
 
   return 0;
 }
 
-
-#if TEST_NSC > 0
-#define NAT 2
-main () {
-
-  int i, j, ndots;
-  real co[3*NAT], ra[NAT], area, volume, a, b, c;
-  real * dots;
-  real * at_area;
-  FILE *fp;
-
-
-  a = 1.; c= 0.1;
-  fp = fopen("nsc.txt", "w+");
-  for (i=1; i<=NAT; i++) {
-    j = i-1;
-    co[3*i-3] = j*1*c;
-    co[3*i-2] = j*1*c;
-    co[3*i-1] = j*1*c;
-    /*
-      co[3*i-3] = i*1.4;
-      co[3*i-2] = 0.;
-      co[3*i-1] = 0.;
-    */
-    /*
-      co[3*i-2] = a*0.3;
-      a = -a; b=0;
-      if (i%3 == 0) b=0.5;
-      co[3*i-1] = b;
-      ra[i-1] = 2.0;
-    */
-    ra[i-1] = (1.+j*0.5)*c;
-  }
-  /*
-    if (NSC(co, ra, NAT, 42, NULL, &area,
-  */
-  if (NSC(co, ra, NAT, 42, NULL, &area,
-	  NULL,NULL,NULL,NULL)) ERROR("error in NSC");
-  fprintf(fp, "\n");
-  fprintf(fp, "area     : %8.3f\n", area);
-  fprintf(fp, "\n");
-  fprintf(fp, "\n");
-  fprintf(fp, "next call\n");
-  fprintf(fp, "\n");
-  fprintf(fp, "\n");
-
-  if (NSC(co, ra, NAT, 42,FLAG_VOLUME | FLAG_ATOM_AREA | FLAG_DOTS, &area,
-	  &at_area, &volume,
-	  &dots, &ndots)) ERROR("error in NSC");
-
-  fprintf(fp, "\n");
-  fprintf(fp, "area     : %8.3f\n", area);
-  printf("area     : %8.3f\n", area);
-  fprintf(fp, "volume   : %8.3f\n", volume);
-  printf("volume   : %8.3f\n", volume);
-  fprintf(fp, "ndots    : %8d\n", ndots);
-  printf("ndots    : %8d\n", ndots);
-  fprintf(fp, "\n");
-  for (i=1; i<=NAT; i++) {
-    fprintf(fp, "%4d ATOM %7.2f %7.2f %7.2f  ra=%4.1f  area=%8.3f\n",
-	    i, co[3*i-3], co[3*i-2], co[3*i-1], ra[i-1], at_area[i-1]);
-  }
-  fprintf(fp, "\n");
-  fprintf(fp, "DOTS : %8d\n", ndots);
-  for (i=1; i<=ndots; i++) {
-    fprintf(fp, "%4d DOTS %8.2f %8.2f %8.2f\n",
-	    i, dots[3*i-3], dots[3*i-2], dots[3*i-1]);
-  }
-}
-#endif

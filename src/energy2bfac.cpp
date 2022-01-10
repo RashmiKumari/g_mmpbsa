@@ -1,10 +1,10 @@
-/*
+/**
  * This file is part of g_mmpbsa.
  *
- * Authors: Rashmi Kumari and Andrew Lynn
- * Contribution: Rajendra Kumar
+ * Authors: Rajendra Kumar, Rashmi Kumari and Andrew Lynn
  *
- * Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2013-2021 Rashmi Kumari and Andrew Lynn
+ * Copyright (C) 2022- Rajendra Kumar and Rashmi Kumari
  *
  * g_mmpbsa is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,79 +38,69 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef HAVE_GROMACS50
-#include "gromacs/legacyheaders/vec.h"
-#include "gromacs/legacyheaders/gmx_fatal.h"
-#include "gromacs/legacyheaders/index.h"
-#include "gromacs/fileio/futil.h"
-#else
-#include "gromacs/math/vec.h"
 #include "gromacs/utility/fatalerror.h"
 #include "gromacs/topology/index.h"
+#include "gromacs/topology/topology.h"
 #include "gromacs/utility/futil.h"
-#endif
-
-#include "gromacs/legacyheaders/typedefs.h"
-#include "gromacs/legacyheaders/macros.h"
+#include "gromacs/utility/basedefinitions.h"
 #include "gromacs/utility/smalloc.h"
-#include "gromacs/fileio/tpxio.h"
+#include "gromacs/utility/arraysize.h"
+#include "gromacs/fileio/confio.h"
 #include "gromacs/fileio/pdbio.h"
-#include "gromacs/fileio/filenm.h"
+#include "gromacs/fileio/oenv.h"
+#include "gromacs/commandline/filenm.h"
 #include "gromacs/commandline/pargs.h"
 #include "gromacs/commandline/cmdlineinit.h"
 
-
-void CopyRightMsg()	{
-	char *copyright[] =	{
-			"                                                                        ",
-			"                           :-)  g_mmpbsa (-:                            ",
-			"                                                                        ",
-			"               Authors: Rashmi Kumari and Andrew Lynn                   ",
-			"               Contribution: Rajendra Kumar                             ",
-			"                                                                        ",
-			"      Copyright (C) 2013 - 2016 Rashmi Kumari and Andrew Lynn           ",
-			"                                                                        ",
-			"g_mmpbsa is free software: you can redistribute it and/or modify        ",
-			"it under the terms of the GNU General Public License as published by    ",
-			"the Free Software Foundation, either version 3 of the License, or       ",
-			"(at your option) any later version.                                     ",
-			"                                                                        ",
-			"g_mmpbsa is distributed in the hope that it will be useful,             ",
-			"but WITHOUT ANY WARRANTY; without even the implied warranty of          ",
-			"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           ",
-			"GNU General Public License for more details.                            ",
-			"                                                                        ",
-			"You should have received a copy of the GNU General Public License       ",
-			"along with g_mmpbsa.  If not, see <http://www.gnu.org/licenses/>.       ",
-			"                                                                        ",
-			"THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     ",
-			"\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     ",
-			"LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   ",
-			"A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    ",
-			"OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   ",
-			"SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED",
-			"TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR  ",
-			"PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  ",
-			"LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING    ",
-			"NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS      ",
-			"SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.            ",
-			"                                                                        ",
-			"                           :-)  g_mmpbsa (-:                            ",
-			"                                                                        ",
-			"                                                                        "
-	};
-	int i = 0;
-	char *str;
-	for(i=0; i<34; i++)	{
-		str = strdup(copyright[i]);
-		fprintf(stderr,"%s\n", str);
-	}
+/**
+ * Copyright message to dispaly at the start of execution
+ */
+void CopyRightMsg()
+{
+    std::string copyright =
+        "                                                                        \n"
+        "                        :-)  g_mmpbsa (-:                               \n"
+        "                                                                        \n"
+        "                                                                        \n"
+        "       Copyright (C) 2013 - 2021 Rashmi Kumari and Andrew Lynn          \n"
+        "       Copyright (C) 2022- Rajendra Kumar and Rashmi Kumari             \n"
+        "                                                                        \n"
+        "g_mmpbsa is free software: you can redistribute it and/or modify        \n"
+        "it under the terms of the GNU General Public License as published by    \n"
+        "the Free Software Foundation, either version 3 of the License, or       \n"
+        "(at your option) any later version.                                     \n"
+        "                                                                        \n"
+        "g_mmpbsa is distributed in the hope that it will be useful,             \n"
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of          \n"
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           \n"
+        "GNU General Public License for more details.                            \n"
+        "                                                                        \n"
+        "You should have received a copy of the GNU General Public License       \n"
+        "along with g_mmpbsa.  If not, see <http://www.gnu.org/licenses/>.       \n"
+        "                                                                        \n"
+        "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     \n"
+        "\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     \n"
+        "LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   \n"
+        "A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    \n"
+        "OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   \n"
+        "SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED\n"
+        "TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR  \n"
+        "PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  \n"
+        "LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING    \n"
+        "NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS      \n"
+        "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.            \n"
+        "                                                                        \n"
+        "                                                                        \n"
+        "                                                                        \n";
+    fprintf ( stderr,"%s\n", copyright.c_str() );
 }
 
 int get_energy( char *fnEnergy, int nres, real *energy)	{
 	int i =0, count=-1, dum =0;
+    double tempDouble;
 	FILE *fin;
 	real *tmpData;
+    const char *informat = sizeof(tmpData) == sizeof(tempDouble) ? "%lf" : "%f";
 
 	fin = gmx_ffopen(fnEnergy,"r");
 	snew(tmpData, 1);
@@ -118,7 +108,7 @@ int get_energy( char *fnEnergy, int nres, real *energy)	{
 	while (fgetc(fin) != EOF)	{
 		srenew(tmpData,count+2);
 		fscanf(fin,"%d", &dum);
-		fscanf(fin,"%g", &tmpData[count+1]);
+		fscanf(fin,informat, &tmpData[count+1]);
 		count++;
 	}
 
@@ -155,22 +145,20 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
     { efPDB, "-s2", "subunit_2.pdb", ffOPTWR },
   };
 
-  char title[STRLEN], buf[256];
+  char title[256], buf[256];
   t_topology top;
-  int ePBC;
+  PbcType ePBC;
   rvec *xtop;
   matrix box;
   t_atoms *atoms;
-  char *atomtype, *resname, *atomname, **modresname = NULL;
-  output_env_t oenv;
+  gmx_output_env_t *oenv;
 
   //Variable for index file
   int *isize;	//Number of index group
-  atom_id **index;
+  int **index;
   char **grpnm;
 
   int i=0,j=0,k=0;
-  gmx_bool *bAtomA, *bAtomB, *bAtomAB;
   int nres = 0, prev_res, curr_res;
   gmx_bool *bResA, *bResB;
   real *energy;
@@ -184,7 +172,7 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT , NFILE, fnm,
       0, NULL, asize(desc), desc, 0, NULL, &oenv);
 
-  read_tps_conf(ftp2fn(efTPS, NFILE, fnm), title, &top, &ePBC, &xtop, NULL, box, FALSE);
+  read_tps_conf(ftp2fn(efTPS, NFILE, fnm), &top, &ePBC, &xtop, NULL, box, FALSE);
   atoms = &(top.atoms);
 
   if (opt2fn_null("-i", NFILE, fnm) == NULL )
