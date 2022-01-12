@@ -316,6 +316,7 @@ private:
     int                              ndots_;
     bool                             bDIFF_;
     bool                             bMM_;
+    bool                             bDDC_;
     bool                             bDCOMP_;
     bool                             bPBSA_;
     bool                             bFocus_;
@@ -481,6 +482,9 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
 
     options->addOption ( BooleanOption ( "mme" ).store ( &bMM_ ).defaultValue ( true )
                          .description ( "To calculate vacuum molecular mechanics energy" ) );
+
+    options->addOption ( BooleanOption ( "ddc" ).store ( &bDDC_ ).defaultValue ( false )
+                         .description ( "To enable distance dependent dielectric constant" ) );
 
     options->addOption ( BooleanOption ( "pbsa" ).store ( &bPBSA_ ).defaultValue ( false )
                          .description ( "To calculate polar and/or non-polar solvation energy" ) );
@@ -648,12 +652,12 @@ AnalysisMMPBSA::initAnalysis ( const TrajectoryAnalysisSettings &settings,
 
     // build non-bonded pairs if requested
     if ( bIncl14_ ) buildNonBondedPairList();
-
+    
     // prepare for PBSA calculations
     if ( bPBSA_ ) {
 
         assignRadius(); // assign radius to all atoms
-
+        
         if ((bApolar_) && ( bDCOMP_ )) {
             for ( int i = 0; i < 3; i++ ) { // energy atom-wise memory allocation
                 snew ( apolarAtomsEnergy_[i], isize_[i] );
@@ -1034,12 +1038,13 @@ void AnalysisMMPBSA::buildNonBondedPairList()
 void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
 {
     rvec dx;
-    real colmb_factor = 138.935485;
+    // real colmb_factor = 138.935485;
+    real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
     double qi, qj, c6, c12, c6j, c12j,rij, c6ij, c12ij;
     int itypeA, itypeB, ntype = mtop_->atomtypes.nr;
     int i, j,k,l,n;
     int atomA, atomB, resA, resB;
-    real TempEE, TempVdw;
+    real TempEE, TempVdw, ddcFactor = 1;
     int nres = atoms_->nres;
 
     std::vector<real> EERes ( nres, 0.0 ), VdwRes ( nres, 0.0 );
@@ -1073,7 +1078,13 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
             c6 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c6;
             c12 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c12;
         }
-        TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) /rij;
+        
+        if (bDDC_) {
+            ddcFactor =  (rij * 10);
+        }
+        
+        TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) / (rij * 10);
+        TempEE = TempEE/ddcFactor;
         TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
         if ( bDIFF_ )	{
@@ -1113,7 +1124,12 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
         c6 = localtop_->idef.iparams[localtop_->idef.il[F_LJ14].iatoms[paramNonBond_.pairtype[i]]].lj14.c6A;
         c12 = localtop_->idef.iparams[localtop_->idef.il[F_LJ14].iatoms[paramNonBond_.pairtype[i]]].lj14.c12A;
 
-        TempEE = mtop_->ffparams.fudgeQQ * ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) /rij;
+        if (bDDC_) {
+            ddcFactor =  (rij * 10);
+        }
+        
+        TempEE = mtop_->ffparams.fudgeQQ * ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) / (rij * 10);
+        TempEE = TempEE/ddcFactor;
         TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
         if ( bDIFF_ ) {
@@ -1151,11 +1167,12 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
 void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
 {
     int i, j=0;
-    real colmb_factor = 138.935485;
+    // real colmb_factor = 138.935485;
+    real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
     double c6, c12, rij;
     int itypeA, itypeB, ntype = mtop_->atomtypes.nr;
     int resA, resB;
-    real TempEE, TempVdw;
+    real TempEE, TempVdw, ddcFactor = 1;
     int nres = atoms_->nres;
 
     std::vector<real> EERes ( nres, 0.0 ), VdwRes ( nres, 0.0 );
@@ -1186,7 +1203,13 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
                 c6 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c6;
                 c12 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c12;
             }
-            TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[index_[0][i]].q * atoms_->atom[index_[1][j]].q ) ) /rij;
+            
+            if (bDDC_) {
+               ddcFactor =  (rij * 10);
+            }
+            
+            TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[index_[0][i]].q * atoms_->atom[index_[1][j]].q ) ) / (rij * 10);
+            TempEE = TempEE/ddcFactor;
             TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
             EEnergyFrame_[2] += TempEE;
@@ -1200,6 +1223,7 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
             }
         }
     }
+    
 
     if ( bDCOMP_ )
         for ( i=0; i<nres; i++ ) {
