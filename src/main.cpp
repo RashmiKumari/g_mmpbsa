@@ -38,6 +38,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <numeric> 
 #include <math.h>
 
 #include <gromacs/trajectoryanalysis.h>
@@ -49,6 +50,7 @@
 #include "gromacs/utility/pleasecite.h"
 #include "gromacs/utility/arraysize.h"
 #include "gromacs/fileio/readinp.h"
+#include "gromacs/fileio/confio.h"
 #include "gromacs/fileio/warninp.h"
 #include <gromacs/utility/exceptions.h>
 
@@ -169,6 +171,27 @@ static const char *APsrfm_words[] = { "sacc", NULL};
 
 enum { mg_auto, mg_para };
 static const char *mg_words[] = { "mg-auto", "mg-para", NULL};
+
+/**
+ * @brief Calculate average and standard deviation from real vector
+ * 
+ * @param v real vector
+ * @param average [output] average pointer
+ * @param stdev [output] standard-deviation pointer
+ */
+void calc_average_stdev(std::vector<real> v, real *average, real *stdev) {
+    real sum = std::accumulate(std::begin(v), std::end(v), 0.0);
+    real m =  sum / v.size();
+
+    real accum = 0.0;
+    std::for_each (std::begin(v), std::end(v), [&](const real d) {
+        accum += (d - m) * (d - m);
+    });
+
+    *average = m;
+    *stdev = sqrt(accum / (v.size()-1));
+};
+
 
 typedef struct {
     const char *key;
@@ -323,7 +346,11 @@ private:
     bool                             bIncl14_;
     bool                             bVerbose_;
     std::string                      fnMDP_;
-    std::string                      fnDist_;
+    std::string                      fnInputPDB_;
+    std::string                      fnOuputPDB_;
+    std::string                      fnBindingEnergy_;
+    std::string                      fnEnergySummary_;
+    std::string                      fnResiduesEnergySummary_;
     std::string                      fnVacMM_;
     std::string                      fnDecompMM_;
     std::string                      fnDecompPol_;
@@ -339,6 +366,7 @@ private:
     const int                        **index_; // atom indices in selections
 
     // Varaible related to topology
+    const TopologyInformation        *topInfo_;
     const gmx_mtop_t                 *mtop_;
     const gmx_localtop_t             *localtop_;
     AtomsDataPtr                      atoms_;
@@ -381,9 +409,18 @@ private:
     real                              *atomsPolarEnergy_[3];    // polar energy atom-wise
     AnalysisData                      polarEnergyData_;
 
+    AnalysisData                      bindingEnergyData_;
+    AnalysisDataAverageModulePointer  avBindingEnergyData_;
+    std::vector<std::vector<real>>    vdwResiduesEnergy_;
+    std::vector<std::vector<real>>    elecResiduesEnergy_;
+    std::vector<std::vector<real>>    polarResiduesEnergy_;
+    std::vector<std::vector<real>>    apolarResiduesEnergy_;
+    std::vector<real>                 totalResiduesEnergy_;
+
     // Common functions
     void prepareOutputFiles ( const TrajectoryAnalysisSettings *settings );
     void writeOutputFrame ( int frnr, real time, TrajectoryAnalysisModuleData *pdata );
+    void dumpEnergyToBfactor();
 
     // vacuum MM energy functions
     void buildNonBondedPairList();
@@ -427,6 +464,16 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
                          .store ( &fnMDP_ ).defaultBasename ( "pbsa" )
                          .description ( "Input parameters for mmpbsa calculations." ) );
 
+    options->addOption ( FileNameOption ( "ipdb" )
+                         .legacyType ( efPDB ).inputFile()
+                         .store ( &fnInputPDB_ ).defaultBasename ( "input" )
+                         .description ( "Input pdb file to dump residue energy in b-factor field. If not provided, input tpr file will be used.") );
+
+    options->addOption ( FileNameOption ( "opdb" )
+                         .legacyType ( efPDB ).outputFile()
+                         .store ( &fnOuputPDB_ ).defaultBasename ( "energy" )
+                         .description ( "Output PDB file with residue energy in b-factor field." ) );
+
     options->addOption ( FileNameOption ( "mm" )
                          .filetype ( eftPlot ).outputFile()
                          .store ( &fnVacMM_ ).defaultBasename ( "energy_MM" )
@@ -444,24 +491,34 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
 
     options->addOption ( FileNameOption ( "mmcon" )
                          .filetype ( eftGenericData ).outputFile()
-                         .store ( &fnDecompMM_ ).defaultBasename ( "contrib_MM" )
+                         .store ( &fnDecompMM_ ).defaultBasename ( "residues_MM" )
                          .description ( "Vacuum MM energy contribution to binding" ) );
 
     options->addOption ( FileNameOption ( "pcon" )
                          .filetype ( eftGenericData ).outputFile()
-                         .store ( &fnDecompPol_ ).defaultBasename ( "contrib_pol" )
+                         .store ( &fnDecompPol_ ).defaultBasename ( "residues_polar" )
                          .description ( "Polar solvation energy contribution to binding" ) );
 
 
     options->addOption ( FileNameOption ( "apcon" )
                          .filetype ( eftGenericData ).outputFile()
-                         .store ( &fnDecompAPol_ ).defaultBasename ( "contrib_apol" )
+                         .store ( &fnDecompAPol_ ).defaultBasename ( "residues_apolar" )
                          .description ( "Apolar solvation energy contribution to binding" ) );
 
     options->addOption ( FileNameOption ( "o" )
                          .filetype ( eftPlot ).outputFile()
-                         .store ( &fnDist_ ).defaultBasename ( "avedist" )
-                         .description ( "Average distances from reference group" ) );
+                         .store ( &fnBindingEnergy_ ).defaultBasename ( "binding_energy" )
+                         .description ( "Final binding energy and its components" ) );
+
+    options->addOption ( FileNameOption ( "os" )
+                         .filetype ( eftCsv ).outputFile()
+                         .store ( &fnEnergySummary_ ).defaultBasename ( "energy_summary" )
+                         .description ( "Summary of binding energy over all frames" ) );
+
+    options->addOption ( FileNameOption ( "ores" )
+                         .filetype ( eftCsv ).outputFile()
+                         .store ( &fnResiduesEnergySummary_ ).defaultBasename ( "residues_energy_summary" )
+                         .description ( "Summary of binding energy contributions of residues over all frames" ) );
 
     options->addOption ( SelectionOption ( "unit1" )
                          .store ( &selA_ ).required()
@@ -507,20 +564,17 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
     settings->setFlag ( TrajectoryAnalysisSettings::efRequireTop );
     settings->setFlag ( settings->efNoUserPBC,true );
     settings->setFlag ( settings->efNoUserRmPBC, true );
+    settings->setFlag ( settings->efUseTopX, true );
 }
 
 void AnalysisMMPBSA::optionsFinished ( TrajectoryAnalysisSettings * )
 {
 
-    // Sanity check for input options
+    // Sanity check for input options and assign default file names
     
     if ( ( !bDIFF_ ) && ( bDCOMP_ ) ) {
         printf ( "\n\nWARNING: For single group calculations, decompositon cannot be used, switching it off!   \n\n" );
         bDCOMP_ = false;
-    }
-
-    if ( ( fnDecompMM_.empty() ) && ( bDCOMP_ ) && ( bMM_ ) ) {
-        GMX_THROW ( InconsistentInputError ( "Decompositon requested, however. -mmcon option is missing. Aborting!!!\n" ) );
     }
 
     if ( ( !bPBSA_ ) && ( !bMM_ ) )   {
@@ -533,6 +587,14 @@ void AnalysisMMPBSA::optionsFinished ( TrajectoryAnalysisSettings * )
 
     }
 
+    if ((bMM_) && ( fnVacMM_.empty()))   {
+        fnVacMM_ = "energy_MM.xvg";
+    }
+
+    if ((bMM_) && ( bDCOMP_ ) && ( fnDecompMM_.empty()))   {
+        fnDecompMM_ = "residues_MM.dat";
+    }
+
     if ( ( bPBSA_ ) && ( fnMDP_.empty() ) ) {
         GMX_THROW ( InconsistentInputError ( "Input parameter file for the PBSA calculation is missing, Use \"-i\" option\n" ) );
     }
@@ -541,11 +603,11 @@ void AnalysisMMPBSA::optionsFinished ( TrajectoryAnalysisSettings * )
         readPBSAInputs();
 
         if ( ( bPolar_ ) && ( fnPolar_.empty() ) )  {
-            GMX_THROW ( InconsistentInputError ( "Polar output file is missing. Use \"-pol\" option\n" ) );
+            fnPolar_ = "polar.xvg";
         }
 
         if ( ( bPolar_ ) && ( fnDecompPol_.empty() ) && ( bDCOMP_ ) )  {
-            GMX_THROW ( InconsistentInputError ( "Decompositon requested, however. -pcon option is missing. Aborting!!!\n" ) );
+            fnDecompPol_ = "residues_polar.dat";
         }
 
         if ( ( bApolar_ ) && ( pbsaInputKwords_.gamma != 0 ) )
@@ -554,13 +616,28 @@ void AnalysisMMPBSA::optionsFinished ( TrajectoryAnalysisSettings * )
         if ( ( bApolar_ ) && ( pbsaInputKwords_.press != 0 ) )
             bSAV_ = true;
 
+        bApolar_ = bSASA_ || bSAV_;
+
         if ( ( bApolar_ ) && ( fnAPolar_.empty() ) )  {
-            GMX_THROW ( InconsistentInputError ( "Apolar output file is missing. Use \"-apol\" option\n" ) );
+            fnAPolar_ = "apolar.xvg";
         }
 
         if ( ( bApolar_ ) && ( fnDecompAPol_.empty() ) && ( bDCOMP_ ) )  {
-            GMX_THROW ( InconsistentInputError ( "Decompositon requested, however. -apcon option is missing. Aborting!!!\n" ) );
+            fnDecompAPol_ = "residues_apolar.dat";
         }
+    }
+
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (fnBindingEnergy_.empty())) {
+        fnBindingEnergy_ = "binding_energy.xvg";
+    }
+
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (fnEnergySummary_.empty())) {
+        fnEnergySummary_ = "energy_summary.csv";
+    }
+
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (bDCOMP_)) {
+        if (fnResiduesEnergySummary_.empty()) fnResiduesEnergySummary_ = "residues_energy_summary.csv";
+        if (fnOuputPDB_.empty()) fnOuputPDB_ = "energy.pdb";
     }
 
 }
@@ -581,6 +658,7 @@ AnalysisMMPBSA::initAnalysis ( const TrajectoryAnalysisSettings &settings,
     }
 
     // Read topology informations
+    topInfo_ = &topInfo;
     mtop_ = topInfo.mtop();
     localtop_ = topInfo.expandedTopology();
     atoms_ = topInfo.copyAtoms();
@@ -753,6 +831,8 @@ AnalysisMMPBSA::analyzeFrame ( int frnr, const t_trxframe &fr, t_pbc *pbc,
 
 void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnalysisModuleData* pdata )
 {
+    real totalVdw = 0, totalElec = 0, totalPolar = 0, totalAolar=0;
+
     // Vacumm MM energy ouput
     if ( bMM_ ) {
         AnalysisDataHandle   mmh         = pdata->dataHandle ( mmEnergyData_ );
@@ -765,6 +845,10 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
                 mmh.setPoint ( ( i*2 )+1, EEnergyFrame_[i] );
             }
             mmh.setPoint ( 6, ( VdwEnergyFrame_[2] + EEnergyFrame_[2] ) - ( EEnergyFrame_[0]+VdwEnergyFrame_[0]+EEnergyFrame_[1]+VdwEnergyFrame_[1] ) );
+
+            totalVdw = VdwEnergyFrame_[2] - (VdwEnergyFrame_[0] + VdwEnergyFrame_[1]);
+            totalElec = EEnergyFrame_[2] - (EEnergyFrame_[0] + EEnergyFrame_[1]);
+
         } else {
             mmh.setPoint ( 0, VdwEnergyFrame_[0] );
             mmh.setPoint ( 1, EEnergyFrame_[0] );
@@ -775,13 +859,19 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
 
         // write to -mmcon file
         if ( bDCOMP_ ) {
+            std::vector<real> vdwResEnergy(atoms_->nres, 0), elecResEnergy(atoms_->nres, 0);
             fprintf ( fDecompMM_, "%15.3lf", time );
-
-            for ( int i = 0; i < atoms_->nres; i++ )
-                if ( ( bResA_[i] ) || ( bResB_[i] ) )
+            for ( int i = 0; i < atoms_->nres; i++ )    {
+                if ( ( bResA_[i] ) || ( bResB_[i] ) ) {
                     fprintf ( fDecompMM_, "%15.3lf", ( EEnergyFrame_[i+3] + VdwEnergyFrame_[i+3] ) /2 );
+                    vdwResEnergy[i] = VdwEnergyFrame_[i+3] / 2;
+                    elecResEnergy[i] = EEnergyFrame_[i+3] / 2;
+                }
+            }       
             fprintf ( fDecompMM_, "\n" );
             fflush ( fDecompMM_ );
+            vdwResiduesEnergy_.push_back(vdwResEnergy);
+            elecResiduesEnergy_.push_back(elecResEnergy);
         }
     }
 
@@ -792,25 +882,27 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
         // write to -apol apolar.xvg file after calculating energy from area/volume
         aphand.startFrame ( frnr, time );
         if ( bDIFF_ ) {
-            if ( bSASA_ ) {
-                aphand.setPoint ( 0, ( totalArea_[0] * pbsaInputKwords_.gamma * 100 ) + pbsaInputKwords_.sasaconst );
-                aphand.setPoint ( 1, ( totalArea_[1] * pbsaInputKwords_.gamma * 100 ) + pbsaInputKwords_.sasaconst );
-                aphand.setPoint ( 2, ( totalArea_[2] * pbsaInputKwords_.gamma * 100 ) + pbsaInputKwords_.sasaconst );
-            } else {
-                aphand.setPoint ( 0, 0.0 );
-                aphand.setPoint ( 1, 0.0 );
-                aphand.setPoint ( 2, 0.0 );
+            std::vector<real> tempApol(3, 0);
+
+            for ( int i=0; i<3; i++ )  {
+                real te = 0;
+                if ( bSASA_ ){
+                    te = ( totalArea_[i] * pbsaInputKwords_.gamma * 100 ) + pbsaInputKwords_.sasaconst ;
+                    aphand.setPoint(i, te);
+                    tempApol[i] += te;
+                } else {
+                    aphand.setPoint(i, 0);
+                }
+                if ( bSAV_ ){
+                    te = ( totalVolume_[i] * pbsaInputKwords_.press * 1000 ) + pbsaInputKwords_.savconst ;
+                    aphand.setPoint(i+3, te);
+                    tempApol[i] += te;
+                } else {
+                    aphand.setPoint(i+3, 0);
+                }              
             }
 
-            if ( bSAV_ ) {
-                aphand.setPoint ( 3, ( totalVolume_[0] * pbsaInputKwords_.press * 1000 ) + pbsaInputKwords_.savconst );
-                aphand.setPoint ( 4, ( totalVolume_[1] * pbsaInputKwords_.press * 1000 ) + pbsaInputKwords_.savconst );
-                aphand.setPoint ( 5, ( totalVolume_[2] * pbsaInputKwords_.press * 1000 ) + pbsaInputKwords_.savconst );
-            } else {
-                aphand.setPoint ( 3, 0.0 );
-                aphand.setPoint ( 4, 0.0 );
-                aphand.setPoint ( 5, 0.0 );
-            }
+            totalAolar =   tempApol[2] - ( tempApol[0] + tempApol[1]);
 
         } else {
             real energy = 0;
@@ -848,6 +940,7 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
 
             // calculate residue-wise energies
             std::vector<real> resEnergy =  decomposeSolvationEnergy ( apolarAtomsEnergy_ );
+            apolarResiduesEnergy_.push_back(resEnergy);
 
             // write residue-wise energies to file
             fprintf ( fDecompAPol_, "%15.3lf", time );
@@ -875,10 +968,13 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
             phand.setPoint ( i, polarEnergyFrame_[i] );
         phand.finishFrame();
 
+        totalPolar = polarEnergyFrame_[2] - (polarEnergyFrame_[0] + polarEnergyFrame_[1]);
+
         // write to -pcon file
         if ( bDCOMP_ ) {
             // calculate residue-wise energies
             std::vector<real> resEnergy =  decomposeSolvationEnergy ( atomsPolarEnergy_ );
+            polarResiduesEnergy_.push_back(resEnergy);
 
             // write residue-wise energies to file
             fprintf ( fDecompPol_, "%15.3lf", time );
@@ -890,17 +986,80 @@ void AnalysisMMPBSA::writeOutputFrame ( int frnr, real time, gmx::TrajectoryAnal
             fflush ( fDecompPol_ );
         }
     }
+
+    // Write binding energy
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_)) {
+        AnalysisDataHandle  dataHand = pdata->dataHandle ( bindingEnergyData_ );
+        dataHand.startFrame( frnr, time );
+        dataHand.setPoint(0, totalVdw);
+        dataHand.setPoint(1, totalElec);
+        dataHand.setPoint(2, totalPolar);
+        dataHand.setPoint(3, totalAolar);
+        dataHand.setPoint(4, totalVdw + totalElec + totalPolar + totalAolar);
+        dataHand.finishFrame();
+    }
 }
 
 
 void AnalysisMMPBSA::writeOutput()
 {
-}
+    // Write summary of average binding energy and its components
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (!fnEnergySummary_.empty())) {
+        FILE *fEnergySummary_ = gmx_ffopen(fnEnergySummary_, "w");
+        fprintf(fEnergySummary_, "\"Energy\", \"Average\", \"Standard-Deviation\",\n");
+        fprintf(fEnergySummary_, "\"vDW\",                 %.3f, %.3f,\n", avBindingEnergyData_->average(0, 0), avBindingEnergyData_->standardDeviation(0, 0));
+        fprintf(fEnergySummary_, "\"Electrostatic\",       %.3f, %.3f,\n", avBindingEnergyData_->average(0, 1), avBindingEnergyData_->standardDeviation(0, 1));
+        fprintf(fEnergySummary_, "\"Polar-solvation\",     %.3f, %.3f,\n", avBindingEnergyData_->average(0, 2), avBindingEnergyData_->standardDeviation(0, 2));
+        fprintf(fEnergySummary_, "\"Non-polar-solvation\", %.3f, %.3f,\n", avBindingEnergyData_->average(0, 3), avBindingEnergyData_->standardDeviation(0, 3));
+        fprintf(fEnergySummary_, "\"Total\",               %.3f, %.3f,\n", avBindingEnergyData_->average(0, 4), avBindingEnergyData_->standardDeviation(0, 4));
+        gmx_ffclose(fEnergySummary_);
+    }
+
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_) && (bDCOMP_)) {
+        FILE *fResiduesEnergySummary_ = gmx_ffopen(fnResiduesEnergySummary_, "w");
+        std::vector<real> energy(vdwResiduesEnergy_.size(), 0.0);
+        std::vector<std::vector<std::vector<real>>> residuesEnergy = { vdwResiduesEnergy_, elecResiduesEnergy_, polarResiduesEnergy_, apolarResiduesEnergy_};
+        real av, stdev;
+
+        totalResiduesEnergy_.resize(atoms_->nres, 0.0);
 
 
-void
-AnalysisMMPBSA::finishAnalysis ( int /*nframes*/ )
-{
+        fprintf(fResiduesEnergySummary_, "\"Resdiue\", \"vDW\", \"vdW-stddev\", \"Elec.\", \"Elec.-stdev\","
+                                         "\"polar\", \"polar-stdev\", \"apolar\", \"apolar-stdev\","
+                                         "\"total\", \"total-stdev\",\n");
+
+        for (int r = 0; r < atoms_->nres; r++)  { // over residues
+            if ( ( bResA_[r] ) || ( bResB_[r] ) ) {
+                fprintf(fResiduesEnergySummary_, "\"%s-%d\", ", * ( atoms_->resinfo[r].name ), atoms_->resinfo[r].nr);
+
+                // For four energy terms, write average and standard deviations
+                for (int n = 0 ; n < residuesEnergy.size(); n++)    { // over energy terms
+                    for (int frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
+                        energy[frame] = residuesEnergy[n][frame][r];
+                    }
+                    calc_average_stdev(energy, &av, &stdev);
+                    fprintf(fResiduesEnergySummary_, "%.3f, %.3f, ",av, stdev);
+                }
+
+                // total energy from each frame
+                for (int frame = 0; frame < vdwResiduesEnergy_.size(); frame++) { // transpose - over frames
+                    energy[frame] = vdwResiduesEnergy_[frame][r] + elecResiduesEnergy_[frame][r] + polarResiduesEnergy_[frame][r] + apolarResiduesEnergy_[frame][r];
+                }
+
+                // average energy
+                calc_average_stdev(energy, &av, &stdev);
+
+                // write total energy and standard deviation
+                fprintf(fResiduesEnergySummary_, "%.3f, %.3f,\n",av, stdev);
+
+                // save total energy for subsequent use
+                totalResiduesEnergy_[r] = av;
+            }
+        }
+
+        dumpEnergyToBfactor();
+    }
+
     show_citation ( stdout, "Abraham2015" );
     if ( bPolar_ )	{
         show_citation ( stdout, "APBS2001" );
@@ -912,6 +1071,11 @@ AnalysisMMPBSA::finishAnalysis ( int /*nframes*/ )
         }
     }
     show_citation ( stdout, "gmmpbsa2014" );
+}
+
+
+void AnalysisMMPBSA::finishAnalysis ( int nframes )
+{
 }
 
 void AnalysisMMPBSA::buildNonBondedPairList()
@@ -1265,7 +1429,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
         {
             AnalysisDataPlotModulePointer plotm ( new AnalysisDataPlotModule ( settings->plotSettings() ) );
             plotm->setFileName ( fnVacMM_ );
-            plotm->setTitle ( "Vaccum MM Energy)" );
+            plotm->setTitle ( "Vaccum MM Energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
             for ( size_t i = 0; i < mmColumnCount; ++i ) {
@@ -1312,7 +1476,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
         {
             AnalysisDataPlotModulePointer plotm ( new AnalysisDataPlotModule ( settings->plotSettings() ) );
             plotm->setFileName ( fnAPolar_ );
-            plotm->setTitle ( "Apolar solvation energy)" );
+            plotm->setTitle ( "Apolar solvation energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
             for ( size_t i = 0; i < apolrColumnCount; ++i ) {
@@ -1353,7 +1517,7 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
         {
             AnalysisDataPlotModulePointer plotm ( new AnalysisDataPlotModule ( settings->plotSettings() ) );
             plotm->setFileName ( fnPolar_ );
-            plotm->setTitle ( "Polar solvation energy)" );
+            plotm->setTitle ( "Polar solvation energy" );
             plotm->setXAxisIsTime();
             plotm->setYLabel ( "Energy (kJ/mol)" );
             for ( size_t i = 0; i < polrColumnCount; ++i ) {
@@ -1373,6 +1537,28 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
             }
             fprintf ( fDecompPol_,"\n" );
         }
+    }
+
+    // Final binding energy file
+    if ((bDIFF_) && (bMM_) && (bPolar_) && (bApolar_)) {
+        int columnCount = 5;
+        std::vector<std::string> legends = { "vDW", "Electrostatics", "Polar", "Apolar", "Total" };
+
+        bindingEnergyData_.setColumnCount(0, columnCount);
+        {
+            AnalysisDataPlotModulePointer plotm ( new AnalysisDataPlotModule ( settings->plotSettings() ) );
+            plotm->setFileName ( fnBindingEnergy_ );
+            plotm->setTitle ( "Binding energy)" );
+            plotm->setXAxisIsTime();
+            plotm->setYLabel ( "Energy (kJ/mol)" );
+            for ( size_t i = 0; i < columnCount; ++i ) {
+                plotm->appendLegend ( legends[i] );
+            }
+            bindingEnergyData_.addModule ( plotm );
+        }
+
+        avBindingEnergyData_.reset(new AnalysisDataAverageModule());
+        bindingEnergyData_.addModule(avBindingEnergyData_);
     }
 }
 
@@ -1831,12 +2017,44 @@ void AnalysisMMPBSA::executeAPBS ( int group )
         remove ( "io.mc" );
 }
 
+void AnalysisMMPBSA::dumpEnergyToBfactor() {
+    t_atoms *atoms;
+    t_topology top;
+    PbcType pbc;
+    const rvec *x;
+    matrix box;
+
+    if (fnInputPDB_.empty()) { // get required data from tpr
+        atoms = atoms_.get();
+        x = as_rvec_array(topInfo_->x().data());
+        pbc = topInfo_->pbcType();
+        topInfo_->getBox(box);
+    } else { // read input file and get required data from input pdb
+        read_tps_conf(fnInputPDB_.c_str(), &top, &pbc, (rvec **) &x, NULL, box, FALSE);
+        atoms = &(top.atoms);
+        if (atoms->nres != atoms_->nres) {
+            GMX_THROW(InconsistentInputError("Number of residues in tpr and input pdb does not match!!"));
+        }
+        if (atoms->nr != atoms_->nr) {
+            GMX_THROW(InconsistentInputError("Number of atoms in tpr and input pdb does not match!!"));
+        }
+    }
+
+    for ( int i = 0; i < atoms_->nr; i++ ) {
+        atoms->pdbinfo[i].bfac = totalResiduesEnergy_[atoms->atom[i].resind];
+        atoms->pdbinfo[i].occup = 1.0;
+    }
+
+    // Write pdb file
+    write_sto_conf(fnOuputPDB_.c_str(), "Binding Energy Contribution in B-factor field", atoms, x, NULL, pbc, box);
+}
 
 AnalysisMMPBSA::AnalysisMMPBSA()
 {
     registerAnalysisDataset ( &mmEnergyData_, "mmEnergy" );
     registerAnalysisDataset ( &apolarEnergyData_, "apolarEnergy" );
     registerAnalysisDataset ( &polarEnergyData_, "polarEnergy" );
+    registerAnalysisDataset ( &bindingEnergyData_, "bindingEnergy" );
 }
 
 
