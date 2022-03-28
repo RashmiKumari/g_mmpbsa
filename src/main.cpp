@@ -1204,14 +1204,9 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
     rvec dx;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
-    double qi, qj, c6, c12, c6j, c12j,rij, c6ij, c12ij;
-    int itypeA, itypeB, ntype = mtop_->atomtypes.nr;
-    int i, j,k,l,n;
-    int atomA, atomB, resA, resB;
-    real TempEE, TempVdw, ddcFactor = 1;
+    int ntype = mtop_->atomtypes.nr;
+    int i, j, k, l, n;
     int nres = atoms_->nres;
-
-    std::vector<real> EERes ( nres, 0.0 ), VdwRes ( nres, 0.0 );
 
     if ( bDIFF_ ) {
         if ( EEnergyFrame_.size() != nres+3 )
@@ -1222,9 +1217,18 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
 
     std::fill ( EEnergyFrame_.begin(), EEnergyFrame_.end(), 0.0 );
     std::fill ( VdwEnergyFrame_.begin(), VdwEnergyFrame_.end(), 0.0 );
+    
+    double EERes[nres] = {0}, VdwRes[nres] = {0};
+    double sumEE[3] ={0}, sumVdw[3] = {0};
 
-    // Energy of all previously listed atom-pairs except 1-2, 1-3 and 1-4 pairs
+    // Energy of all previously listed atom-pairs except 1-2, 1-3 and 1-4 pairs  
+    #pragma omp parallel for default(shared) reduction(+:sumEE[:3]) reduction(+:sumVdw[:3]) reduction(+:EERes[:nres]) reduction(+:VdwRes[:nres])
     for ( i=0; i<paramNonBond_.nr_nb; i++ )	{
+        double c6, c12, rij;
+        int itypeA, itypeB;
+        int atomA, atomB, resA, resB;
+        double TempEE, TempVdw, ddcFactor = 1;
+
         atomA = paramNonBond_.pairNB[i][0];
         atomB = paramNonBond_.pairNB[i][1];
         resA = atoms_->atom[atomA].resind;
@@ -1242,29 +1246,29 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
             c6 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c6;
             c12 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c12;
         }
-        
+
         if (bDDC_) {
             ddcFactor =  (rij * 10);
         }
-        
+
         TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) / (rij * 10);
         TempEE = TempEE/ddcFactor;
         TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
         if ( bDIFF_ )	{
             if ( paramNonBond_.bItsA[i] ) {
-                EEnergyFrame_[0] += TempEE;
-                VdwEnergyFrame_[0] += TempVdw;
+                sumEE[0] += TempEE;
+                sumVdw[0] += TempVdw;
             }
             if ( paramNonBond_.bItsB[i] ) {
-                EEnergyFrame_[1] += TempEE;
-                VdwEnergyFrame_[1] += TempVdw;
+                sumEE[1] += TempEE;
+                sumVdw[1] += TempVdw;
             }
-            EEnergyFrame_[2] += TempEE;
-            VdwEnergyFrame_[2] += TempVdw;
+            sumEE[2] += TempEE;
+            sumVdw[2] += TempVdw;
         } else {
-            EEnergyFrame_[0] += TempEE;
-            VdwEnergyFrame_[0] += TempVdw;
+            sumEE[0] += TempEE;
+            sumVdw[0] += TempVdw;
         }
 
         if ( bDCOMP_ )
@@ -1276,8 +1280,14 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
             }
     }
     
-    // Energy of previously listed 1-4 atom pairs
+    // Energy of previously listed 1-4 atom pairs        
+    #pragma omp parallel for default(shared) reduction(+:sumEE[:3]) reduction(+:sumVdw[:3]) reduction(+:EERes[:nres]) reduction(+:VdwRes[:nres])
     for ( i=0; i<paramNonBond_.nr_14; i++ ) {
+        double c6, c12, rij;
+        int itypeA, itypeB;
+        int atomA, atomB, resA, resB;
+        double TempEE, TempVdw, ddcFactor = 1;
+
         atomA = paramNonBond_.pair14[i][0];
         atomB = paramNonBond_.pair14[i][1];
         resA = atoms_->atom[atomA].resind;
@@ -1291,25 +1301,25 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
         if (bDDC_) {
             ddcFactor =  (rij * 10);
         }
-        
+
         TempEE = mtop_->ffparams.fudgeQQ * ( ( colmb_factor/pdie_ ) * ( atoms_->atom[atomA].q*atoms_->atom[atomB].q ) ) / (rij * 10);
         TempEE = TempEE/ddcFactor;
         TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
         if ( bDIFF_ ) {
             if ( paramNonBond_.bItsA14[i] ) {
-                EEnergyFrame_[0] += TempEE;
-                VdwEnergyFrame_[0] += TempVdw;
+                sumEE[0] += TempEE;
+                sumVdw[0] += TempVdw;
             }
             if ( paramNonBond_.bItsB14[i] ) {
-                EEnergyFrame_[1] += TempEE;
-                VdwEnergyFrame_[1] += TempVdw;
+                sumEE[1] += TempEE;
+                sumVdw[1] += TempVdw;
             }
-            EEnergyFrame_[2] += TempEE;
-            VdwEnergyFrame_[2] += TempVdw;
+            sumEE[2] += TempEE;
+            sumVdw[2] += TempVdw;
         } else {
-            EEnergyFrame_[0] += TempEE;
-            VdwEnergyFrame_[0] += TempVdw;
+            sumEE[0] += TempEE;
+            sumVdw[0] += TempVdw;
         }
         if ( bDCOMP_ )
             if ( ( !paramNonBond_.bItsA14[i] ) && ( !paramNonBond_.bItsB14[i] ) ) {
@@ -1319,12 +1329,18 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
                 VdwRes[resB] += TempVdw;
             }
     }
-
+        
+    for ( i=0; i<3; i++ ) {
+        EEnergyFrame_[i] = sumEE[i];
+        VdwEnergyFrame_[i] = sumVdw[i];
+    }
+        
     if ( bDCOMP_ )
         for ( i=0; i<nres; i++ ) {
             EEnergyFrame_[i+3] = EERes[i];
             VdwEnergyFrame_[i+3] = VdwRes[i];
         }
+
 
 }
 
@@ -1333,13 +1349,8 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
     int i, j=0;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
-    double c6, c12, rij;
-    int itypeA, itypeB, ntype = mtop_->atomtypes.nr;
-    int resA, resB;
-    real TempEE, TempVdw, ddcFactor = 1;
+    int ntype = mtop_->atomtypes.nr;
     int nres = atoms_->nres;
-
-    std::vector<real> EERes ( nres, 0.0 ), VdwRes ( nres, 0.0 );
 
     if ( EEnergyFrame_.size() != nres+3 )
         EEnergyFrame_.resize ( nres+3 );
@@ -1348,10 +1359,18 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
 
     std::fill ( EEnergyFrame_.begin(), EEnergyFrame_.end(), 0.0 );
     std::fill ( VdwEnergyFrame_.begin(), VdwEnergyFrame_.end(), 0.0 );
+    
+    double EERes[nres] = {0}, VdwRes[nres] = {0};
+    double sumEE =0, sumVdw = 0;
 
+    #pragma omp parallel for default(shared) reduction(+:sumEE) reduction(+:sumVdw) reduction(+:EERes[:nres]) reduction(+:VdwRes[:nres])
     for ( i=0; i<isize_[0]; i++ ) {
-        for ( j=0; j<isize_[1]; j++ )	{
-
+        for ( int j=0; j<isize_[1]; j++ )	{
+            double c6, c12, rij;
+            int itypeA, itypeB;
+            int resA, resB;
+            double TempEE, TempVdw, ddcFactor = 1;
+            
             resA = atoms_->atom[index_[0][i]].resind;
             resB = atoms_->atom[index_[1][j]].resind;
 
@@ -1367,26 +1386,29 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
                 c6 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c6;
                 c12 = localtop_->idef.iparams[itypeB*ntype+itypeA].lj.c12;
             }
-            
+
             if (bDDC_) {
                ddcFactor =  (rij * 10);
             }
-            
+
             TempEE = ( ( colmb_factor/pdie_ ) * ( atoms_->atom[index_[0][i]].q * atoms_->atom[index_[1][j]].q ) ) / (rij * 10);
             TempEE = TempEE/ddcFactor;
             TempVdw = ( c12/pow ( rij,12 ) ) - ( c6/pow ( rij,6 ) );
 
-            EEnergyFrame_[2] += TempEE;
-            VdwEnergyFrame_[2] += TempVdw;
-
+            sumEE += TempEE;
+            sumVdw += TempVdw;
             if ( bDCOMP_ ) {
                 EERes[resA] += TempEE;
                 EERes[resB] += TempEE;
                 VdwRes[resA] += TempVdw;
                 VdwRes[resB] += TempVdw;
             }
+
         }
     }
+    
+    EEnergyFrame_[2] = sumEE;
+    VdwEnergyFrame_[2] = sumVdw;
     
 
     if ( bDCOMP_ )
