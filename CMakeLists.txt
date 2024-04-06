@@ -35,7 +35,7 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 project(g_mmpbsa)
 
 set(g_mmpbsa_MAJOR_VERSION 1)
@@ -73,14 +73,3 @@ include_directories(
 
 # Add sub-directories
 add_subdirectory(src)
-
-
-# ============== Eclipse CDT Error Handling======
-#IF(CMAKE_COMPILER_IS_GNUCC)
-#  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
-#ENDIF(CMAKE_COMPILER_IS_GNUCC)
-#IF(CMAKE_COMPILER_IS_GNUCXX)
-#  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
-#ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-#SET(CMAKE_VERBOSE_MAKEFILE ON)
-# ===============================

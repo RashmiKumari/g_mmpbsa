@@ -43,7 +43,10 @@
 #include <math.h>
 #include <stdarg.h>
 
-#include <gromacs/trajectoryanalysis.h>
+#include "gromacs/analysisdata/analysisdata.h"
+#include "gromacs/utility/smalloc.h"
+#include "gromacs/utility/fatalerror.h"
+#include "gromacs/math/vec.h"
 
 using namespace std;
 using namespace gmx;
@@ -74,10 +77,6 @@ int    last_cubus=0;
 #define UPDATE_FL  __file__=__FILE__,__line__=__LINE__
 const char * __file__;   /* declared versions of macros */
 int  __line__;           /* __FILE__  and __LINE__ */
-
-// copied from #include <gromacs/utility/fatalerror.h>
-void _range_check(int n, int n_min, int n_max, const char* warn_str, const char* var, const char* file, int line);
-#define range_check(n, n_min, n_max) _range_check(n, n_min, n_max, NULL, #n, __FILE__, __LINE__)
 
 #ifdef ERROR
 #undef ERROR

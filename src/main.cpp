@@ -41,18 +41,29 @@
 #include <numeric> 
 #include <math.h>
 
-#include <gromacs/trajectoryanalysis.h>
+#include "gromacs/analysisdata/analysisdata.h"
+#include "gromacs/analysisdata/modules/average.h"
+#include "gromacs/analysisdata/modules/plot.h"
+#include "gromacs/options/basicoptions.h"
+#include "gromacs/options/filenameoption.h"
+#include "gromacs/options/ioptionscontainer.h"
+#include "gromacs/trajectory/trajectoryframe.h"
+#include "gromacs/trajectoryanalysis/analysismodule.h"
+#include "gromacs/trajectoryanalysis/analysissettings.h"
+#include "gromacs/trajectoryanalysis/cmdlinerunner.h"
 #include "gromacs/trajectoryanalysis/topologyinformation.h"
+#include "gromacs/selection/selection.h"
+#include "gromacs/selection/selectionoption.h"
 #include "gromacs/utility/futil.h"
 #include "gromacs/utility/filestream.h"
-#include "gromacs/utility/stringutil.h"
-#include "gromacs/utility/cstringutil.h"
 #include "gromacs/utility/pleasecite.h"
 #include "gromacs/utility/arraysize.h"
 #include "gromacs/fileio/readinp.h"
+#include "gromacs/fileio/filetypes.h"
 #include "gromacs/fileio/confio.h"
 #include "gromacs/fileio/warninp.h"
-#include <gromacs/utility/exceptions.h>
+#include "gromacs/utility/exceptions.h"
+#include "gromacs/math/vec.h"
 
 using namespace gmx;
 
@@ -465,58 +476,58 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
                          .description ( "Input parameters for mmpbsa calculations." ) );
 
     options->addOption ( FileNameOption ( "ipdb" )
-                         .legacyType ( efPDB ).inputFile()
+                         .filetype ( OptionFileType::PDB ).inputFile()
                          .store ( &fnInputPDB_ ).defaultBasename ( "input" )
                          .description ( "Input pdb file to dump residue energy in b-factor field. If not provided, input tpr file will be used.") );
 
     options->addOption ( FileNameOption ( "opdb" )
-                         .legacyType ( efPDB ).outputFile()
+                         .filetype ( OptionFileType::PDB ).outputFile()
                          .store ( &fnOuputPDB_ ).defaultBasename ( "energy" )
                          .description ( "Output PDB file with residue energy in b-factor field." ) );
 
     options->addOption ( FileNameOption ( "mm" )
-                         .filetype ( eftPlot ).outputFile()
+                         .filetype ( OptionFileType::Plot ).outputFile()
                          .store ( &fnVacMM_ ).defaultBasename ( "energy_MM" )
                          .description ( "Vaccum MM energy as a function of time" ) );
 
     options->addOption ( FileNameOption ( "pol" )
-                         .filetype ( eftPlot ).outputFile()
+                         .filetype ( OptionFileType::Plot ).outputFile()
                          .store ( &fnPolar_ ).defaultBasename ( "polar" )
                          .description ( "Polar solvation energy as a function of time" ) );
 
     options->addOption ( FileNameOption ( "apol" )
-                         .filetype ( eftPlot ).outputFile()
+                         .filetype ( OptionFileType::Plot ).outputFile()
                          .store ( &fnAPolar_ ).defaultBasename ( "apolar" )
                          .description ( "Apolar solvation energy as a function of time" ) );
 
     options->addOption ( FileNameOption ( "mmcon" )
-                         .filetype ( eftGenericData ).outputFile()
+                         .filetype ( OptionFileType::GenericData ).outputFile()
                          .store ( &fnDecompMM_ ).defaultBasename ( "residues_MM" )
                          .description ( "Vacuum MM energy contribution to binding" ) );
 
     options->addOption ( FileNameOption ( "pcon" )
-                         .filetype ( eftGenericData ).outputFile()
+                         .filetype ( OptionFileType::GenericData ).outputFile()
                          .store ( &fnDecompPol_ ).defaultBasename ( "residues_polar" )
                          .description ( "Polar solvation energy contribution to binding" ) );
 
 
     options->addOption ( FileNameOption ( "apcon" )
-                         .filetype ( eftGenericData ).outputFile()
+                         .filetype ( OptionFileType::GenericData ).outputFile()
                          .store ( &fnDecompAPol_ ).defaultBasename ( "residues_apolar" )
                          .description ( "Apolar solvation energy contribution to binding" ) );
 
     options->addOption ( FileNameOption ( "o" )
-                         .filetype ( eftPlot ).outputFile()
+                         .filetype ( OptionFileType::Plot ).outputFile()
                          .store ( &fnBindingEnergy_ ).defaultBasename ( "binding_energy" )
                          .description ( "Final binding energy and its components" ) );
 
     options->addOption ( FileNameOption ( "os" )
-                         .filetype ( eftCsv ).outputFile()
+                         .filetype ( OptionFileType::Csv ).outputFile()
                          .store ( &fnEnergySummary_ ).defaultBasename ( "energy_summary" )
                          .description ( "Summary of binding energy over all frames" ) );
 
     options->addOption ( FileNameOption ( "ores" )
-                         .filetype ( eftCsv ).outputFile()
+                         .filetype ( OptionFileType::Csv ).outputFile()
                          .store ( &fnResiduesEnergySummary_ ).defaultBasename ( "residues_energy_summary" )
                          .description ( "Summary of binding energy contributions of residues over all frames" ) );
 
@@ -1204,7 +1215,7 @@ void AnalysisMMPBSA::vaccumMMFull ( rvec *x )
     rvec dx;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
-    int ntype = mtop_->atomtypes.nr;
+    int ntype = mtop_->ffparams.atnr;
     int i, j, k, l, n;
     int nres = atoms_->nres;
 
@@ -1349,7 +1360,7 @@ void AnalysisMMPBSA::vaccumMMWithoutExclusions ( rvec *x )
     int i, j=0;
     // real colmb_factor = 138.935485;
     real colmb_factor = 1389.35485; // converted for Angstrom, gromacs/math/units.h
-    int ntype = mtop_->atomtypes.nr;
+    int ntype = mtop_->ffparams.atnr;
     int nres = atoms_->nres;
 
     if ( EEnergyFrame_.size() != nres+3 )
@@ -1585,14 +1596,12 @@ void AnalysisMMPBSA::prepareOutputFiles ( const TrajectoryAnalysisSettings *sett
 }
 
 void AnalysisMMPBSA::readPBSAInputs()
-{
-    warninp_t wi;
+{    
     gmx_bool bAllowWarnings=FALSE;
     int maxwarning = 99;
 
-
     // Start reading input file
-    wi = init_warning ( bAllowWarnings, maxwarning );
+    WarningHandler *wi = new WarningHandler(bAllowWarnings, maxwarning);
     gmx::TextInputFile     stream ( fnMDP_ );
     std::vector<t_inpfile> inp = read_inpfile ( &stream, fnMDP_.c_str(), wi );
 
@@ -1646,6 +1655,7 @@ void AnalysisMMPBSA::readPBSAInputs()
         pbsaInputKwords_.savrad = get_ereal ( &inp, "savrad",    1.29,  wi );
     }
 
+    free(wi);
 }
 
 void AnalysisMMPBSA::assignRadius()
@@ -1686,7 +1696,7 @@ void AnalysisMMPBSA::assignRadius()
     }
 
 
-    int itype, ntype = mtop_->atomtypes.nr;
+    int itype, ntype = mtop_->ffparams.atnr;
     real c6, c12, sig6, rad = -1;
     std::string atomtype, atomname, atomname2, atomtype2;
     for ( int i = 0; i < atoms_->nr; i++ ) {    // get charge and radius for all atoms

@@ -33,12 +33,9 @@
 #
 #
 
-
-option(EXT_APBS "compile without APBS" OFF)
-option(APBS_INSTALL "Path to APBS installation directory" "/opt/apbs-1.3-source")
-option(APBS_SRC "Path to APBS source directory" "/opt/apbs")
-option(APBS14 "Enable compiling and linking with APBS-1.4.x" OFF)
-option(BUILD_STATIC "Build standalone static executables" OFF)
+ENABLE_LANGUAGE(CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (BUILD_STATIC)
 	SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
@@ -55,34 +52,17 @@ endif(BUILD_STATIC)
 
 set(CMAKE_PREFIX_PATH "" CACHE STRING "Extra locations to search for external libraries and tools (give directory without lib, bin, or include)")
 
-
-##############################################################
-################### Including GROMACS SRC ####################
-##############################################################
-if(GMX_SRC)
-    if(EXISTS "${GMX_SRC}/src/gromacs")
-        set(GROMACS_SRC_INCLUDE "${GMX_SRC}/src/")
-        message(STATUS "Found GROMACS Source directory for header files: ${GMX_SRC}/src/")
-    else()
-        message(FATAL_ERROR "\n ${GMX_SRC}/src/gromacs not found in GROMACS SOURCE PATH. \nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
-    endif()
-else()
-    message(FATAL_ERROR "\nGROMACS SOURCE PATH is not defined.....\nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
-endif()
-
-##############################################################
-
 ##############################################################
 ################### CHECKING GROMACS PATH ####################
 ##############################################################
-if(GMX_DOUBLE)
-    find_package(GROMACS COMPONENTS "libgromacs_d")
-else()
-    find_package(GROMACS COMPONENTS "libgromacs")
-endif()
+find_package(GROMACS COMPONENTS "libgromacs")
 
 if (NOT GROMACS_FOUND)
-	message(STATUS "Continue checking for other Gromacs version library file")
+    find_package(GROMACS COMPONENTS "libgromacs_d")
+endif(NOT GROMACS_FOUND)
+
+if (NOT GROMACS_FOUND)
+    find_package(GROMACS COMPONENTS "libgromacs_mpi")
 endif(NOT GROMACS_FOUND)
 
 if (NOT GROMACS_FOUND)
@@ -91,19 +71,43 @@ endif(NOT GROMACS_FOUND)
 
 message(STATUS "Found Gromacs include directory: " ${GROMACS_INCLUDE_DIRS})
 
-if(${GROMACS_VERSION} VERSION_LESS "2021")
-	message(FATAL_ERROR "Gromacs-${GROMACS_VERSION} not supported. Please use Gromacs-2021 and above versions.\n")
-endif(${GROMACS_VERSION} VERSION_LESS "2021")
-
-include_directories( ${GROMACS_SRC_INCLUDE} )
-include_directories( ${GROMACS_INCLUDE_DIRS} )
-add_definitions( ${GROMACS_DEFINITIONS} )
+if(${GROMACS_VERSION} VERSION_LESS "2023")
+	message(FATAL_ERROR, "\n Not implemented for Gromacs version: ${GROMACS_VERSION} \n")
+endif()
 ##############################################################
 
+
+##############################################################
+################### Including GROMACS SRC ####################
+##############################################################
+if(GMX_SRC)
+    if(EXISTS "${GMX_SRC}/src/gromacs")
+        set(GROMACS_SRC "${GMX_SRC}/src/")
+        message(STATUS "Found GROMACS Source directory for header files: ${GMX_SRC}/src/")
+    else()
+        message(FATAL_ERROR "\n ${GMX_SRC}/src/gromacs not found in GROMACS SOURCE PATH. \nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
+    endif()
+else()
+    message(FATAL_ERROR "\nGROMACS SOURCE PATH is not defined.....\nUSE:\n -DGMX_SRC=/path/to/gromacs/source\n" )
+endif()
+
+FILE(GLOB INCLUDE_DIRS RELATIVE ${GROMACS_SRC} ${GROMACS_SRC}/gromacs/*/include)
+FOREACH(INC_DIR ${INCLUDE_DIRS})
+  include_directories(${GROMACS_SRC}${INC_DIR})
+ENDFOREACH()
+##############################################################
+
+
+include_directories( ${GROMACS_SRC} )
+include_directories( ${GROMACS_INCLUDE_DIRS} )
+add_definitions( ${GROMACS_DEFINITIONS} )
 
 add_executable(g_mmpbsa main.cpp nsc.cpp)
 SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX CXX_STANDARD 17)
 SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES COMPILE_FLAGS "-fopenmp")
+if( NOT ("${GROMACS_LIBRARIES}" MATCHES "openmp"))
+	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINK_LIBRARIES "-fopenmp")
+endif()
 target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
 	
 add_executable(energy2bfac energy2bfac.cpp)
