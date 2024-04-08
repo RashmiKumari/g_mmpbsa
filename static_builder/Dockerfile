@@ -8,7 +8,6 @@ RUN mkdir /build
 RUN mkdir /build/external
 WORKDIR /build/external
 
-RUN curl -O https://cmake.org/files/v3.27/cmake-3.27.7.tar.gz && tar -zxvf cmake-3.27.7.tar.gz
 RUN curl -L -O https://ftp.gromacs.org/gromacs/gromacs-2023.2.tar.gz && tar -zxvf gromacs-2023.2.tar.gz
 
 WORKDIR /build/external/gromacs-2023.2
