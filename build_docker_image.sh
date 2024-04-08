@@ -1,2 +1,2 @@
-docker build -t mmpbsa -f Dockerfile
+docker build -t mmpbsa .
 docker run -v `pwd`:/workspace:Z -it mmpbsa bash
