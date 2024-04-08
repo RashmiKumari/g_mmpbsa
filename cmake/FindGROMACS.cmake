@@ -210,3 +210,24 @@ if(PC_GROMACS_FOUND)
   mark_as_advanced(GROMACS_INCLUDE_DIR GROMACS_LIBRARY GROMACS_DEFINITIONS GROMACS_PKG GROMACS_VERSION GROMACS_DEP_LIBRARIES)
 
 endif(PC_GROMACS_FOUND)
+
+# Special case when static executable needed to build
+if(GMX_LIB AND GMX_INC AND BUILD_STATIC)
+  
+  find_library(CM_GROMACS_LIBRARY gromacs HINTS ${GMX_LIB})
+
+  if("${CM_GROMACS_LIBRARY}" MATCHES "libgromacs[^;]*(\\.a|\\.so)")
+    set(GROMACS_LIBRARY "${CM_GROMACS_LIBRARY}" )
+  endif()
+  
+  find_library(CM_MUPARSER_LIBRARY muparser HINTS ${GMX_LIB})
+  if("${CM_MUPARSER_LIBRARY}" MATCHES "libmuparser[^;]*(\\.a|\\.so)")
+    set(MUPARSER_LIBRARY "${CM_MUPARSER_LIBRARY}" )
+  endif()
+  set(GROMACS_LIBRARIES "${GROMACS_LIBRARY};${MUPARSER_LIBRARY}" )
+
+  find_path(GROMACS_INCLUDE_DIR gromacs HINTS ${GMX_INC} )
+  set(GROMACS_INCLUDE_DIRS ${GROMACS_INCLUDE_DIR} )
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(GROMACS DEFAULT_MSG GROMACS_LIBRARY GROMACS_INCLUDE_DIR)
+endif()
