@@ -1,0 +1,6 @@
+[submodule "external/apbs"]
+	path = external/apbs
+	url = https://github.com/Electrostatics/apbs.git
+[submodule "external/gromacs"]
+	path = external/gromacs
+	url = https://github.com/gromacs/gromacs.git
