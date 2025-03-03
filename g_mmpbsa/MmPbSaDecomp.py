@@ -124,7 +124,7 @@ def CheckEnData(MM,Pol,APol):
 
 
 def ParseOptions():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(prog='g_mmpbsa decompose', description='Calculate final average decomposed energies of residues with plots')
 	parser.add_argument("-m", "--molmech", help='Molecular Mechanics energy file',action="store", default='contrib_MM.dat', metavar='contrib_MM.dat')
 	parser.add_argument("-p", "--polar", help='Polar solvation energy file',action="store",default='contrib_pol.dat', metavar='contrib_pol.dat')
 	parser.add_argument("-a", "--apolar", help='Non-Polar solvation energy file',action="store",default='contrib_apol.dat',metavar='contrib_apol.dat')
@@ -156,7 +156,7 @@ def ParseOptions():
 		parser.print_help()
 		sys.exit(1)
 
-	return parser.parse_args()
+	return args
 
 def CheckResname(resA,resB,resC):
 	if(len(resA) != len(resB)):

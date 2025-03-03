@@ -1,4 +1,5 @@
-### Introduction
+Introduction
+------------
 
 The development of g_mmpbsa package is initiated under [Open Source Drug Discovery Consortium (OSDD)][OSDD], which is a collaborative platform to design and discover new drugs for neglected tropical diseases such as Malaria, Tuberculosis, Leshmaniasis etc.
 
@@ -8,20 +9,27 @@ The tool calculates components of binding energy using MM-PBSA method except the
 
 The output from the tool is used further as input in python scripts which is provided in this package, to get the final binding energy and energetic contribution of each residue.
 
-#### For complete documentation, please visit [g_mmpbsa](http://rashmikumari.github.io/g_mmpbsa/).
-#### Please post problems and queries in [g_mmpbsa forum](https://groups.google.com/d/forum/g_mmpbsa).
+**For complete documentation, please visit [g_mmpbsa](http://rashmikumari.github.io/g_mmpbsa/).**
+**Please post problems and queries in [g_mmpbsa forum](https://groups.google.com/d/forum/g_mmpbsa).**
 
 ***
 
-#### Please always cite following two publications:
+Please always cite following two publications
+==============================================
 
 * Kumari _et al_ (2014) [g_mmpbsa - A GROMACS tool for high-throughput MM-PBSA calculations][g_mmpbsa paper]. _J. Chem. Inf. Model._ 54:1951-1962.
 
 * Baker _et al._ (2001) [Electrostatics of nanosystems: Application to microtubules and the ribosome][apbs paper]. _Proc. Natl. Acad. Sci. USA_  98:10037-10041.
 
-***
+Version v3.0 Release Notes
+==========================
+* `g_mmpbsa` is converted into a python package.
+* It can be installed by pip command: `python -m pip install g_mmpbsa`.
+* `apbs` is als included as sub-command in `g_mmpbsa`.
+* Supports **GROMACS-2018+ versions**.
 
-### Features v2.0
+Version v2.0 Release Notes
+==========================
 
 *   It is an open source tool and can be modified under the terms of the GNU public license
 
@@ -41,9 +49,9 @@ The output from the tool is used further as input in python scripts which is pro
 
 *   This tool can be modified and/or redistributed under terms of GNU public license.
 
-***
 
-### Removed features from previous versions
+Removed features from previous versions
+=======================================
 
 *   Removed internal APBS linking, now always requires an external APBS program.
 
@@ -52,9 +60,9 @@ The output from the tool is used further as input in python scripts which is pro
 *   Weeks–Chandler–Andersen (WCA) non-polar solvation model is removed.
 
 
-***
 
-#### Other Citations:
+Other Citations
+===============
 
 * Pronk _et al._ (2013) [GROMACS 4.5: a high-throughput and highly parallel open source molecular simulation toolkit][gromacs paper]. _Bioinformatics_ 29:845-854.
 
@@ -62,7 +70,6 @@ The output from the tool is used further as input in python scripts which is pro
 
 * Wagoner _et al._ (2006) [Assessing implicit models for nonpolar mean solvation forces: The importance of dispersion and volume terms][wca paper]. _Proc. Natl. Acad. Sci. USA_  103:8331-8336.
 
-* * *
 
 [OSDD]: http://www.osdd.net/
 [GROMACS]: http://www.gromacs.org/

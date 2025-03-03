@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 cd /io/external
 mkdir apbs_installed
-mkdir gromacs_installed
+mkdir gmx_installed
 
 cd apbs/
 if [ -d build ]; then
@@ -16,13 +16,13 @@ mkdir build && cd build
 cmake .. \
   -DCMAKE_INSTALL_INCLUDEDIR="include" \
   -DBUILD_DOC=OFF \
-  -DAPBS_STATIC_BUILD=ON  \
+  -DAPBS_STATIC_BUILD=OFF  \
   -DBUILD_TOOLS=OFF \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_INSTALL_PREFIX=/io/external/apbs_installed \
   -DENABLE_PYGBE=OFF \
   -DENABLE_BEM=OFF \
-  -DENABLE_iAPBS=OFF \
+  -DENABLE_iAPBS=ON \
   -DENABLE_GEOFLOW=OFF \
   -DENABLE_OPENMP=ON \
   -DENABLE_PBAM=OFF \
@@ -36,18 +36,17 @@ cmake .. \
 make -j12
 make install
 
-#cd /io/external/gromacs
-#if [ -d build ]; then
-#    rm -rf build
-#fi
-#mkdir build && cd build
+cd /io/external/gromacs
+if [ -d build ]; then
+    rm -rf build
+fi
+mkdir build && cd build
 
-#export GMX_PATH=/io/external/gmx_installed
-#export GMX_SRC=/io/external/gromacs
+export GMX_PATH=/io/external/gmx_installed
+export GMX_SRC=/io/external/gromacs
 
-#cmake .. -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
-#             -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_PATH} \
-#             -DGMX_PREFER_STATIC_LIBS=ON -DGMX_OPENMP=OFF -DBUILD_SHARED_LIBS=OFF
+cmake .. -DGMX_SIMD=NONE -DGMX_GPU=off -DGMXAPI=OFF -DGMX_INSTALL_LEGACY_API=on \
+             -DGMX_FFT_LIBRARY=fftpack -DCMAKE_INSTALL_PREFIX=${GMX_PATH}
             
-#make -j12
-#make install
+make -j12
+make install

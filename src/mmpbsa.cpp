@@ -39,6 +39,7 @@
 #include <map>
 #include <algorithm>
 #include <numeric> 
+#include <iostream> 
 #include <math.h>
 
 #include "gromacs/analysisdata/analysisdata.h"
@@ -56,6 +57,7 @@
 #include "gromacs/selection/selectionoption.h"
 #include "gromacs/utility/futil.h"
 #include "gromacs/utility/filestream.h"
+#include "gromacs/utility/programcontext.h"
 #include "gromacs/utility/pleasecite.h"
 #include "gromacs/utility/arraysize.h"
 #include "gromacs/fileio/readinp.h"
@@ -580,7 +582,6 @@ AnalysisMMPBSA::initOptions ( IOptionsContainer          *options,
 
 void AnalysisMMPBSA::optionsFinished ( TrajectoryAnalysisSettings * )
 {
-
     // Sanity check for input options and assign default file names
     
     if ( ( !bDIFF_ ) && ( bDCOMP_ ) ) {
@@ -767,16 +768,9 @@ AnalysisMMPBSA::initAnalysis ( const TrajectoryAnalysisSettings &settings,
             char *apbs_env = NULL;
             apbs_env = std::getenv ( "APBS" );
             if ( apbs_env == NULL ) {
-                printf ( "\n WARNING: APBS Environment variable is not defined... Looking in PATH...\n" );
-                if ( system ( "which apbs > /dev/null 2>&1" ) )
-                    GMX_THROW ( InconsistentInputError ( "APBS not found! Define APBS environment variable or install apbs!!" ) );
-                else
-                    printf ( "\n ... Found apbs in $PATH... Continuing...\n\n" );
-                apbsCommand_ = "apbs";
+                apbsCommand_ = "g_mmpbsa apbs";
             } else {
                 apbsCommand_ = apbs_env;
-                if ( !gmx_fexist ( apbsCommand_ ) )
-                    GMX_THROW ( InconsistentInputError ( "APBS not found with the defined APBS environment variable.!!!" ) );
             }
 
             // Building apbs command
@@ -2093,8 +2087,7 @@ AnalysisMMPBSA::AnalysisMMPBSA()
 /*! \brief
  * The main function for the analysis template.
  */
-int
-main ( int argc, char *argv[] )
+int mmpbsa ( int argc, char *argv[] )
 {
     CopyRightMsg();
     return gmx::TrajectoryAnalysisCommandLineRunner::runAsMain<AnalysisMMPBSA> ( argc, argv );

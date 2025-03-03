@@ -52,49 +52,6 @@
 #include "gromacs/commandline/pargs.h"
 #include "gromacs/commandline/cmdlineinit.h"
 
-/**
- * Copyright message to dispaly at the start of execution
- */
-void CopyRightMsg()
-{
-    std::string copyright =
-        "                                                                        \n"
-        "                        :-)  g_mmpbsa (-:                               \n"
-        "                                                                        \n"
-        "                                                                        \n"
-        "       Copyright (C) 2013 - 2021 Rashmi Kumari and Andrew Lynn          \n"
-        "       Copyright (C) 2022- Rajendra Kumar and Rashmi Kumari             \n"
-        "                                                                        \n"
-        "g_mmpbsa is free software: you can redistribute it and/or modify        \n"
-        "it under the terms of the GNU General Public License as published by    \n"
-        "the Free Software Foundation, either version 3 of the License, or       \n"
-        "(at your option) any later version.                                     \n"
-        "                                                                        \n"
-        "g_mmpbsa is distributed in the hope that it will be useful,             \n"
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of          \n"
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           \n"
-        "GNU General Public License for more details.                            \n"
-        "                                                                        \n"
-        "You should have received a copy of the GNU General Public License       \n"
-        "along with g_mmpbsa.  If not, see <http://www.gnu.org/licenses/>.       \n"
-        "                                                                        \n"
-        "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     \n"
-        "\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT     \n"
-        "LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   \n"
-        "A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    \n"
-        "OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   \n"
-        "SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED\n"
-        "TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR  \n"
-        "PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  \n"
-        "LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING    \n"
-        "NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS      \n"
-        "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.            \n"
-        "                                                                        \n"
-        "                                                                        \n"
-        "                                                                        \n";
-    fprintf ( stderr,"%s\n", copyright.c_str() );
-}
-
 int get_energy( char *fnEnergy, int nres, real *energy)	{
 	int i =0, count=-1, dum =0;
     double tempDouble;
@@ -166,7 +123,6 @@ int	gmx_energy2bfac (int argc, char *argv[])		{
   FILE *fComplex, *fS1, *fS2;
 
   #define NFILE asize(fnm)
-  CopyRightMsg();
   //To show the option on the screen and to take the all option
   parse_common_args(&argc, argv,
       PCA_CAN_TIME | PCA_CAN_VIEW | PCA_TIME_UNIT , NFILE, fnm,
@@ -261,7 +217,7 @@ return 0;
 }
 
 
-int main(int argc, char *argv[])
+int energy2bfac(int argc, char *argv[])
 {
   gmx_run_cmain(argc, argv, &gmx_energy2bfac);
   return 0;

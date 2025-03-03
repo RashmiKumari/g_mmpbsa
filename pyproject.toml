@@ -1,0 +1,34 @@
+[build-system]
+requires = [ "pybind11==2.9.2", "setuptools", "pkgconfig"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g_mmpbsa"
+version = "3.0.0"
+description = "MM/PBSA calculations for GROMACS."
+authors = [
+    { name = "Rajendra Kumar", email = "rjdkmr@gmail.com" },
+    { name = "Rashmi Kumari"}
+]
+license = { text = "GNU General Public License v3 (GPLv3)" }
+readme = "README.rst"
+keywords = ["Molecular Modeling", "Molecular Dynamics Simulations", "Computational Chemistry", "Computational Biophysics", "MM/PBSA"]
+dependencies = ['numpy>=1.6',  'scipy>=0.9', 'matplotlib>=1.1.0']
+classifiers = [
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'Intended Audience :: End Users/Desktop',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Natural Language :: English',
+    'Operating System :: MacOS',
+    'Operating System :: POSIX :: Linux',
+    'Topic :: Scientific/Engineering :: Computational-Chemistry',
+]
+
+[project.urls]
+homepage = "https://rashmikumari.github.io/g_mmpbsa/"
+repository = "https://github.com/RashmiKumari/g_mmpbsa"
+
+[project.scripts]
+g_mmpbsa = "g_mmpbsa:main.main"

@@ -210,7 +210,7 @@ def CheckEnData(mmEn,polEn,apolEn):
 
 
 def ParseOptions():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(prog='g_mmpbsa average', description='Calculate final average binding energy including all energy terms. Supports multiple complexes at once.')
 	parser.add_argument("-mt", "--multiple", help='If given, calculate for multiple complexes. Need Metafile containing path of energy files', action="store_true")
 	parser.add_argument("-mf", "--metafile", help='Metafile containing path to energy files of each complex in a row obtained from g_mmpbsa in following order: \
                                                        [MM file] [Polar file] [ Non-polar file] ',action="store", default='metafile.dat', metavar='metafile.dat')

@@ -322,7 +322,7 @@ def CheckEnData(mmEn,polEn,apolEn):
 			raise ValueError("In APolar file, size of columns are not equal.")
 
 def ParseOptions():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(prog='g_mmpbsa correlation', description='Same as average, but also calculates correlation between predicted and experimental binding energies')
 	parser.add_argument("-mt", "--multiple", help='If given, calculate for multiple complexes. Need Metafile containing path of energy files',action="store_true")
 	parser.add_argument("-mf", "--metafile", help='Metafile containing path to energy files of each complex in a row obtained from g_mmpbsa in following order: \
                                                        [MM file] [Polar file] [ Non-polar file] [Ki]  \
@@ -339,7 +339,7 @@ def ParseOptions():
 	parser.add_argument("-cd", "--corrdist", help='Correlation distribution data from bootstrapping',action="store",default='corrdist.dat', metavar='corrdist.dat')
 	parser.add_argument("-cp", "--corrplot", help='Plot of correlation distribution',action="store",default='corrdist.png', metavar='corrdist.png')
 
-	if len(sys.argv) < 2:
+	if len(sys.argv) < 3:
 		print('ERROR: No input files. Need help!!!')
 		parser.print_help()
 		sys.exit(1)
