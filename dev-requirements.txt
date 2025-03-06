@@ -1,0 +1,6 @@
+pybind11==2.9.2
+pkgconfig
+setuptools
+numpy
+scipy
+matplotlib
