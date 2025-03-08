@@ -1,0 +1,55 @@
+name: MacOS-Wheels-Build
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            python: 311
+            platform_id: macosx_x86_64
+            env:
+              MACOSX_DEPLOYMENT_TARGET: 13.0            
+          - os: macos-14
+            python: 311
+            platform_id: macosx_x86_64
+            env:
+              MACOSX_DEPLOYMENT_TARGET: 14.0
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "true"
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: "3.11" # update once build dependencies are available
+
+      - name: Build Wheels
+        run: bash scripts/build_macos_wheels.sh
+
+      - name: Test Wheels
+        run: |
+          for PYTHON in ${PYTHONS[@]}
+          do
+            pyenv global $PYTHON
+            echo $(python --version)
+            python -c "import gmx_clusterByFeatures; print('=====\nTEST -- gmx_clusterByFeatures GROMACS version: ', gmx_clusterByFeatures.gmx_version, '\n=====')"
+          done
+          pyenv global system
+
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: fixed_wheels/*.whl
