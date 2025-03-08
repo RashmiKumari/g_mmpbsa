@@ -3,8 +3,6 @@ set -e -x
 
 CWD=`pwd`
 
-port install f2c
-
 brew install gcc@14 libomp gsl fftw pyenv eigen arpack \
              boost openblas lapack suite-sparse
 brew cleanup
