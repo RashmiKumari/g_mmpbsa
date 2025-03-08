@@ -2,8 +2,7 @@ name: MacOS-Wheels-Build
 
 on:
   push:
-    tags:
-      - '**'
+    branches: [ "python" ]
 
 jobs:
   build_wheels:
