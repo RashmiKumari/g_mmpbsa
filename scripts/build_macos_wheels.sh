@@ -33,8 +33,8 @@ mkdir apbs_installed
 mkdir gmx_installed
 
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/lapack/lib/pkgconfig"
-export LDFLAGS="-L/usr/local/opt/libomp/lib"
-export CPPFLAGS="-I/usr/local/opt/libomp/include"
+export LDFLAGS="-L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib"
+export CPPFLAGS="-I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
 
 export CC=gcc-14
 export CXX=g++-14
