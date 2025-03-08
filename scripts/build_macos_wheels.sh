@@ -32,8 +32,9 @@ cd external
 mkdir apbs_installed
 mkdir gmx_installed
 
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/lapack/lib/pkgconfig"
-export LDFLAGS="-L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib"
+echo ${PKG_CONFIG_PATH}
+export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
+export LDFLAGS="-L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib -lopenblas"
 export CPPFLAGS="-I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
 
 export CC=gcc-14
@@ -68,7 +69,8 @@ cmake .. \
   -DGET_NanoShaper=OFF \
   -DCMAKE_C_FLAGS="-fpermissive" \
   -DCMAKE_CC_COMIPLER=gcc-14 \
-  -DCMAKE_CXX_COMIPLER=g++-14
+  -DCMAKE_CXX_COMIPLER=g++-14 \
+  -DCMAKE_VERBOSE_MAKEFILE=ON
 
 make 
 make install
