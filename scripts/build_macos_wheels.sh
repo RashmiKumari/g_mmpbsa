@@ -32,6 +32,7 @@ cd external
 mkdir apbs_installed
 mkdir gmx_installed
 
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/lapack/lib/pkgconfig"
 export LDFLAGS="-L/usr/local/opt/libomp/lib"
 export CPPFLAGS="-I/usr/local/opt/libomp/include"
 
