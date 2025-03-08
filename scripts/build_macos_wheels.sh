@@ -34,8 +34,8 @@ mkdir gmx_installed
 
 echo ${PKG_CONFIG_PATH}
 export PKG_CONFIG_PATH="/usr/local/opt/lapack/lib/pkgconfig:/usr/local/opt/openblas/lib/pkgconfig:${PKG_CONFIG_PATH}"
-export LDFLAGS="-L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib -lopenblas"
-export CPPFLAGS="-I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/libomp/lib -L/usr/local/opt/lapack/lib -L/usr/local/opt/openblas/lib -lopenblas -lvf2c"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/libomp/include -I/usr/local/opt/lapack/include -I/usr/local/opt/openblas/include"
 
 export CC=gcc-14
 export CXX=g++-14
