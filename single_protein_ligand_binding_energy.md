@@ -2,6 +2,8 @@
 layout: page
 ---
 
+## This is now deprecated. [Latest version of g_mmpbsa is now HERE](https://g-mmpbsa.readthedocs.io/). 
+
 #### Download Tutorial Package 
 
  To download the tutorial package, click on this [**link**](tutorial.tar.gz). This package contains required file for the tutorial.
