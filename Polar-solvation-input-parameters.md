@@ -2,6 +2,8 @@
 layout: page
 ---
 
+## This is now deprecated. [Latest version of g_mmpbsa is now HERE](https://g-mmpbsa.readthedocs.io/). 
+
 ### Input Keywords for Polar Solvation Energy
 
 
