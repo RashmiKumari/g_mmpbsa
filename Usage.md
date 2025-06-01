@@ -2,6 +2,7 @@
 layout: page
 ---
 
+## This is now deprecated. Latest version of g_mmpbsa is now here: https://g-mmpbsa.readthedocs.io/. 
 
 <a name="top"></a>
 
