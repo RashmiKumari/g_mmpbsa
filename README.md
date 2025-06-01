@@ -1,3 +1,6 @@
+## This g_mmpbsa repo is no longer updated and maintained. Latest g_mmpbsa repo is now moved here: https://github.com/rjdkmr/g_mmpbsa and https://g-mmpbsa.readthedocs.io/. 
+
+
 ### Introduction
 
 
