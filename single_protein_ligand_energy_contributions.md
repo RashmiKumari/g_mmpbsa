@@ -2,6 +2,8 @@
 layout: page
 ---
 
+## This is now deprecated. [Latest version of g_mmpbsa is now HERE](https://g-mmpbsa.readthedocs.io/). 
+
 #### Contribution of residues to the binding energy 
 
 This tutorial is continuation of a [**previous tutorial**](single_protein_ligand_binding_energy.html). The required input files for this tutorial were generated in previous one.To calculate average contribution of the residues to the binding energy, a python script [**MmPbSaDecomp.py**](https://github.com/RashmiKumari/g_mmpbsa/blob/master/tools/MmPbSaDecomp.py){:target="_blank"} is provided. For details about this script, please click on this [**link**](Usage.html#mmpbsadecomppy).
