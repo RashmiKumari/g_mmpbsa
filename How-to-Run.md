@@ -2,6 +2,8 @@
 layout: page
 ---
 
+## This is now deprecated. [Latest version of g_mmpbsa is now HERE](https://g-mmpbsa.readthedocs.io/). 
+
 ### Executing g_mmpbsa
 
 g_mmpbsa is a console application which is executed from terminal/console by command options similar to other GROMACS module. All the input options should be provided on command line depending on the type of calculation. To calculate for single atomic group (e.g. only protein, only ligand, only specific region of protein etc.) one group is required to choose from index file, whereas for complex (e.g. protein-ligand, protein-protein etc.) two separate group is required to choose from index file.
