@@ -53,7 +53,9 @@
  * @brief Define `bool` variable with `int`
  * @ingroup Ext_apbs
  */
+#ifndef __cplusplus
 typedef int bool;
+#endif
 
 /**
  * @brief Define bool variable `FALSE`

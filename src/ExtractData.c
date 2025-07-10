@@ -139,7 +139,7 @@ char* extract_digits(char *str)	{
 
 	do {
 
-		if isdigit(str[i])	{
+		if(isdigit(str[i]))	{
 			final[n] = str[i];
 			n++;
 		}
@@ -259,7 +259,7 @@ void remove_leading_white_space(char *str)	{
 
 	for(i=0; i<=len; i++)	{
 
-		if isspace(str[i])	{
+		if(isspace(str[i]))	{
 			nspace += 1;
 			continue;
 		}

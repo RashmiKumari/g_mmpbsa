@@ -3,6 +3,7 @@
 #
 # Authors: Rashmi Kumari and Andrew Lynn
 # Contribution: Rajendra Kumar
+# Contribution: Ievgen Sliusar
 #
 # Copyright (C) 2013-2016 Rashmi Kumari and Andrew Lynn
 #
@@ -81,19 +82,31 @@ endif()
 if(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
 	set(HAVE_GROMACS50 TRUE)
 	ADD_DEFINITIONS("-DHAVE_GROMACS50")
-  ENABLE_LANGUAGE(CXX)
 endif(${GROMACS_VERSION} VERSION_GREATER "5.0" AND ${GROMACS_VERSION} VERSION_LESS "5.1")
 
-if(${GROMACS_VERSION} VERSION_GREATER "5.1")
+if(${GROMACS_VERSION} VERSION_GREATER "5.1" AND ${GROMACS_VERSION} VERSION_LESS "2016")
 	set(HAVE_GROMACS51 TRUE)
 	ADD_DEFINITIONS("-DHAVE_GROMACS51")
-  ENABLE_LANGUAGE(CXX)
-endif(${GROMACS_VERSION} VERSION_GREATER "5.1")
+endif(${GROMACS_VERSION} VERSION_GREATER "5.1" AND ${GROMACS_VERSION} VERSION_LESS "2016")
+
+if(NOT ${GROMACS_VERSION} VERSION_LESS "2016")
+	set(HAVE_GROMACS2016 TRUE)
+	ADD_DEFINITIONS("-DHAVE_GROMACS2016")
+endif(NOT ${GROMACS_VERSION} VERSION_LESS "2016")
+
+if(${GROMACS_VERSION} VERSION_GREATER "5.0")
+	ENABLE_LANGUAGE(CXX)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GROMACS_CXX_STANDARD}")
+endif(${GROMACS_VERSION} VERSION_GREATER "5.0")
 
 include_directories( ${GROMACS_INCLUDE_DIRS} )
 add_definitions( ${GROMACS_DEFINITIONS} )
 ##############################################################
 
+
+if (NOT EXT_APBS AND HAVE_GROMACS2016)
+	message(FATAL_ERROR "\nOnly external APBS invocation is supported for Gromacs-${GROMACS_VERSION}\n")
+endif (NOT EXT_APBS AND HAVE_GROMACS2016)
 
 ##############################################################
 ######################## APBS-1.3 PATH  ######################
@@ -233,7 +246,7 @@ endif()
 ##############################################################
 ###### GROMACS-45/46: Compiling and linking Without APBS #####
 ##############################################################
-if(EXT_APBS AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
+if(EXT_APBS AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 AND NOT HAVE_GROMACS2016)
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c  GMX46/radius.c GMX46/extrn_apbs.c ExtractData.c ExtractData.h)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
 endif()
@@ -243,7 +256,7 @@ endif()
 ##############################################################
 ##### GROMACS-45/46: Compiling and linking With APBS-1.3 #####
 ##############################################################
-if(NOT EXT_APBS AND NOT APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 )
+if(NOT EXT_APBS AND NOT APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 AND NOT HAVE_GROMACS2016)
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs13/apbs_main.c apbs13/apbs_routines.c apbs13/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE Fortran)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} )
@@ -254,7 +267,7 @@ endif()
 ##############################################################
 ##### GROMACS-45/46: Compiling and linking With APBS-1.4 #####
 ##############################################################
-if(NOT EXT_APBS AND APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
+if(NOT EXT_APBS AND APBS14 AND NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51 AND NOT HAVE_GROMACS2016)
 	add_executable(g_mmpbsa GMX46/main.c GMX46/g_mmpbsa.h GMX46/energy_mm.c GMX46/InputPBSA.c GMX46/nsc.c GMX46/PbsaPrep.c GMX46/psize.c GMX46/radius.c apbs14/apbs.h apbs14/apbs_main.c apbs14/apbs_routines.c apbs14/apbs_routines.h)
 	SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
 	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES} ${APBS_LIBS} "-fopenmp")
@@ -295,8 +308,53 @@ endif()
 ##############################################################
 
 
-################# energy2bfac ###############################
-if(NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
+##############################################################
+###### GROMACS-20xx: Compiling and linking Without APBS ######
+##############################################################
+if(EXT_APBS AND HAVE_GROMACS2016)
+	add_executable(g_mmpbsa GMX2K/main.cxx GMX2K/g_mmpbsa.h GMX2K/energy_mm.cxx GMX2K/InputPBSA.cxx GMX2K/nsc.cxx GMX2K/PbsaPrep.cxx GMX2K/psize.cxx GMX2K/radius.cxx GMX2K/extrn_apbs.cxx GMX2K/ported/readinp.cxx GMX2K/ported/warninp.cxx ExtractData.c ExtractData.h)
+	SET_SOURCE_FILES_PROPERTIES(ExtractData.c PROPERTIES LANGUAGE CXX)
+	#SET_TARGET_PROPERTIES(g_mmpbsa PROPERTIES LINKER_LANGUAGE CXX)
+	target_link_libraries(g_mmpbsa ${GROMACS_LIBRARIES})
+endif()
+##############################################################
+
+
+##############################################################
+###### GROMACS-2020 and newer: do header fixups         ######
+##############################################################
+if(HAVE_GROMACS2016)
+	include(FixupHeader)
+	set(FIXUP_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/GMX2K/fixups)
+	set(CMAKE_REQUIRED_INCLUDES "${GROMACS_INCLUDE_DIRS}")
+	FixupHeaderCXX("gromacs/commandline/cmdlineinit.h")
+	FixupHeaderCXX("gromacs/commandline/filenm.h")
+	FixupHeaderCXX("gromacs/commandline/pargs.h")
+	FixupHeaderCXX("gromacs/fileio/confio.h")
+	FixupHeaderCXX("gromacs/fileio/oenv.h")
+	FixupHeaderCXX("gromacs/fileio/filetypes.h")
+	FixupHeaderCXX("gromacs/fileio/readinp.h")
+	FixupHeaderCXX("gromacs/fileio/warninp.h")
+	FixupHeaderCXX("gromacs/fileio/xvgr.h")
+	FixupHeaderCXX("gromacs/math/vec.h")
+	FixupHeaderCXX("gromacs/pbcutil/pbc.h")
+	FixupHeaderCXX("gromacs/pbcutil/rmpbc.h")
+	FixupHeaderCXX("gromacs/topology/index.h")
+	FixupHeaderCXX("gromacs/utility/arrayref.h")
+	FixupHeaderCXX("gromacs/utility/arraysize.h")
+	FixupHeaderCXX("gromacs/utility/cstringutil.h")
+	FixupHeaderCXX("gromacs/utility/exceptions.h")
+	FixupHeaderCXX("gromacs/utility/fatalerror.h")
+	FixupHeaderCXX("gromacs/utility/futil.h")
+endif()
+##############################################################
+
+
+################## energy2bfac ###############################
+if(HAVE_GROMACS2016)
+	add_executable(energy2bfac GMX2K/energy2bfac.cxx)
+	target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
+elseif(NOT HAVE_GROMACS50 AND NOT HAVE_GROMACS51)
 	add_executable(energy2bfac GMX46/energy2bfac.c)
 	target_link_libraries(energy2bfac ${GROMACS_LIBRARIES})
 else()
